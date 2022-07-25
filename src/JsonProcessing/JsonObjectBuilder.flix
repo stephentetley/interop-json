@@ -44,8 +44,13 @@ namespace JsonProcessing/JsonObjectBuilder {
 
     use JsonProcessing.JsonObjectBuilder;
     use JsonProcessing.JsonObjectBuilder.{JsonObjectBuilder};
+
+    use JsonProcessing.JsonArrayBuilder;
+    use JsonProcessing.JsonArrayBuilder.{JsonArrayBuilder};    
     use JsonProcessing.JsonObject;
     use JsonProcessing.JsonObject.{JsonObject};
+    use JsonProcessing.JsonValue;
+    use JsonProcessing.JsonValue.{JsonValue};
 
     pub def getJsonObjectBuilder(x: JsonObjectBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##javax.json.JsonObjectBuilder, a] = 
         let JsonObjectBuilder(x1) = x;
@@ -53,10 +58,6 @@ namespace JsonProcessing/JsonObjectBuilder {
 
     pub def throwError(msg: String): JsonObjectBuilder[r, ka, a] = 
         JsonObjectBuilder(MonadLib/Builder.throwError(msg))
-
-
-    pub def liftGetter(f: ##javax.json.JsonObjectBuilder -> a & ef): JsonObjectBuilder[r, ka, a] & ef = 
-        JsonObjectBuilder(MonadLib/Builder.liftGetter(f))
     
     pub def liftSetter(f: ##javax.json.JsonObjectBuilder -> ##javax.json.JsonObjectBuilder & ef): JsonObjectBuilder[r, ka, Unit] & ef =
         JsonObjectBuilder(MonadLib/Builder.liftSetter(f))
@@ -70,9 +71,11 @@ namespace JsonProcessing/JsonObjectBuilder {
         MonadLib/Builder.runBuilder(r, getJsonObjectBuilder(ma), s)
 
 
+
+
     /// Must be Impure uses IO...
     pub def createObject(r: Region[r], ma: JsonObjectBuilder[r, a, a]): Result[JsonObject, String] \ { Write(r) } = 
-        import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r as createObjectBuilder;
+        import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r;
         import javax.json.JsonObjectBuilder.build(): ##javax.json.JsonObject & r as build1;
         try {
             let jbuilder = createObjectBuilder();
@@ -87,13 +90,58 @@ namespace JsonProcessing/JsonObjectBuilder {
         }
 
 
+
+
+    pub def addNull(name: String): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.addNull(String): ##javax.json.JsonObjectBuilder & r;
+        liftSetter(x1 -> addNull(x1, name))
+
+    pub def addBool(name: String, value: Bool): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, Bool): ##javax.json.JsonObjectBuilder & r;
+        liftSetter(x1 -> add(x1, name, value))
+
+    pub def addBigInt(name: String, value: BigInt): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, BigInt): ##javax.json.JsonObjectBuilder & r;
+        liftSetter(x1 -> add(x1, name, value))
+
+
+    pub def addFloat64(name: String, value: Float64): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, Float64): ##javax.json.JsonObjectBuilder & r;
+        liftSetter(x1 -> add(x1, name, value))
+
     pub def addInt32(name: String, value: Int32): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
-        import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder & r as add;
+        import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder & r;
         liftSetter(x1 -> add(x1, name, value))
 
 
     pub def addString(name: String, value: String): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
-        import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder & r as add;
+        import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder & r;
         liftSetter(x1 -> add(x1, name, value))
 
+    pub def addJsonValue(name: String, value: JsonValue): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonValue): ##javax.json.JsonObjectBuilder & r;
+        let JsonValue(v1) = value;
+        liftSetter(x1 -> add(x1, name, v1))
+
+
+    pub def addJsonArrayBuilder(name: String, value: JsonArrayBuilder[r, ka, ka]): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonArrayBuilder): ##javax.json.JsonObjectBuilder & r;
+        import static javax.json.Json.createArrayBuilder(): ##javax.json.JsonArrayBuilder & r;
+        let st = createArrayBuilder();
+        match JsonProcessing/JsonArrayBuilder.runBuilder(() as Region[r], value, st) {
+            case Ok(_)    => liftSetter(x1 -> add(x1, name, st))
+            case Err(msg) => throwError(msg)
+        }
+
+    pub def addJsonObjectBuilder(name: String, value: JsonObjectBuilder[r, ka, ka]): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonObjectBuilder): ##javax.json.JsonObjectBuilder & r;
+        import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r;
+        let st = createObjectBuilder();
+        match runBuilder(() as Region[r], value, st) {
+            case Ok(_)    => liftSetter(x1 -> add(x1, name, st))
+            case Err(msg) => throwError(msg)
+        }
+        
+
+        
 }
