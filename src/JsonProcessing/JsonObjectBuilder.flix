@@ -1,0 +1,99 @@
+/*
+ * Copyright 2022 Stephen Tetley
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+namespace JsonProcessing {
+
+    use JsonProcessing/JsonObjectBuilder.{getJsonObjectBuilder};
+
+    pub enum JsonObjectBuilder[r: Region, ka: Type, a: Type](MonadLib.Builder[r, ka, ##javax.json.JsonObjectBuilder, a])
+
+    instance Functor[JsonObjectBuilder[r, ka]] {
+        pub def map(f: a -> b & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef = 
+            JsonObjectBuilder(MonadLib/Builder.map(f, getJsonObjectBuilder(ma)))
+    }
+
+    instance Applicative[JsonObjectBuilder[r, ka]] {
+        pub def point(x: a): JsonObjectBuilder[r, ka, a] = JsonObjectBuilder(MonadLib/Builder.point(x))
+        pub def ap(mf: JsonObjectBuilder[r, ka, a -> b & ef], ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
+            JsonObjectBuilder(MonadLib/Builder.ap(getJsonObjectBuilder(mf), getJsonObjectBuilder(ma)))
+    }
+
+    instance Monad[JsonObjectBuilder[r, ka]] {
+        pub def flatMap(f: a -> JsonObjectBuilder[r, ka, b] & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
+            JsonObjectBuilder(MonadLib/Builder.flatMap(f >> getJsonObjectBuilder, getJsonObjectBuilder(ma)))
+    }
+
+
+}
+
+namespace JsonProcessing/JsonObjectBuilder {
+
+    use JsonProcessing.JsonObjectBuilder;
+    use JsonProcessing.JsonObjectBuilder.{JsonObjectBuilder};
+    use JsonProcessing.JsonObject;
+    use JsonProcessing.JsonObject.{JsonObject};
+
+    pub def getJsonObjectBuilder(x: JsonObjectBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##javax.json.JsonObjectBuilder, a] = 
+        let JsonObjectBuilder(x1) = x;
+        x1
+
+    pub def throwError(msg: String): JsonObjectBuilder[r, ka, a] = 
+        JsonObjectBuilder(MonadLib/Builder.throwError(msg))
+
+
+    pub def liftGetter(f: ##javax.json.JsonObjectBuilder -> a & ef): JsonObjectBuilder[r, ka, a] & ef = 
+        JsonObjectBuilder(MonadLib/Builder.liftGetter(f))
+    
+    pub def liftSetter(f: ##javax.json.JsonObjectBuilder -> ##javax.json.JsonObjectBuilder & ef): JsonObjectBuilder[r, ka, Unit] & ef =
+        JsonObjectBuilder(MonadLib/Builder.liftSetter(f))
+
+    ///
+    /// Returns the result of applying `ma` to the initial state `s`.
+    ///
+    pub def runBuilder(r: Region[r], 
+                        ma: JsonObjectBuilder[r, a, a], 
+                        s: ##javax.json.JsonObjectBuilder): Result[a, String] & r = 
+        MonadLib/Builder.runBuilder(r, getJsonObjectBuilder(ma), s)
+
+
+    /// Must be Impure uses IO...
+    pub def createObject(r: Region[r], ma: JsonObjectBuilder[r, a, a]): Result[JsonObject, String] \ { Write(r) } = 
+        import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r as createObjectBuilder;
+        import javax.json.JsonObjectBuilder.build(): ##javax.json.JsonObject & r as build1;
+        try {
+            let jbuilder = createObjectBuilder();
+            match runBuilder(r, ma, jbuilder) {
+                case Err(msg) => Err(msg)
+                case Ok(_)    => Ok(JsonObject(build1(jbuilder)))
+            }
+        } catch {
+            case ex: ##java.lang.Exception => 
+                import java.lang.Throwable.getMessage(): String & r;
+                Err(getMessage(ex))
+        }
+
+
+    pub def addInt32(name: String, value: Int32): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder & r as add;
+        liftSetter(x1 -> add(x1, name, value))
+
+
+    pub def addString(name: String, value: String): JsonObjectBuilder[r, ka, Unit] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder & r as add;
+        liftSetter(x1 -> add(x1, name, value))
+
+}
