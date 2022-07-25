@@ -28,6 +28,7 @@ namespace JsonProcessing {
 
     instance Applicative[JsonObjectBuilder[r, ka]] {
         pub def point(x: a): JsonObjectBuilder[r, ka, a] = JsonObjectBuilder(MonadLib/Builder.point(x))
+        
         pub def ap(mf: JsonObjectBuilder[r, ka, a -> b & ef], ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
             JsonObjectBuilder(MonadLib/Builder.ap(getJsonObjectBuilder(mf), getJsonObjectBuilder(ma)))
     }

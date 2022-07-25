@@ -80,7 +80,7 @@ namespace MonadLib/Builder {
 
 
     ///
-    /// Returns the result of applying `ma` to the initial state `s`.
+    /// Returns the result of applying `ma` to the state `s`.
     ///
     pub def runBuilder(_: Region[r], 
                         ma: Builder[r, a, st, a], 
@@ -90,8 +90,7 @@ namespace MonadLib/Builder {
         f(s, cont)
 
 
-    pub def point(x: a): Builder[r, ka, st, a] =
-        Builder((_, k) -> k(x))
+    pub def point(x: a): Builder[r, ka, st, a] = Builder((_, k) -> k(x))
 
     pub def map(f: a -> b & ef, ma: Builder[r, ka, st, a]): Builder[r, ka, st, b] & ef =
         Builder((s, k) ->
