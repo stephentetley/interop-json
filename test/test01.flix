@@ -7,7 +7,6 @@ namespace Test01 {
         JsonProcessing/JsonValue.jsonTrue() |> println;
         true
 
-
     @test
     def test02(): Bool & Impure = 
         use Applicative.{*>};
@@ -17,6 +16,7 @@ namespace Test01 {
             JsonProcessing/JsonObjectBuilder.createObject(r, proc()) |> println;
             true
         }
+
     @test
     def test03(): Bool & Impure = 
         use Applicative.{*>};
@@ -26,4 +26,12 @@ namespace Test01 {
             JsonProcessing/JsonObjectBuilder.createObject(r, proc()) |> println;
             true
         }
+
+    @test
+    def test04(): Bool & Impure = 
+        match JsonProcessing/JsonValue.readValue("{ \"number\": 1000, \"string\": \"some_text\" } ") {
+            case Ok(json) => {println("Read: ${json}"); true}
+            case Err(msg) => {println(msg); false}
+        }
+
 }

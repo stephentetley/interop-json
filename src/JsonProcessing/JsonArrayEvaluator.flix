@@ -133,5 +133,14 @@ namespace JsonProcessing/JsonArrayEvaluator {
         let* obj = getJsonArray(ix);
         liftActionResult(_ -> runJsonArrayEvaluator(() as Region[r], ma, obj))
 
+    pub def size(): JsonArrayEvaluator[r, ka, Int32] =
+        import java.util.Collection.size(): Int32 & Pure;
+        liftGetter(x1 -> size(x1 as ##java.util.Collection))
+
+    pub def isEmpty(): JsonArrayEvaluator[r, ka, Bool] =
+        import java.util.Collection.isEmpty(): Bool & Pure;
+        liftGetter(x1 -> isEmpty(x1 as ##java.util.Collection))
+
+
 }
 

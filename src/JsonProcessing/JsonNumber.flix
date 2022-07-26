@@ -23,6 +23,14 @@ namespace JsonProcessing {
         pub def toString(x: JsonNumber): String = JsonProcessing/JsonNumber.toString(x)
     }
 
+    instance Eq[JsonNumber] {
+        pub def eq(x: JsonNumber, y: JsonNumber): Bool = JsonProcessing/JsonNumber.equals(x, y)
+    }
+    
+    instance Hash[JsonNumber] {
+        pub def hash(x: JsonNumber): Int32 = JsonProcessing/JsonNumber.hashCode(x)
+    }
+
 }
 
 namespace JsonProcessing/JsonNumber {
@@ -35,6 +43,79 @@ namespace JsonProcessing/JsonNumber {
         let JsonNumber(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
 
+    pub def equals(x: JsonNumber, y: JsonNumber): Bool =
+        import javax.json.JsonNumber.equals(##java.lang.Object): Bool & Pure;
+        let JsonNumber(x1) = x;
+        let JsonNumber(y1) = y;
+        equals(x1, y1 as ##java.lang.Object)
+
+    pub def hashCode(x: JsonNumber): Int32 =
+        import javax.json.JsonNumber.hashCode(): Int32 & Pure;
+        let JsonNumber(x1) = x;
+        hashCode(x1)
+
+
+    pub def isIntegral(x: JsonNumber): Bool =
+        import javax.json.JsonNumber.isIntegral(): Bool & Pure;
+        let JsonNumber(x1) = x;
+        isIntegral(x1)
+
+    pub def intValue(x: JsonNumber): Int32 =
+        import javax.json.JsonNumber.intValue(): Int32 & Pure;
+        let JsonNumber(x1) = x;
+        intValue(x1)
+
+    pub def intValueExact(x: JsonNumber): Result[Int32, String] =
+        import javax.json.JsonNumber.intValueExact(): Int32 & Pure;
+        try {
+            let JsonNumber(x1) = x;
+            Ok(intValueExact(x1))
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String & Pure;
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def longValue(x: JsonNumber): Int64 =
+        import javax.json.JsonNumber.longValue(): Int64 & Pure;
+        let JsonNumber(x1) = x;
+        longValue(x1)
+
+    pub def longValueExact(x: JsonNumber): Result[Int64, String] =
+        import javax.json.JsonNumber.longValueExact(): Int64 & Pure;
+        try {
+            let JsonNumber(x1) = x;
+            Ok(longValueExact(x1))
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String & Pure;
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def bigIntegerValue(x: JsonNumber): BigInt =
+        import javax.json.JsonNumber.bigIntegerValue(): BigInt & Pure;
+        let JsonNumber(x1) = x;
+        bigIntegerValue(x1)
+
+    pub def bigIntegerValueExact(x: JsonNumber): Result[BigInt, String] =
+        import javax.json.JsonNumber.bigIntegerValueExact(): BigInt & Pure;
+        try {
+            let JsonNumber(x1) = x;
+            Ok(bigIntegerValueExact(x1))
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String & Pure;
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+
+    pub def doubleValue(x: JsonNumber): Float64 =
+        import javax.json.JsonNumber.doubleValue(): Float64 & Pure;
+        let JsonNumber(x1) = x;
+        doubleValue(x1)
 
 
 }
