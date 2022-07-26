@@ -17,25 +17,24 @@
 
 namespace JsonProcessing {
 
-    use JsonProcessing/JsonArrayBuilder.{getJsonArrayBuilder};
 
     pub enum JsonArrayBuilder[r: Region, ka: Type, a: Type](MonadLib.Builder[r, ka, ##javax.json.JsonArrayBuilder, a])
 
     instance Functor[JsonArrayBuilder[r, ka]] {
         pub def map(f: a -> b & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef = 
-            JsonArrayBuilder(MonadLib/Builder.map(f, getJsonArrayBuilder(ma)))
+            JsonProcessing/JsonArrayBuilder.map(f, ma)
     }
 
     instance Applicative[JsonArrayBuilder[r, ka]] {
-        pub def point(x: a): JsonArrayBuilder[r, ka, a] = JsonArrayBuilder(MonadLib/Builder.point(x))
+        pub def point(x: a): JsonArrayBuilder[r, ka, a] = JsonProcessing/JsonArrayBuilder.point(x)
         
         pub def ap(mf: JsonArrayBuilder[r, ka, a -> b & ef], ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
-            JsonArrayBuilder(MonadLib/Builder.ap(getJsonArrayBuilder(mf), getJsonArrayBuilder(ma)))
+            JsonProcessing/JsonArrayBuilder.ap(mf, ma)
     }
 
     instance Monad[JsonArrayBuilder[r, ka]] {
         pub def flatMap(f: a -> JsonArrayBuilder[r, ka, b] & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
-            JsonArrayBuilder(MonadLib/Builder.flatMap(f >> getJsonArrayBuilder, getJsonArrayBuilder(ma)))
+            JsonProcessing/JsonArrayBuilder.flatMap(f, ma)
     }
 
 
@@ -55,6 +54,18 @@ namespace JsonProcessing/JsonArrayBuilder {
     pub def getJsonArrayBuilder(x: JsonArrayBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##javax.json.JsonArrayBuilder, a] = 
         let JsonArrayBuilder(x1) = x;
         x1
+
+    pub def map(f: a -> b & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef = 
+        JsonArrayBuilder(MonadLib/Builder.map(f, getJsonArrayBuilder(ma)))
+
+    pub def point(x: a): JsonArrayBuilder[r, ka, a] = JsonArrayBuilder(MonadLib/Builder.point(x))
+    
+    pub def ap(mf: JsonArrayBuilder[r, ka, a -> b & ef], ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
+        JsonArrayBuilder(MonadLib/Builder.ap(getJsonArrayBuilder(mf), getJsonArrayBuilder(ma)))
+
+    pub def flatMap(f: a -> JsonArrayBuilder[r, ka, b] & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
+        JsonArrayBuilder(MonadLib/Builder.flatMap(f >> getJsonArrayBuilder, getJsonArrayBuilder(ma)))
+
 
     pub def throwError(msg: String): JsonArrayBuilder[r, ka, a] = 
         JsonArrayBuilder(MonadLib/Builder.throwError(msg))

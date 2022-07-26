@@ -17,25 +17,23 @@
 
 namespace JsonProcessing {
 
-    use JsonProcessing/JsonObjectBuilder.{getJsonObjectBuilder};
-
     pub enum JsonObjectBuilder[r: Region, ka: Type, a: Type](MonadLib.Builder[r, ka, ##javax.json.JsonObjectBuilder, a])
 
     instance Functor[JsonObjectBuilder[r, ka]] {
         pub def map(f: a -> b & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef = 
-            JsonObjectBuilder(MonadLib/Builder.map(f, getJsonObjectBuilder(ma)))
+            JsonProcessing/JsonObjectBuilder.map(f, ma)
     }
 
     instance Applicative[JsonObjectBuilder[r, ka]] {
-        pub def point(x: a): JsonObjectBuilder[r, ka, a] = JsonObjectBuilder(MonadLib/Builder.point(x))
+        pub def point(x: a): JsonObjectBuilder[r, ka, a] = JsonProcessing/JsonObjectBuilder.point(x)
         
         pub def ap(mf: JsonObjectBuilder[r, ka, a -> b & ef], ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
-            JsonObjectBuilder(MonadLib/Builder.ap(getJsonObjectBuilder(mf), getJsonObjectBuilder(ma)))
+            JsonProcessing/JsonObjectBuilder.ap(mf, ma)
     }
 
     instance Monad[JsonObjectBuilder[r, ka]] {
         pub def flatMap(f: a -> JsonObjectBuilder[r, ka, b] & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
-            JsonObjectBuilder(MonadLib/Builder.flatMap(f >> getJsonObjectBuilder, getJsonObjectBuilder(ma)))
+            JsonProcessing/JsonObjectBuilder.flatMap(f, ma)
     }
 
 
@@ -56,6 +54,18 @@ namespace JsonProcessing/JsonObjectBuilder {
     pub def getJsonObjectBuilder(x: JsonObjectBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##javax.json.JsonObjectBuilder, a] = 
         let JsonObjectBuilder(x1) = x;
         x1
+
+    pub def point(x: a): JsonObjectBuilder[r, ka, a] = JsonObjectBuilder(MonadLib/Builder.point(x))
+    
+    pub def map(f: a -> b & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef = 
+        JsonObjectBuilder(MonadLib/Builder.map(f, getJsonObjectBuilder(ma)))
+
+    pub def ap(mf: JsonObjectBuilder[r, ka, a -> b & ef], ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
+        JsonObjectBuilder(MonadLib/Builder.ap(getJsonObjectBuilder(mf), getJsonObjectBuilder(ma)))
+        
+    pub def flatMap(f: a -> JsonObjectBuilder[r, ka, b] & ef, ma: JsonObjectBuilder[r, ka, a]): JsonObjectBuilder[r, ka, b] & ef =
+        JsonObjectBuilder(MonadLib/Builder.flatMap(f >> getJsonObjectBuilder, getJsonObjectBuilder(ma)))
+
 
     pub def throwError(msg: String): JsonObjectBuilder[r, ka, a] = 
         JsonObjectBuilder(MonadLib/Builder.throwError(msg))

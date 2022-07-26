@@ -16,26 +16,24 @@
 
 namespace JsonProcessing {
 
-    use JsonProcessing/JsonObjectEvaluator.{getJsonObjectEvaluator};
-
     pub enum JsonObjectEvaluator[r: Region, ka: Type, a: Type](MonadLib.Evaluator[r, ka, ##javax.json.JsonObject, a])
         
 
     instance Functor[JsonObjectEvaluator[r, ka]] {
         pub def map(f: a -> b & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef = 
-            JsonObjectEvaluator(MonadLib/Evaluator.map(f, getJsonObjectEvaluator(ma)))
+            JsonProcessing/JsonObjectEvaluator.map(f, ma)
     }
 
     instance Applicative[JsonObjectEvaluator[r, ka]] {
-        pub def point(x: a): JsonObjectEvaluator[r, ka, a] = JsonObjectEvaluator(MonadLib/Evaluator.point(x))
+        pub def point(x: a): JsonObjectEvaluator[r, ka, a] = JsonProcessing/JsonObjectEvaluator.point(x)
 
         pub def ap(mf: JsonObjectEvaluator[r, ka, a -> b & ef], ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
-            JsonObjectEvaluator(MonadLib/Evaluator.ap(getJsonObjectEvaluator(mf), getJsonObjectEvaluator(ma)))
+            JsonProcessing/JsonObjectEvaluator.ap(mf, ma)
     }
 
     instance Monad[JsonObjectEvaluator[r, ka]] {
         pub def flatMap(f: a -> JsonObjectEvaluator[r, ka, b] & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
-            JsonObjectEvaluator(MonadLib/Evaluator.flatMap(f >> getJsonObjectEvaluator, getJsonObjectEvaluator(ma)))
+            JsonProcessing/JsonObjectEvaluator.flatMap(f, ma)
     }
 
 }
@@ -44,6 +42,26 @@ namespace JsonProcessing/JsonObjectEvaluator {
 
     use JsonProcessing.JsonObjectEvaluator;
     use JsonProcessing.JsonObjectEvaluator.{JsonObjectEvaluator};
+
+    use JsonProcessing.JsonArray;
+    use JsonProcessing.JsonArray.{JsonArray};
+    use JsonProcessing.JsonNumber;
+    use JsonProcessing.JsonNumber.{JsonNumber};
+    use JsonProcessing.JsonObject;
+    use JsonProcessing.JsonObject.{JsonObject};
+
+    pub def point(x: a): JsonObjectEvaluator[r, ka, a] = JsonObjectEvaluator(MonadLib/Evaluator.point(x))
+
+            
+    pub def map(f: a -> b & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef = 
+        JsonObjectEvaluator(MonadLib/Evaluator.map(f, getJsonObjectEvaluator(ma)))
+
+    pub def ap(mf: JsonObjectEvaluator[r, ka, a -> b & ef], ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
+        JsonObjectEvaluator(MonadLib/Evaluator.ap(getJsonObjectEvaluator(mf), getJsonObjectEvaluator(ma)))
+
+    pub def flatMap(f: a -> JsonObjectEvaluator[r, ka, b] & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
+        JsonObjectEvaluator(MonadLib/Evaluator.flatMap(f >> getJsonObjectEvaluator, getJsonObjectEvaluator(ma)))
+
 
     pub def getJsonObjectEvaluator(x: JsonObjectEvaluator[r, ka, a]): MonadLib.Evaluator[r, ka, ##javax.json.JsonObject, a] = 
         let JsonObjectEvaluator(x1) = x;
@@ -56,9 +74,45 @@ namespace JsonProcessing/JsonObjectEvaluator {
         JsonObjectEvaluator(MonadLib/Evaluator.liftGetter(f))
 
 
+    pub def getBool(name: String): JsonObjectEvaluator[r, ka, Bool] =
+        import javax.json.JsonObject.getBoolean(String): Bool & Pure;
+        liftGetter(x1 -> getBoolean(x1, name))
+
+    pub def getBoolWithDefault(name: String, defaultVal: Bool): JsonObjectEvaluator[r, ka, Bool] =
+        import javax.json.JsonObject.getBoolean(String, Bool): Bool & Pure;
+        liftGetter(x1 -> getBoolean(x1, name, defaultVal))
+
     pub def getInt32(name: String): JsonObjectEvaluator[r, ka, Int32] =
         import javax.json.JsonObject.getInt(String): Int32 & Pure;
         liftGetter(x1 -> getInt(x1, name))
+    
+    pub def getInt32WithDefault(name: String, defaultVal: Int32): JsonObjectEvaluator[r, ka, Int32] =
+        import javax.json.JsonObject.getInt(String, Int32): Int32 & Pure;
+        liftGetter(x1 -> getInt(x1, name, defaultVal))
+
+    pub def getJsonArray(name: String): JsonObjectEvaluator[r, ka, JsonArray] =
+        import javax.json.JsonObject.getJsonArray(String): ##javax.json.JsonArray & Pure;
+        liftGetter(x1 -> getJsonArray(x1, name)) |> map(JsonArray)
+
+    pub def getJsonNumber(name: String): JsonObjectEvaluator[r, ka, JsonNumber] =
+        import javax.json.JsonObject.getJsonNumber(String): ##javax.json.JsonNumber & Pure;
+        liftGetter(x1 -> getJsonNumber(x1, name)) |> map(JsonNumber)
+
+    pub def getJsonObject(name: String): JsonObjectEvaluator[r, ka, JsonObject] =
+        import javax.json.JsonObject.getJsonObject(String): ##javax.json.JsonObject & Pure;
+        liftGetter(x1 -> getJsonObject(x1, name)) |> map(JsonObject)        
+
+    pub def getString(name: String): JsonObjectEvaluator[r, ka, String] =
+        import javax.json.JsonObject.getString(String): String & Pure;
+        liftGetter(x1 -> getString(x1, name))
+    
+    pub def getStringWithDefault(name: String, defaultVal: String): JsonObjectEvaluator[r, ka, String] =
+        import javax.json.JsonObject.getString(String, String): String & Pure;
+        liftGetter(x1 -> getString(x1, name, defaultVal))
+
+    pub def isNull(name: String): JsonObjectEvaluator[r, ka, Bool] =
+        import javax.json.JsonObject.isNull(String): Bool & Pure;
+        liftGetter(x1 -> isNull(x1, name))
 
 }
 
