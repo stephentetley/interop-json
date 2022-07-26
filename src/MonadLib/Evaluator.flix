@@ -118,7 +118,13 @@ namespace MonadLib/Evaluator {
             }            
         ) as & ef
 
-
+    pub def liftActionResult(f: Unit -> Result[a, String] & ef): Evaluator[r, ka, st, a] & ef = 
+        Evaluator((_, k) ->
+            match {f() as & r} {
+                case Err(msg) => Err(msg)
+                case Ok(a)    => k(a)
+            }
+        ) as & ef
 
 }
 

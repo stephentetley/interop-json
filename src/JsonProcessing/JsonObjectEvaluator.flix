@@ -45,10 +45,17 @@ namespace JsonProcessing/JsonObjectEvaluator {
 
     use JsonProcessing.JsonArray;
     use JsonProcessing.JsonArray.{JsonArray};
+    use JsonProcessing.JsonArrayEvaluator;
     use JsonProcessing.JsonNumber;
     use JsonProcessing.JsonNumber.{JsonNumber};
     use JsonProcessing.JsonObject;
     use JsonProcessing.JsonObject.{JsonObject};
+
+    pub def runJsonObjectEvaluator(r: Region[r], 
+                                    ma: JsonObjectEvaluator[r, a, a], 
+                                    obj: JsonObject): Result[a, String] & r =
+        let JsonObject(obj1) = obj;
+        MonadLib/Evaluator.runEvaluator(r, getJsonObjectEvaluator(ma), obj1)
 
     pub def point(x: a): JsonObjectEvaluator[r, ka, a] = JsonObjectEvaluator(MonadLib/Evaluator.point(x))
 
@@ -70,9 +77,11 @@ namespace JsonProcessing/JsonObjectEvaluator {
     pub def throwError(msg: String): JsonObjectEvaluator[r, ka, a] = 
         JsonObjectEvaluator(MonadLib/Evaluator.throwError(msg))
     
-    pub def liftGetter(f: ##javax.json.JsonObject -> a & ef): JsonObjectEvaluator[r, ka, a] & ef =
+    def liftGetter(f: ##javax.json.JsonObject -> a & ef): JsonObjectEvaluator[r, ka, a] & ef =
         JsonObjectEvaluator(MonadLib/Evaluator.liftGetter(f))
 
+    def liftActionResult(f: Unit -> Result[a, String] & ef): JsonObjectEvaluator[r, ka, a] & ef =          
+        JsonObjectEvaluator(MonadLib/Evaluator.liftActionResult(f))
 
     pub def getBool(name: String): JsonObjectEvaluator[r, ka, Bool] =
         import javax.json.JsonObject.getBoolean(String): Bool & Pure;
@@ -113,6 +122,14 @@ namespace JsonProcessing/JsonObjectEvaluator {
     pub def isNull(name: String): JsonObjectEvaluator[r, ka, Bool] =
         import javax.json.JsonObject.isNull(String): Bool & Pure;
         liftGetter(x1 -> isNull(x1, name))
+
+    pub def evalJsonObject(name: String, ma: JsonObjectEvaluator[r, a, a]): JsonObjectEvaluator[r, ka, a] & r =
+        let* obj = getJsonObject(name);
+        liftActionResult(_ -> runJsonObjectEvaluator(() as Region[r], ma, obj))
+        
+    pub def evalJsonArray(name: String, ma: JsonArrayEvaluator[r, a, a]): JsonObjectEvaluator[r, ka, a] & r =
+        let* obj = getJsonArray(name);
+        liftActionResult(_ -> JsonProcessing/JsonArrayEvaluator.runJsonArrayEvaluator(() as Region[r], ma, obj))
 
 }
 
