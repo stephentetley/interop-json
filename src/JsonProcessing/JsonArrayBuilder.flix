@@ -151,6 +151,6 @@ namespace JsonProcessing/JsonArrayBuilder {
             case Err(msg) => throwError(msg)
         }
         
-
+    // TODO EE8 has set and remove methods...
         
 }
