@@ -19,6 +19,9 @@ namespace JsonProcessing {
 
     pub enum JsonPatch(##javax.json.JsonPatch)
 
+    instance ToString[JsonPatch] {
+        pub def toString(x: JsonPatch): String = JsonProcessing/JsonPatch.toJsonArray(x) |> ToString.toString
+    }
 
 }
 
@@ -85,6 +88,19 @@ namespace JsonProcessing/JsonPatch {
         import javax.json.JsonPatch.toJsonArray(): ##javax.json.JsonArray & Pure;
         let JsonPatch(x1) = x;
         JsonArray(toJsonArray(x1))
+
+    pub def createJsonObjectDiff(src: JsonObject, dst: JsonObject): JsonPatch = 
+        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch & Pure;
+        let JsonObject(src1) = src;
+        let JsonObject(dst1) = dst;
+        JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
+
+    pub def createJsonArrayDiff(src: JsonArray, dst: JsonArray): JsonPatch = 
+        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch & Pure;
+        let JsonArray(src1) = src;
+        let JsonArray(dst1) = dst;
+        JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
+
 
     pub def applyToJsonObject(x: JsonPatch, o: JsonObject): Result[JsonObject, String] =
         import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure & Pure;

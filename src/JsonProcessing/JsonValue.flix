@@ -127,4 +127,7 @@ namespace JsonProcessing/JsonValue {
             }
         }
     }
+
+    pub def readFile(path: String): Result[JsonValue, String] & Impure = 
+        File.read(path) |> Result.flatMap(readValue)
 }

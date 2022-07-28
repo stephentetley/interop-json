@@ -35,22 +35,28 @@ namespace JsonProcessing/JsonObject {
         let JsonObject(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
 
+
+    pub def readObject(src: String): Result[JsonObject, String] = region r {
+        import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;
+        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader & r;
+        import javax.json.JsonReader.readObject(): ##javax.json.JsonObject & r;
+        import javax.json.JsonReader.close(): Unit & r;
+        try {
+            let _ = [] @ r;
+            let strReader = newStringReader(src);
+            let jsonReader = createReader(strReader as ##java.io.Reader);
+            let ans = readObject(jsonReader);
+            close(jsonReader);
+            Ok(JsonObject(ans))
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String & Pure;
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+    }
+
+    pub def readFile(path: String): Result[JsonObject, String] & Impure = 
+        File.read(path) |> Result.flatMap(readObject)
         
-    /// pub def getValueType(x: JsonValue): ValueType =
-    ///     import javax.json.JsonValue.getValueType(): ##javax.json.JsonValue$ValueType & Pure;
-    ///     let JsonValue(x1) = x;
-    ///     getValueType(x1) |> unmarshal
-
-    /// pub def jsonFalse(): JsonValue = 
-    ///     import static get javax.json.JsonValue.FALSE: ##javax.json.JsonValue & Pure as get_FALSE;
-    ///     JsonValue(get_FALSE())
-
-    /// pub def jsonTrue(): JsonValue = 
-    ///     import static get javax.json.JsonValue.TRUE: ##javax.json.JsonValue & Pure as get_TRUE;
-    ///     JsonValue(get_TRUE())
-    
-    /// pub def jsonNull(): JsonValue = 
-    ///     import static get javax.json.JsonValue.NULL: ##javax.json.JsonValue & Pure as get_NULL;
-    ///     JsonValue(get_NULL())
-
 }
