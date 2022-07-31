@@ -15,41 +15,41 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
 
     pub enum JsonArrayBuilder[r: Region, ka: Type, a: Type](MonadLib.Builder[r, ka, ##javax.json.JsonArrayBuilder, a])
 
     instance Functor[JsonArrayBuilder[r, ka]] {
         pub def map(f: a -> b & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef = 
-            JsonProcessing/JsonArrayBuilder.map(f, ma)
+            Interop/Json/JsonArrayBuilder.map(f, ma)
     }
 
     instance Applicative[JsonArrayBuilder[r, ka]] {
-        pub def point(x: a): JsonArrayBuilder[r, ka, a] = JsonProcessing/JsonArrayBuilder.point(x)
+        pub def point(x: a): JsonArrayBuilder[r, ka, a] = Interop/Json/JsonArrayBuilder.point(x)
         
         pub def ap(mf: JsonArrayBuilder[r, ka, a -> b & ef], ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
-            JsonProcessing/JsonArrayBuilder.ap(mf, ma)
+            Interop/Json/JsonArrayBuilder.ap(mf, ma)
     }
 
     instance Monad[JsonArrayBuilder[r, ka]] {
         pub def flatMap(f: a -> JsonArrayBuilder[r, ka, b] & ef, ma: JsonArrayBuilder[r, ka, a]): JsonArrayBuilder[r, ka, b] & ef =
-            JsonProcessing/JsonArrayBuilder.flatMap(f, ma)
+            Interop/Json/JsonArrayBuilder.flatMap(f, ma)
     }
 
 
 }
 
-namespace JsonProcessing/JsonArrayBuilder {
+namespace Interop/Json/JsonArrayBuilder {
 
-    use JsonProcessing.JsonArrayBuilder;
-    use JsonProcessing.JsonArrayBuilder.{JsonArrayBuilder};
-    use JsonProcessing.JsonArray;
-    use JsonProcessing.JsonArray.{JsonArray};
-    use JsonProcessing.JsonObjectBuilder;
-    use JsonProcessing.JsonObjectBuilder.{JsonObjectBuilder};    
-    use JsonProcessing.JsonValue;
-    use JsonProcessing.JsonValue.{JsonValue};
+    use Interop/Json.JsonArrayBuilder;
+    use Interop/Json.JsonArrayBuilder.{JsonArrayBuilder};
+    use Interop/Json.JsonArray;
+    use Interop/Json.JsonArray.{JsonArray};
+    use Interop/Json.JsonObjectBuilder;
+    use Interop/Json.JsonObjectBuilder.{JsonObjectBuilder};    
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
 
     pub def getJsonArrayBuilder(x: JsonArrayBuilder[r, ka, a]): MonadLib.Builder[r, ka, ##javax.json.JsonArrayBuilder, a] = 
         let JsonArrayBuilder(x1) = x;
@@ -146,7 +146,7 @@ namespace JsonProcessing/JsonArrayBuilder {
         import javax.json.JsonArrayBuilder.add(##javax.json.JsonObjectBuilder): ##javax.json.JsonArrayBuilder & r;
         import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r;
         let st = createObjectBuilder();
-        match JsonProcessing/JsonObjectBuilder.runBuilder(() as Region[r], value, st) {
+        match Interop/Json/JsonObjectBuilder.runBuilder(() as Region[r], value, st) {
             case Ok(_)    => liftSetter(x1 -> add(x1, st))
             case Err(msg) => throwError(msg)
         }

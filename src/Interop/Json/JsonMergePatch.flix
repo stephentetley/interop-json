@@ -15,20 +15,20 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
     pub enum JsonMergePatch(##javax.json.JsonMergePatch)
 
 
 }
 
-namespace JsonProcessing/JsonMergePatch {
+namespace Interop/Json/JsonMergePatch {
 
-    use JsonProcessing.JsonMergePatch;
-    use JsonProcessing.JsonMergePatch.{JsonMergePatch};
+    use Interop/Json.JsonMergePatch;
+    use Interop/Json.JsonMergePatch.{JsonMergePatch};
 
-    use JsonProcessing.JsonValue;
-    use JsonProcessing.JsonValue.{JsonValue};
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
 
     pub def createMergeDiff(src: JsonValue, dst: JsonValue): JsonMergePatch = 
         import static javax.json.Json.createMergeDiff(##javax.json.JsonValue, ##javax.json.JsonValue): ##javax.json.JsonMergePatch & Pure;

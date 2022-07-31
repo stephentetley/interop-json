@@ -15,28 +15,28 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
     pub enum JsonNumber(##javax.json.JsonNumber)
 
     instance ToString[JsonNumber] {
-        pub def toString(x: JsonNumber): String = JsonProcessing/JsonNumber.toString(x)
+        pub def toString(x: JsonNumber): String = Interop/Json/JsonNumber.toString(x)
     }
 
     instance Eq[JsonNumber] {
-        pub def eq(x: JsonNumber, y: JsonNumber): Bool = JsonProcessing/JsonNumber.equals(x, y)
+        pub def eq(x: JsonNumber, y: JsonNumber): Bool = Interop/Json/JsonNumber.equals(x, y)
     }
     
     instance Hash[JsonNumber] {
-        pub def hash(x: JsonNumber): Int32 = JsonProcessing/JsonNumber.hashCode(x)
+        pub def hash(x: JsonNumber): Int32 = Interop/Json/JsonNumber.hashCode(x)
     }
 
 }
 
-namespace JsonProcessing/JsonNumber {
+namespace Interop/Json/JsonNumber {
 
-    use JsonProcessing.JsonNumber;
-    use JsonProcessing.JsonNumber.{JsonNumber};
+    use Interop/Json.JsonNumber;
+    use Interop/Json.JsonNumber.{JsonNumber};
 
     pub def toString(x: JsonNumber): String =
         import javax.json.JsonValue.toString(): String & Pure;

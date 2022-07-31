@@ -15,25 +15,25 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
     pub enum JsonPatch(##javax.json.JsonPatch)
 
     instance ToString[JsonPatch] {
-        pub def toString(x: JsonPatch): String = JsonProcessing/JsonPatch.toJsonArray(x) |> ToString.toString
+        pub def toString(x: JsonPatch): String = Interop/Json/JsonPatch.toJsonArray(x) |> ToString.toString
     }
 
 }
 
-namespace JsonProcessing/JsonPatch {
+namespace Interop/Json/JsonPatch {
 
-    use JsonProcessing.JsonPatch;
-    use JsonProcessing.JsonPatch.{JsonPatch};
+    use Interop/Json.JsonPatch;
+    use Interop/Json.JsonPatch.{JsonPatch};
 
-    use JsonProcessing.JsonArray;
-    use JsonProcessing.JsonArray.{JsonArray};
-    use JsonProcessing.JsonObject;
-    use JsonProcessing.JsonObject.{JsonObject};
+    use Interop/Json.JsonArray;
+    use Interop/Json.JsonArray.{JsonArray};
+    use Interop/Json.JsonObject;
+    use Interop/Json.JsonObject.{JsonObject};
 
     pub enum Operation with Eq, Order, ToString, Hash, Boxable {
         case Add

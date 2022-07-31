@@ -14,42 +14,42 @@
  * limitations under the License.
  */
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
     pub enum JsonObjectEvaluator[r: Region, ka: Type, a: Type](MonadLib.Evaluator[r, ka, ##javax.json.JsonObject, a])
         
 
     instance Functor[JsonObjectEvaluator[r, ka]] {
         pub def map(f: a -> b & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef = 
-            JsonProcessing/JsonObjectEvaluator.map(f, ma)
+            Interop/Json/JsonObjectEvaluator.map(f, ma)
     }
 
     instance Applicative[JsonObjectEvaluator[r, ka]] {
-        pub def point(x: a): JsonObjectEvaluator[r, ka, a] = JsonProcessing/JsonObjectEvaluator.point(x)
+        pub def point(x: a): JsonObjectEvaluator[r, ka, a] = Interop/Json/JsonObjectEvaluator.point(x)
 
         pub def ap(mf: JsonObjectEvaluator[r, ka, a -> b & ef], ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
-            JsonProcessing/JsonObjectEvaluator.ap(mf, ma)
+            Interop/Json/JsonObjectEvaluator.ap(mf, ma)
     }
 
     instance Monad[JsonObjectEvaluator[r, ka]] {
         pub def flatMap(f: a -> JsonObjectEvaluator[r, ka, b] & ef, ma: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, b] & ef =
-            JsonProcessing/JsonObjectEvaluator.flatMap(f, ma)
+            Interop/Json/JsonObjectEvaluator.flatMap(f, ma)
     }
 
 }
 
-namespace JsonProcessing/JsonObjectEvaluator {
+namespace Interop/Json/JsonObjectEvaluator {
 
-    use JsonProcessing.JsonObjectEvaluator;
-    use JsonProcessing.JsonObjectEvaluator.{JsonObjectEvaluator};
+    use Interop/Json.JsonObjectEvaluator;
+    use Interop/Json.JsonObjectEvaluator.{JsonObjectEvaluator};
 
-    use JsonProcessing.JsonArray;
-    use JsonProcessing.JsonArray.{JsonArray};
-    use JsonProcessing.JsonArrayEvaluator;
-    use JsonProcessing.JsonNumber;
-    use JsonProcessing.JsonNumber.{JsonNumber};
-    use JsonProcessing.JsonObject;
-    use JsonProcessing.JsonObject.{JsonObject};
+    use Interop/Json.JsonArray;
+    use Interop/Json.JsonArray.{JsonArray};
+    use Interop/Json.JsonArrayEvaluator;
+    use Interop/Json.JsonNumber;
+    use Interop/Json.JsonNumber.{JsonNumber};
+    use Interop/Json.JsonObject;
+    use Interop/Json.JsonObject.{JsonObject};
 
     pub def runJsonObjectEvaluator(r: Region[r], 
                                     ma: JsonObjectEvaluator[r, a, a], 
@@ -129,7 +129,7 @@ namespace JsonProcessing/JsonObjectEvaluator {
         
     pub def evalJsonArray(name: String, ma: JsonArrayEvaluator[r, a, a]): JsonObjectEvaluator[r, ka, a] & r =
         let* obj = getJsonArray(name);
-        liftActionResult(_ -> JsonProcessing/JsonArrayEvaluator.runJsonArrayEvaluator(() as Region[r], ma, obj))
+        liftActionResult(_ -> Interop/Json/JsonArrayEvaluator.runJsonArrayEvaluator(() as Region[r], ma, obj))
 
 
     pub def size(): JsonObjectEvaluator[r, ka, Int32] =

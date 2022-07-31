@@ -15,39 +15,39 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
-    pub enum JsonArray(##javax.json.JsonArray)
+    pub enum JsonObject(##javax.json.JsonObject)
 
-    instance ToString[JsonArray] {
-        pub def toString(x: JsonArray): String = JsonProcessing/JsonArray.toString(x)
+    instance ToString[JsonObject] {
+        pub def toString(x: JsonObject): String = Interop/Json/JsonObject.toString(x)
     }
 
 }
 
-namespace JsonProcessing/JsonArray {
+namespace Interop/Json/JsonObject {
 
-    use JsonProcessing.JsonArray;
-    use JsonProcessing.JsonArray.{JsonArray};
+    use Interop/Json.JsonObject;
+    use Interop/Json.JsonObject.{JsonObject};
 
-    pub def toString(x: JsonArray): String =
+    pub def toString(x: JsonObject): String =
         import javax.json.JsonValue.toString(): String & Pure;
-        let JsonArray(x1) = x;
+        let JsonObject(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
 
 
-    pub def readArray(src: String): Result[JsonArray, String] = region r {
+    pub def readObject(src: String): Result[JsonObject, String] = region r {
         import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;
         import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader & r;
-        import javax.json.JsonReader.readArray(): ##javax.json.JsonArray & r;
+        import javax.json.JsonReader.readObject(): ##javax.json.JsonObject & r;
         import javax.json.JsonReader.close(): Unit & r;
         try {
             let _ = [] @ r;
             let strReader = newStringReader(src);
             let jsonReader = createReader(strReader as ##java.io.Reader);
-            let ans = readArray(jsonReader);
+            let ans = readObject(jsonReader);
             close(jsonReader);
-            Ok(JsonArray(ans))
+            Ok(JsonObject(ans))
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String & Pure;
@@ -56,6 +56,7 @@ namespace JsonProcessing/JsonArray {
         }
     }
 
-    pub def readFile(path: String): Result[JsonArray, String] & Impure = 
-        File.read(path) |> Result.flatMap(readArray)
+    pub def readFile(path: String): Result[JsonObject, String] & Impure = 
+        File.read(path) |> Result.flatMap(readObject)
+        
 }

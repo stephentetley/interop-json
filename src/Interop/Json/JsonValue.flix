@@ -15,20 +15,20 @@
  */
 
 
-namespace JsonProcessing {
+namespace Interop/Json {
 
     pub enum JsonValue(##javax.json.JsonValue)
 
     instance ToString[JsonValue] {
-        pub def toString(x: JsonValue): String = JsonProcessing/JsonValue.toString(x)
+        pub def toString(x: JsonValue): String = Interop/Json/JsonValue.toString(x)
     }
 
 }
 
-namespace JsonProcessing/JsonValue {
+namespace Interop/Json/JsonValue {
 
-    use JsonProcessing.JsonValue;
-    use JsonProcessing.JsonValue.{JsonValue};
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
 
     pub enum ValueType with Eq, Order, ToString, Hash, Boxable {
         case JsArray
