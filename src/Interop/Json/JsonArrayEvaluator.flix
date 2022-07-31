@@ -35,6 +35,15 @@ namespace Interop/Json {
         pub def flatMap(f: a -> JsonArrayEvaluator[r, ka, b] & ef, ma: JsonArrayEvaluator[r, ka, a]): JsonArrayEvaluator[r, ka, b] & ef =
             Interop/Json/JsonArrayEvaluator.flatMap(f, ma)
     }
+    
+    instance MonadZero[JsonArrayEvaluator[r, ka]] {
+        pub def empty(): JsonArrayEvaluator[r, ka, a] = Interop/Json/JsonArrayEvaluator.empty()
+    }
+    
+    instance MonadLib.MonadOr[JsonArrayEvaluator[r, ka]] {
+        pub def orelse(a: JsonArrayEvaluator[r, ka, a], b: JsonArrayEvaluator[r, ka, a]): JsonArrayEvaluator[r, ka, a] =
+            Interop/Json/JsonArrayEvaluator.orelse(a, b)
+    }
 
 }
 
@@ -78,6 +87,11 @@ namespace Interop/Json/JsonArrayEvaluator {
     pub def throwError(msg: String): JsonArrayEvaluator[r, ka, a] = 
         JsonArrayEvaluator(MonadLib/Evaluator.throwError(msg))
     
+    pub def empty(): JsonArrayEvaluator[r, ka, a] = JsonArrayEvaluator(MonadLib/Evaluator.empty())
+        
+    pub def orelse(ma: JsonArrayEvaluator[r, ka, a], mb: JsonArrayEvaluator[r, ka, a]): JsonArrayEvaluator[r, ka, a] =
+        JsonArrayEvaluator(MonadLib/Evaluator.orelse(getJsonArrayEvaluator(ma), getJsonArrayEvaluator(mb)))
+
     def liftGetter(f: ##javax.json.JsonArray -> a & ef): JsonArrayEvaluator[r, ka, a] & ef =
         JsonArrayEvaluator(MonadLib/Evaluator.liftGetter(f))
 

@@ -36,6 +36,16 @@ namespace Interop/Json {
             Interop/Json/JsonObjectEvaluator.flatMap(f, ma)
     }
 
+    instance MonadZero[JsonObjectEvaluator[r, ka]] {
+        pub def empty(): JsonObjectEvaluator[r, ka, a] = Interop/Json/JsonObjectEvaluator.empty()
+    }
+    
+    instance MonadLib.MonadOr[JsonObjectEvaluator[r, ka]] {
+        pub def orelse(a: JsonObjectEvaluator[r, ka, a], b: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, a] =
+            Interop/Json/JsonObjectEvaluator.orelse(a, b)
+    }
+
+
 }
 
 namespace Interop/Json/JsonObjectEvaluator {
@@ -50,6 +60,11 @@ namespace Interop/Json/JsonObjectEvaluator {
     use Interop/Json.JsonNumber.{JsonNumber};
     use Interop/Json.JsonObject;
     use Interop/Json.JsonObject.{JsonObject};
+
+
+    pub def getJsonObjectEvaluator(x: JsonObjectEvaluator[r, ka, a]): MonadLib.Evaluator[r, ka, ##javax.json.JsonObject, a] = 
+        let JsonObjectEvaluator(x1) = x;
+        x1
 
     pub def runJsonObjectEvaluator(r: Region[r], 
                                     ma: JsonObjectEvaluator[r, a, a], 
@@ -70,13 +85,16 @@ namespace Interop/Json/JsonObjectEvaluator {
         JsonObjectEvaluator(MonadLib/Evaluator.flatMap(f >> getJsonObjectEvaluator, getJsonObjectEvaluator(ma)))
 
 
-    pub def getJsonObjectEvaluator(x: JsonObjectEvaluator[r, ka, a]): MonadLib.Evaluator[r, ka, ##javax.json.JsonObject, a] = 
-        let JsonObjectEvaluator(x1) = x;
-        x1
-
     pub def throwError(msg: String): JsonObjectEvaluator[r, ka, a] = 
         JsonObjectEvaluator(MonadLib/Evaluator.throwError(msg))
     
+    pub def empty(): JsonObjectEvaluator[r, ka, a] = JsonObjectEvaluator(MonadLib/Evaluator.empty())
+        
+
+    pub def orelse(ma: JsonObjectEvaluator[r, ka, a], mb: JsonObjectEvaluator[r, ka, a]): JsonObjectEvaluator[r, ka, a] =
+        JsonObjectEvaluator(MonadLib/Evaluator.orelse(getJsonObjectEvaluator(ma), getJsonObjectEvaluator(mb)))
+
+
     def liftGetter(f: ##javax.json.JsonObject -> a & ef): JsonObjectEvaluator[r, ka, a] & ef =
         JsonObjectEvaluator(MonadLib/Evaluator.liftGetter(f))
 
