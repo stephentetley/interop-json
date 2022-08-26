@@ -17,10 +17,35 @@
 
 namespace Interop/Json {
 
+    use Interop/Json.JsonStructure;
+    use Interop/Json.JsonStructure.{JsonStructure};
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
+
     pub enum JsonArray(##javax.json.JsonArray)
 
     instance ToString[JsonArray] {
         pub def toString(x: JsonArray): String = Interop/Json/JsonArray.toString(x)
+    }
+
+    instance Interop/Json.ImpJsonValue[JsonArray] {
+        pub def toJsonValue(x: JsonArray): JsonValue = 
+            let JsonArray(x1) = x;
+            JsonValue(x1 as ##javax.json.JsonValue)
+
+        pub def fromJsonValue(x: JsonValue): JsonArray = 
+            let JsonValue(x1) = x;
+            JsonArray(x1 as ##javax.json.JsonArray)
+    }
+
+    instance Interop/Json.ImpJsonStructure[JsonArray] {
+        pub def toJsonStructure(x: JsonArray): JsonStructure = 
+            let JsonArray(x1) = x;
+            JsonStructure(x1 as ##javax.json.JsonStructure)
+
+        pub def fromJsonStructure(x: JsonStructure): JsonArray = 
+            let JsonStructure(x1) = x;
+            JsonArray(x1 as ##javax.json.JsonArray) 
     }
 
 }

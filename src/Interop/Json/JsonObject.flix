@@ -23,6 +23,25 @@ namespace Interop/Json {
         pub def toString(x: JsonObject): String = Interop/Json/JsonObject.toString(x)
     }
 
+    instance Interop/Json.ImpJsonValue[JsonObject] {
+        pub def toJsonValue(x: JsonObject): JsonValue = 
+            let JsonObject(x1) = x;
+            JsonValue(x1 as ##javax.json.JsonValue)
+
+        pub def fromJsonValue(x: JsonValue): JsonObject = 
+            let JsonValue(x1) = x;
+            JsonObject(x1 as ##javax.json.JsonObject)
+    }
+
+    instance Interop/Json.ImpJsonStructure[JsonObject] {
+        pub def toJsonStructure(x: JsonObject): JsonStructure = 
+            let JsonObject(x1) = x;
+            JsonStructure(x1 as ##javax.json.JsonStructure)
+
+        pub def fromJsonStructure(x: JsonStructure): JsonObject = 
+            let JsonStructure(x1) = x;
+            JsonObject(x1 as ##javax.json.JsonObject) 
+    }
 }
 
 namespace Interop/Json/JsonObject {

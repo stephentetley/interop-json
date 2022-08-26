@@ -17,11 +17,22 @@
 
 namespace Interop/Json {
 
+    ///
+    /// Represents a JsonValue.
+    /// Interface
+    ///
     pub enum JsonValue(##javax.json.JsonValue)
 
     instance ToString[JsonValue] {
         pub def toString(x: JsonValue): String = Interop/Json/JsonValue.toString(x)
     }
+
+
+    pub class ImpJsonValue[t: Type] {
+        pub def toJsonValue(x: t): JsonValue
+        pub def fromJsonValue(x: JsonValue): t
+    }
+
 
 }
 
@@ -29,6 +40,12 @@ namespace Interop/Json/JsonValue {
 
     use Interop/Json.JsonValue;
     use Interop/Json.JsonValue.{JsonValue};
+
+
+    pub def getHH(v: JsonValue): ##javax.json.JsonValue = 
+        let JsonValue(v1) = v;
+        v1
+
 
     pub enum ValueType with Eq, Order, ToString, Hash, Boxable {
         case JsArray

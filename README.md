@@ -17,3 +17,7 @@ License: Apache 2.0
 ## Dependencies
 
 https://github.com/stephentetley/monad-lib
+
+https://github.com/stephentetley/interop-base (pkg and jar)
+
+A `javax.json` implementation e.g. Apache Geronimo  and Apache Johnzon

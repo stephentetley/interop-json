@@ -60,6 +60,11 @@ namespace Interop/Json/JsonArrayEvaluator {
     use Interop/Json.JsonObject;
     use Interop/Json.JsonObject.{JsonObject};
 
+
+    pub def getJsonArrayEvaluator(x: JsonArrayEvaluator[r, ka, a]): MonadLib.Evaluator[r, ka, ##javax.json.JsonArray, a] = 
+        let JsonArrayEvaluator(x1) = x;
+        x1
+        
     pub def runJsonArrayEvaluator(r: Region[r], 
                                 ma: JsonArrayEvaluator[r, a, a], 
                                 arr: JsonArray): Result[a, String] & r =
@@ -79,10 +84,6 @@ namespace Interop/Json/JsonArrayEvaluator {
     pub def flatMap(f: a -> JsonArrayEvaluator[r, ka, b] & ef, ma: JsonArrayEvaluator[r, ka, a]): JsonArrayEvaluator[r, ka, b] & ef =
         JsonArrayEvaluator(MonadLib/Evaluator.flatMap(f >> getJsonArrayEvaluator, getJsonArrayEvaluator(ma)))
 
-
-    pub def getJsonArrayEvaluator(x: JsonArrayEvaluator[r, ka, a]): MonadLib.Evaluator[r, ka, ##javax.json.JsonArray, a] = 
-        let JsonArrayEvaluator(x1) = x;
-        x1
 
     pub def throwError(msg: String): JsonArrayEvaluator[r, ka, a] = 
         JsonArrayEvaluator(MonadLib/Evaluator.throwError(msg))

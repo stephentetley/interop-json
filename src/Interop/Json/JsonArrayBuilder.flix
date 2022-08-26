@@ -142,6 +142,7 @@ namespace Interop/Json/JsonArrayBuilder {
             case Err(msg) => throwError(msg)
         }
 
+    /// TODO should value be ```value: JsonObjectBuilder[r, ka, Unit]```
     pub def addJsonObjectBuilder(value: JsonObjectBuilder[r, ka, ka]): JsonArrayBuilder[r, ka, Unit] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(##javax.json.JsonObjectBuilder): ##javax.json.JsonArrayBuilder & r;
         import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder & r;
