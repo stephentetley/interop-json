@@ -46,12 +46,12 @@ namespace Interop/Json/JsonPatch {
 
 
     pub def marshal(x: Operation): ##javax.json.JsonPatch$Operation =
-        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation & Pure as get_ADD;
-        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation & Pure as get_COPY;
-        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation & Pure as get_MOVE;
-        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation & Pure as get_REMOVE;
-        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation & Pure as get_REPLACE;
-        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation& Pure as get_TEST;
+        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation \ {} as get_ADD;
+        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation \ {} as get_COPY;
+        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation \ {} as get_MOVE;
+        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation \ {} as get_REMOVE;
+        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation \ {} as get_REPLACE;
+        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation\ {} as get_TEST;
         match x {
             case Add        => get_ADD()
             case Copy       => get_COPY()
@@ -62,19 +62,19 @@ namespace Interop/Json/JsonPatch {
         }
 
     def primEquals(x: ##javax.json.JsonPatch$Operation, y: ##javax.json.JsonPatch$Operation): Bool =
-        import java.lang.Enum.equals(##java.lang.Object): Bool & Pure;
+        import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
         let x1 = x as ##java.lang.Enum;
         let y1 = y as ##java.lang.Object;
         equals(x1, y1)
 
 
     pub def unmarshal(x: ##javax.json.JsonPatch$Operation): Operation = 
-        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation & Pure as get_ADD;
-        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation & Pure as get_COPY;
-        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation & Pure as get_MOVE;
-        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation & Pure as get_REMOVE;
-        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation & Pure as get_REPLACE;
-        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation& Pure as get_TEST;
+        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation \ {} as get_ADD;
+        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation \ {} as get_COPY;
+        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation \ {} as get_MOVE;
+        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation \ {} as get_REMOVE;
+        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation \ {} as get_REPLACE;
+        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation\ {} as get_TEST;
         match x {
             case x1 if primEquals(x1, get_ADD())        => Add
             case x1 if primEquals(x1, get_COPY())       => Copy
@@ -85,39 +85,38 @@ namespace Interop/Json/JsonPatch {
         }
 
     pub def toJsonArray(x: JsonPatch): JsonArray =
-        import javax.json.JsonPatch.toJsonArray(): ##javax.json.JsonArray & Pure;
+        import javax.json.JsonPatch.toJsonArray(): ##javax.json.JsonArray \ {};
         let JsonPatch(x1) = x;
         JsonArray(toJsonArray(x1))
 
     pub def createJsonObjectDiff(src: JsonObject, dst: JsonObject): JsonPatch = 
-        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch & Pure;
+        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch \ {};
         let JsonObject(src1) = src;
         let JsonObject(dst1) = dst;
         JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
 
     pub def createJsonArrayDiff(src: JsonArray, dst: JsonArray): JsonPatch = 
-        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch & Pure;
+        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch \ {};
         let JsonArray(src1) = src;
         let JsonArray(dst1) = dst;
         JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
 
 
     pub def applyToJsonObject(x: JsonPatch, o: JsonObject): Result[JsonObject, String] =
-        import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure & Pure;
+        import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure \ {};
         try {
             let JsonPatch(x1) = x;
             let JsonObject(o1) = o;
             let ans = apply(x1, o1 as ##javax.json.JsonStructure);
             JsonObject(ans as ##javax.json.JsonObject) |> Ok
         } catch {
-            case ex: ##java.lang.Exception => {
-                import java.lang.Throwable.getMessage(): String & Pure;
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex as ##java.lang.Throwable))
-            }
         }
 
     pub def applyToJsonArray(x: JsonPatch, arr: JsonArray): Result[JsonArray, String] =
-        import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure & Pure;
+        import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure \ {};
         try {
             let JsonPatch(x1) = x;
             let JsonArray(arr1) = arr;
@@ -125,7 +124,7 @@ namespace Interop/Json/JsonPatch {
             JsonArray(ans as ##javax.json.JsonArray) |> Ok
         } catch {
             case ex: ##java.lang.Exception => {
-                import java.lang.Throwable.getMessage(): String & Pure;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex as ##java.lang.Throwable))
             }
         }

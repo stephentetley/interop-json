@@ -56,7 +56,7 @@ namespace Interop/Json/JsonArray {
     use Interop/Json.JsonArray.{JsonArray};
 
     pub def toString(x: JsonArray): String =
-        import javax.json.JsonValue.toString(): String & Pure;
+        import javax.json.JsonValue.toString(): String \ {};
         let JsonArray(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
 
@@ -75,12 +75,12 @@ namespace Interop/Json/JsonArray {
             Ok(JsonArray(ans))
         } catch {
             case ex: ##java.lang.Exception => {
-                import java.lang.Throwable.getMessage(): String & Pure;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex as ##java.lang.Throwable))
             }
         }
     }
 
-    pub def readFile(path: String): Result[JsonArray, String] & Impure = 
+    pub def readFile(path: String): Result[JsonArray, String] \ IO = 
         File.read(path) |> Result.flatMap(readArray)
 }

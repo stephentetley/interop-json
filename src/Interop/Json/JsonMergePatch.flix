@@ -31,24 +31,24 @@ namespace Interop/Json/JsonMergePatch {
     use Interop/Json.JsonValue.{JsonValue};
 
     pub def createMergeDiff(src: JsonValue, dst: JsonValue): JsonMergePatch = 
-        import static javax.json.Json.createMergeDiff(##javax.json.JsonValue, ##javax.json.JsonValue): ##javax.json.JsonMergePatch & Pure;
+        import static javax.json.Json.createMergeDiff(##javax.json.JsonValue, ##javax.json.JsonValue): ##javax.json.JsonMergePatch \ {};
         let JsonValue(src1) = src;
         let JsonValue(dst1) = dst;
         JsonMergePatch(createMergeDiff(src1, dst1))
 
     pub def createMergePatch(patch: JsonValue): JsonMergePatch = 
-        import static javax.json.Json.createMergePatch(##javax.json.JsonValue): ##javax.json.JsonMergePatch & Pure;
+        import static javax.json.Json.createMergePatch(##javax.json.JsonValue): ##javax.json.JsonMergePatch \ {};
         let JsonValue(patch1) = patch;
         JsonMergePatch(createMergePatch(patch1))
 
 
     pub def toJsonValue(x: JsonMergePatch): JsonValue =
-        import javax.json.JsonMergePatch.toJsonValue(): ##javax.json.JsonValue & Pure;
+        import javax.json.JsonMergePatch.toJsonValue(): ##javax.json.JsonValue \ {};
         let JsonMergePatch(x1) = x;
         JsonValue(toJsonValue(x1))
 
     pub def apply(x: JsonMergePatch, v: JsonValue): JsonValue =
-        import javax.json.JsonMergePatch.apply(##javax.json.JsonValue): ##javax.json.JsonValue & Pure;
+        import javax.json.JsonMergePatch.apply(##javax.json.JsonValue): ##javax.json.JsonValue \ {};
         let JsonMergePatch(x1) = x;
         let JsonValue(v1) = v;
         JsonValue(apply(x1, v1))

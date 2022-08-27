@@ -50,7 +50,7 @@ namespace Interop/Json/JsonObject {
     use Interop/Json.JsonObject.{JsonObject};
 
     pub def toString(x: JsonObject): String =
-        import javax.json.JsonValue.toString(): String & Pure;
+        import javax.json.JsonValue.toString(): String \ {};
         let JsonObject(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
 
@@ -69,13 +69,13 @@ namespace Interop/Json/JsonObject {
             Ok(JsonObject(ans))
         } catch {
             case ex: ##java.lang.Exception => {
-                import java.lang.Throwable.getMessage(): String & Pure;
+                import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex as ##java.lang.Throwable))
             }
         }
     }
 
-    pub def readFile(path: String): Result[JsonObject, String] & Impure = 
+    pub def readFile(path: String): Result[JsonObject, String] \ IO = 
         File.read(path) |> Result.flatMap(readObject)
         
 }
