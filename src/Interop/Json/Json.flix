@@ -30,6 +30,8 @@ namespace Interop/Json/Json {
     use Interop/Json.JsonMergePatch.{JsonMergePatch};
     use Interop/Json.JsonPatch;
     use Interop/Json.JsonPatch.{JsonPatch};
+    use Interop/Json.JsonPatchBuilder;
+    use Interop/Json.JsonPatchBuilder.{JsonPatchBuilder};
     use Interop/Json.JsonPointer;
     use Interop/Json.JsonPointer.{JsonPointer};
     use Interop/Json.JsonReader;
@@ -84,5 +86,9 @@ namespace Interop/Json/Json {
         import static javax.json.Json.createWriter(##java.io.Writer): ##javax.json.JsonWriter \ {r, r2};
         let Writer(wr1) = wr;
         createWriter(wr1) |> JsonWriter
+    
+    pub def createPatchBuilder(): JsonPatchBuilder[r] \ {Write(r)} = 
+        import static javax.json.Json.createPatchBuilder(): ##javax.json.JsonPatchBuilder \ r;
+        createPatchBuilder() |> JsonPatchBuilder
 
 }

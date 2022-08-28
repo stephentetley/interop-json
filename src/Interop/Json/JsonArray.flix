@@ -17,11 +17,6 @@
 
 namespace Interop/Json {
 
-    use Interop/Json.JsonStructure;
-    use Interop/Json.JsonStructure.{JsonStructure};
-    use Interop/Json.JsonValue;
-    use Interop/Json.JsonValue.{JsonValue};
-
     pub enum JsonArray(##javax.json.JsonArray)
 
     instance ToString[JsonArray] {
