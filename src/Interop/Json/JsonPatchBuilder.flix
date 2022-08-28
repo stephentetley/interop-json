@@ -35,6 +35,8 @@ namespace Interop/Json/JsonPatchBuilder {
     use Interop/Json.JsonArray.{JsonArray};
     use Interop/Json.JsonObject;
     use Interop/Json.JsonObject.{JsonObject};
+    use Interop/Json.JsonPatch;
+    use Interop/Json.JsonPatch.{JsonPatch};
     use Interop/Json.JsonStructure;
     use Interop/Json.JsonStructure.{JsonStructure};
     use Interop/Json.ImpJsonStructure;
@@ -42,6 +44,12 @@ namespace Interop/Json/JsonPatchBuilder {
     pub def getHH(bld: JsonPatchBuilder[r]): ##javax.json.JsonPatchBuilder = 
         let JsonPatchBuilder(bld1) = bld;
         bld1
+
+    pub def build(bld: JsonPatchBuilder[r]): JsonPatch \ Read(r) =
+        import javax.json.JsonPatchBuilder.build(): ##javax.json.JsonPatch \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        build(bld1) |> JsonPatch
+
 
     pub def addBool!(path: String, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
         import javax.json.JsonPatchBuilder.add(String, Bool): ##javax.json.JsonPatchBuilder \ r;

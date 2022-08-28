@@ -45,6 +45,12 @@ namespace Interop/Json/JsonObjectBuilder {
         let JsonObjectBuilder(bld1) = bld;
         bld1
 
+    pub def build(bld: JsonObjectBuilder[r]): JsonObject \ Read(r) =
+        import javax.json.JsonObjectBuilder.build(): ##javax.json.JsonObject \ r;
+        let JsonObjectBuilder(bld1) = bld;
+        build(bld1) |> JsonObject
+
+
     /// Note - the Java exception `addNull` thrown should be "unreachable" in Flix.
     pub def addNull!(name: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
         import javax.json.JsonObjectBuilder.addNull(String): ##javax.json.JsonObjectBuilder \ r;

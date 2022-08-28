@@ -70,36 +70,36 @@ namespace Interop/Json/Json {
         createMergePatch(patch1) |> JsonMergePatch
 
 
-    pub def createReaderWithInputStream(ins: InputStream[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
+    pub def createReaderWithInputStream(_: Region[r], ins: InputStream[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
         import static javax.json.Json.createReader(##java.io.InputStream): ##javax.json.JsonReader \ {r, r2};
         let InputStream(ins1) = ins;
         createReader(ins1) |> JsonReader
 
-    pub def createReaderWithWriter(rd: Reader[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
+    pub def createReaderWithWriter(_: Region[r], rd: Reader[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
         import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader \ {r, r2};
         let Reader(rd1) = rd;
         createReader(rd1) |> JsonReader
 
 
-    pub def createWriterWithOutputStream(outs: OutputStream[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
+    pub def createWriterWithOutputStream(_: Region[r], outs: OutputStream[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
         import static javax.json.Json.createWriter(##java.io.OutputStream): ##javax.json.JsonWriter \ {r, r2};
         let OutputStream(outs1) = outs;
         createWriter(outs1) |> JsonWriter
 
-    pub def createWriterWithWriter(wr: Writer[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
+    pub def createWriterWithWriter(_: Region[r], wr: Writer[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
         import static javax.json.Json.createWriter(##java.io.Writer): ##javax.json.JsonWriter \ {r, r2};
         let Writer(wr1) = wr;
         createWriter(wr1) |> JsonWriter
 
-    pub def createArrayBuilder(): JsonArrayBuilder[r] \ {Write(r)} = 
+    pub def createArrayBuilder(_: Region[r]): JsonArrayBuilder[r] \ {Write(r)} = 
         import static javax.json.Json.createArrayBuilder(): ##javax.json.JsonArrayBuilder \ r;
         createArrayBuilder() |> JsonArrayBuilder
 
-    pub def createObjectBuilder(): JsonObjectBuilder[r] \ {Write(r)} = 
+    pub def createObjectBuilder(_: Region[r]): JsonObjectBuilder[r] \ {Write(r)} = 
         import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder \ r;
         createObjectBuilder() |> JsonObjectBuilder
 
-    pub def createPatchBuilder(): JsonPatchBuilder[r] \ {Write(r)} = 
+    pub def createPatchBuilder(_: Region[r]): JsonPatchBuilder[r] \ {Write(r)} = 
         import static javax.json.Json.createPatchBuilder(): ##javax.json.JsonPatchBuilder \ r;
         createPatchBuilder() |> JsonPatchBuilder
 

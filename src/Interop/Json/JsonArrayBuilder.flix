@@ -44,6 +44,12 @@ namespace Interop/Json/JsonArrayBuilder {
         let JsonArrayBuilder(bld1) = bld;
         bld1
 
+    pub def build(bld: JsonArrayBuilder[r]): JsonArray \ Read(r) =
+        import javax.json.JsonArrayBuilder.build(): ##javax.json.JsonArray \ r;
+        let JsonArrayBuilder(bld1) = bld;
+        build(bld1) |> JsonArray
+
+
     /// Note - the Java exception `addNull` thrown should be "unreachable" in Flix.
     pub def addNull!(bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.addNull(): ##javax.json.JsonArrayBuilder \ r;
