@@ -16,6 +16,9 @@
 
 
 namespace Interop/Json/JsonPatch {
+    
+    use Interop/Lang.Enum;
+    use Interop/Lang.Enum.{Enum};
 
     pub enum Operation(##javax.json.JsonPatch$Operation)
 
@@ -26,6 +29,16 @@ namespace Interop/Json/JsonPatch {
 
         pub def fromJavaObject(o: ##java.lang.Object): Operation = 
             Operation(o as ##javax.json.JsonPatch$Operation)
+    }
+
+    instance Interop/Lang.SubEnum[Operation] {
+        pub def toEnum(x: Operation): Enum[a] = 
+            let Operation(x1) = x;
+            Enum(x1 as ##java.lang.Enum)
+
+        pub def fromEnum(x: Enum[a]): Operation = 
+            let Enum(x1) = x;
+            Operation(x1 as ##javax.json.JsonPatch$Operation) 
     }
 
 }

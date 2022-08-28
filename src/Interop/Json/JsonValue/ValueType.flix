@@ -16,6 +16,9 @@
 
 
 namespace Interop/Json/JsonValue {
+    
+    use Interop/Lang.Enum;
+    use Interop/Lang.Enum.{Enum};
 
     pub enum ValueType(##javax.json.JsonValue$ValueType)
 
@@ -26,6 +29,16 @@ namespace Interop/Json/JsonValue {
 
         pub def fromJavaObject(o: ##java.lang.Object): ValueType = 
             ValueType(o as ##javax.json.JsonValue$ValueType)
+    }
+
+    instance Interop/Lang.SubEnum[ValueType] {
+        pub def toEnum(x: ValueType): Enum[a] = 
+            let ValueType(x1) = x;
+            Enum(x1 as ##java.lang.Enum)
+
+        pub def fromEnum(x: Enum[a]): ValueType = 
+            let Enum(x1) = x;
+            ValueType(x1 as ##javax.json.JsonValue$ValueType) 
     }
 
 }
