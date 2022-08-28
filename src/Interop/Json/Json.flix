@@ -17,14 +17,27 @@
 
 namespace Interop/Json/Json {
 
+    use Interop/IO.InputStream;
+    use Interop/IO.InputStream.{InputStream};
+    use Interop/IO.OutputStream;
+    use Interop/IO.OutputStream.{OutputStream};
+    use Interop/IO.Reader;
+    use Interop/IO.Reader.{Reader};
+    use Interop/IO.Writer;
+    use Interop/IO.Writer.{Writer};
+
     use Interop/Json.JsonMergePatch;
     use Interop/Json.JsonMergePatch.{JsonMergePatch};
     use Interop/Json.JsonPatch;
     use Interop/Json.JsonPatch.{JsonPatch};
     use Interop/Json.JsonPointer;
     use Interop/Json.JsonPointer.{JsonPointer};
+    use Interop/Json.JsonReader;
+    use Interop/Json.JsonReader.{JsonReader};
     use Interop/Json.JsonValue;
     use Interop/Json.JsonValue.{JsonValue};
+    use Interop/Json.JsonWriter;
+    use Interop/Json.JsonWriter.{JsonWriter};
     use Interop/Json.ImpJsonValue;
     use Interop/Json.ImpJsonStructure;
 
@@ -51,5 +64,25 @@ namespace Interop/Json/Json {
         createMergePatch(patch1) |> JsonMergePatch
 
 
+    pub def createReaderWithInputStream(ins: InputStream[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
+        import static javax.json.Json.createReader(##java.io.InputStream): ##javax.json.JsonReader \ {r, r2};
+        let InputStream(ins1) = ins;
+        createReader(ins1) |> JsonReader
+
+    pub def createReaderWithWriter(rd: Reader[r2]): JsonReader[r] \ {Write(r), Write(r2)} = 
+        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader \ {r, r2};
+        let Reader(rd1) = rd;
+        createReader(rd1) |> JsonReader
+
+
+    pub def createWriterWithOutputStream(outs: OutputStream[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
+        import static javax.json.Json.createWriter(##java.io.OutputStream): ##javax.json.JsonWriter \ {r, r2};
+        let OutputStream(outs1) = outs;
+        createWriter(outs1) |> JsonWriter
+
+    pub def createWriterWithWriter(wr: Writer[r2]): JsonWriter[r] \ {Write(r), Write(r2)} = 
+        import static javax.json.Json.createWriter(##java.io.Writer): ##javax.json.JsonWriter \ {r, r2};
+        let Writer(wr1) = wr;
+        createWriter(wr1) |> JsonWriter
 
 }
