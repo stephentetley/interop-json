@@ -46,25 +46,25 @@ namespace Interop/Json/JsonObjectBuilder {
         bld1
 
     /// Note - the Java exception `addNull` thrown should be "unreachable" in Flix.
-    pub def addNull(name: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+    pub def addNull!(name: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
         import javax.json.JsonObjectBuilder.addNull(String): ##javax.json.JsonObjectBuilder \ r;
         let JsonObjectBuilder(bld1) = bld;
         addNull(bld1, name) |> JsonObjectBuilder 
 
         
-    pub def addJsonValue(name: String, value: t, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) with ImpJsonValue[t] =
+    pub def addJsonValue!(name: String, value: t, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) with ImpJsonValue[t] =
         import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonValue): ##javax.json.JsonObjectBuilder \ r;
         let JsonObjectBuilder(bld1) = bld;
         let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
         add(bld1, name, value1) |> JsonObjectBuilder 
         
 
-    pub def addBool(name: String, value: Bool, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+    pub def addBool!(name: String, value: Bool, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
         import javax.json.JsonObjectBuilder.add(String, Bool): ##javax.json.JsonObjectBuilder \ r;
         let JsonObjectBuilder(bld1) = bld;
         add(bld1, name, value) |> JsonObjectBuilder
 
-    pub def addBigInt(name: String, value: BigInt, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+    pub def addBigInt!(name: String, value: BigInt, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
         import javax.json.JsonObjectBuilder.add(String, BigInt): ##javax.json.JsonObjectBuilder \ r;
         let JsonObjectBuilder(bld1) = bld;
         add(bld1, name, value) |> JsonObjectBuilder

@@ -45,46 +45,46 @@ namespace Interop/Json/JsonArrayBuilder {
         bld1
 
     /// Note - the Java exception `addNull` thrown should be "unreachable" in Flix.
-    pub def addNull(bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addNull!(bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.addNull(): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         addNull(bld1) |> JsonArrayBuilder 
 
-    pub def addBool(value: Bool, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addBool!(value: Bool, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(Bool): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         add(bld1, value) |> JsonArrayBuilder 
 
-    pub def addBigInt(value: BigInt, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addBigInt!(value: BigInt, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(BigInt): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         add(bld1, value) |> JsonArrayBuilder 
 
 
-    pub def addFloat64(value: Float64, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addFloat64!(value: Float64, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(Float64): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         add(bld1, value) |> JsonArrayBuilder 
 
-    pub def addInt32(value: Int32, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addInt32!(value: Int32, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(Int32): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         add(bld1, value) |> JsonArrayBuilder 
 
 
-    pub def addString(value: String, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
+    pub def addString!(value: String, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
         import javax.json.JsonArrayBuilder.add(String): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         add(bld1, value) |> JsonArrayBuilder 
 
-    pub def addJsonValue(value: t, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) with ImpJsonValue[t] =
+    pub def addJsonValue!(value: t, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) with ImpJsonValue[t] =
         import javax.json.JsonArrayBuilder.add(##javax.json.JsonValue): ##javax.json.JsonArrayBuilder \ r;
         let JsonArrayBuilder(bld1) = bld;
         let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
         add(bld1, value1) |> JsonArrayBuilder
 
 
-    pub def addJsonArrayBuilder(value: { value :: JsonArrayBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
+    pub def addJsonArrayBuilder!(value: { value :: JsonArrayBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonArrayBuilder.add(##javax.json.JsonArrayBuilder): ##javax.json.JsonArrayBuilder \ r;
             let JsonArrayBuilder(bld1) = bld;
@@ -96,7 +96,7 @@ namespace Interop/Json/JsonArrayBuilder {
                 Err(getMessage(ex as ##java.lang.Throwable))
         }
 
-    pub def addJsonObjectBuilder(value: { value :: JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
+    pub def addJsonObjectBuilder!(value: { value :: JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonArrayBuilder.add(##javax.json.JsonObjectBuilder): ##javax.json.JsonArrayBuilder \ r;
             let JsonArrayBuilder(bld1) = bld;

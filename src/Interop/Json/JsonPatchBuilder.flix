@@ -43,12 +43,12 @@ namespace Interop/Json/JsonPatchBuilder {
         let JsonPatchBuilder(bld1) = bld;
         bld1
 
-    pub def addBool(path: String, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+    pub def addBool!(path: String, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
         import javax.json.JsonPatchBuilder.add(String, Bool): ##javax.json.JsonPatchBuilder \ r;
         let JsonPatchBuilder(bld1) = bld;
         add(bld1, path, value) |> JsonPatchBuilder 
 
-    pub def addInt32(path: String, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+    pub def addInt32!(path: String, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
         import javax.json.JsonPatchBuilder.add(String, Int32): ##javax.json.JsonPatchBuilder \ r;
         let JsonPatchBuilder(bld1) = bld;
         add(bld1, path, value) |> JsonPatchBuilder 
