@@ -54,11 +54,128 @@ namespace Interop/Json/JsonArray {
 
     use Interop/Json.JsonArray;
     use Interop/Json.JsonArray.{JsonArray};
+    use Interop/Json.JsonNumber;
+    use Interop/Json.JsonNumber.{JsonNumber};
+    use Interop/Json.JsonObject;
+    use Interop/Json.JsonObject.{JsonObject};
+    use Interop/Json.JsonString;
+    use Interop/Json.JsonString.{JsonString};
+
+    pub def getHH(arr: JsonArray): ##javax.json.JsonArray = 
+        let JsonArray(arr1) = arr;
+        arr1
 
     pub def toString(x: JsonArray): String =
         import javax.json.JsonValue.toString(): String \ {};
         let JsonArray(x1) = x;
         toString(x1 as ##javax.json.JsonValue)
+
+
+    pub def getJsonObject(ix: Int32, arr: JsonArray): Result[JsonObject, String] =
+        try {
+            import javax.json.JsonArray.getJsonObject(Int32): ##javax.json.JsonObject \ {};
+            let JsonArray(arr1) = arr;
+            getJsonObject(arr1, ix) |> JsonObject |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getJsonArray(ix: Int32, arr: JsonArray): Result[JsonArray, String] =
+        try {
+            import javax.json.JsonArray.getJsonArray(Int32): ##javax.json.JsonArray \ {};
+            let JsonArray(arr1) = arr;
+            getJsonArray(arr1, ix) |> JsonArray |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getJsonNumber(ix: Int32, arr: JsonArray): Result[JsonNumber, String] =
+        try {
+            import javax.json.JsonArray.getJsonNumber(Int32): ##javax.json.JsonNumber \ {};
+            let JsonArray(arr1) = arr;
+            getJsonNumber(arr1, ix) |> JsonNumber |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getJsonString(ix: Int32, arr: JsonArray): Result[JsonString, String] =
+        try {
+            import javax.json.JsonArray.getJsonString(Int32): ##javax.json.JsonString \ {};
+            let JsonArray(arr1) = arr;
+            getJsonString(arr1, ix) |> JsonString |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getBoolean(ix: Int32, arr: JsonArray): Result[Bool, String] =
+        try {
+            import javax.json.JsonArray.getBoolean(Int32): Bool \ {};
+            let JsonArray(arr1) = arr;
+            getBoolean(arr1, ix) |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getBooleanWithDefault(ix: Int32, d: Bool, arr: JsonArray): Bool =
+        import javax.json.JsonArray.getBoolean(Int32, Bool): Bool \ {};
+        let JsonArray(arr1) = arr;
+        getBoolean(arr1, ix, d)
+
+    pub def getInt(ix: Int32, arr: JsonArray): Result[Int32, String] =
+        try {
+            import javax.json.JsonArray.getInt(Int32): Int32 \ {};
+            let JsonArray(arr1) = arr;
+            getInt(arr1, ix) |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getIntWithDefault(ix: Int32, d: Int32, arr: JsonArray): Int32 =
+        import javax.json.JsonArray.getInt(Int32, Int32): Int32 \ {};
+        let JsonArray(arr1) = arr;
+        getInt(arr1, ix, d)
+
+    pub def getString(ix: Int32, arr: JsonArray): Result[String, String] =
+        try {
+            import javax.json.JsonArray.getString(Int32): String \ {};
+            let JsonArray(arr1) = arr;
+            getString(arr1, ix) |> Ok
+        } catch {
+            case ex: ##java.lang.Exception => {
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+            }
+        }
+
+    pub def getStringWithDefault(ix: Int32, d: String, arr: JsonArray): String =
+        import javax.json.JsonArray.getString(Int32, String): String \ {};
+        let JsonArray(arr1) = arr;
+        getString(arr1, ix, d)
+
+
+
+    pub def isNull(ix: Int32, arr: JsonArray): Bool =
+        import javax.json.JsonArray.isNull(Int32): Bool \ {};
+        let JsonArray(arr1) = arr;
+        isNull(arr1, ix)
 
 
     pub def readArray(src: String): Result[JsonArray, String] = region r {

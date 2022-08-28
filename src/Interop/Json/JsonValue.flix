@@ -40,65 +40,70 @@ namespace Interop/Json/JsonValue {
 
     use Interop/Json.JsonValue;
     use Interop/Json.JsonValue.{JsonValue};
-
+    use Interop/Json/JsonValue.ValueType;
+    use Interop/Json/JsonValue.ValueType.{ValueType};
+    use Interop/Json.ImpJsonValue;
 
     pub def getHH(v: JsonValue): ##javax.json.JsonValue = 
         let JsonValue(v1) = v;
         v1
 
-
-    pub enum ValueType with Eq, Order, ToString, Hash, Boxable {
-        case JsArray
-        case JsFalse
-        case JsNull
-        case JsNumber
-        case JsObject
-        case JsString
-        case JsTrue
-    }
-
-    pub def marshal(x: ValueType): ##javax.json.JsonValue$ValueType =
-        import static get javax.json.JsonValue$ValueType.ARRAY: ##javax.json.JsonValue$ValueType \ {} as get_ARRAY;
-        import static get javax.json.JsonValue$ValueType.FALSE: ##javax.json.JsonValue$ValueType \ {} as get_FALSE;
-        import static get javax.json.JsonValue$ValueType.NULL: ##javax.json.JsonValue$ValueType \ {} as get_NULL;
-        import static get javax.json.JsonValue$ValueType.NUMBER: ##javax.json.JsonValue$ValueType \ {} as get_NUMBER;
-        import static get javax.json.JsonValue$ValueType.OBJECT: ##javax.json.JsonValue$ValueType \ {} as get_OBJECT;
-        import static get javax.json.JsonValue$ValueType.STRING: ##javax.json.JsonValue$ValueType \ {} as get_STRING;
-        import static get javax.json.JsonValue$ValueType.TRUE: ##javax.json.JsonValue$ValueType \ {} as get_TRUE;
-        match x {
-            case JsArray    => get_ARRAY()
-            case JsFalse    => get_FALSE()
-            case JsNull     => get_NULL()
-            case JsNumber   => get_NUMBER()
-            case JsObject   => get_OBJECT()
-            case JsString   => get_STRING()
-            case JsTrue     => get_TRUE() 
-        }
-
-    def primEquals(x: ##javax.json.JsonValue$ValueType, y: ##javax.json.JsonValue$ValueType): Bool =
-        import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
-        let x1 = x as ##java.lang.Enum;
-        let y1 = y as ##java.lang.Object;
-        equals(x1, y1)
+    pub def toJsonValueHH[t: Type](v: t): ##javax.json.JsonValue with ImpJsonValue[t] = 
+        Interop/Json/ImpJsonValue.toJsonValue(v) |> getHH
 
 
-    pub def unmarshal(x: ##javax.json.JsonValue$ValueType): ValueType = 
-        import static get javax.json.JsonValue$ValueType.ARRAY: ##javax.json.JsonValue$ValueType \ {} as get_ARRAY;
-        import static get javax.json.JsonValue$ValueType.FALSE: ##javax.json.JsonValue$ValueType \ {} as get_FALSE;
-        import static get javax.json.JsonValue$ValueType.NULL: ##javax.json.JsonValue$ValueType \ {} as get_NULL;
-        import static get javax.json.JsonValue$ValueType.NUMBER: ##javax.json.JsonValue$ValueType \ {} as get_NUMBER;
-        import static get javax.json.JsonValue$ValueType.OBJECT: ##javax.json.JsonValue$ValueType \ {} as get_OBJECT;
-        import static get javax.json.JsonValue$ValueType.STRING: ##javax.json.JsonValue$ValueType \ {} as get_STRING;
-        import static get javax.json.JsonValue$ValueType.TRUE: ##javax.json.JsonValue$ValueType \ {} as get_TRUE;
-        match x {
-            case x1 if primEquals(x1, get_ARRAY())      => JsArray
-            case x1 if primEquals(x1, get_FALSE())      => JsFalse
-            case x1 if primEquals(x1, get_NULL())       => JsNull
-            case x1 if primEquals(x1, get_NUMBER())     => JsNumber
-            case x1 if primEquals(x1, get_OBJECT())     => JsObject
-            case x1 if primEquals(x1, get_STRING())     => JsString
-            case x1 if primEquals(x1, get_TRUE())       => JsTrue
-        }
+    // pub enum ValueType with Eq, Order, ToString, Hash, Boxable {
+    //     case JsArray
+    //     case JsFalse
+    //     case JsNull
+    //     case JsNumber
+    //     case JsObject
+    //     case JsString
+    //     case JsTrue
+    // }
+
+    // pub def marshal(x: ValueType): ##javax.json.JsonValue$ValueType =
+    //     import static get javax.json.JsonValue$ValueType.ARRAY: ##javax.json.JsonValue$ValueType \ {} as get_ARRAY;
+    //     import static get javax.json.JsonValue$ValueType.FALSE: ##javax.json.JsonValue$ValueType \ {} as get_FALSE;
+    //     import static get javax.json.JsonValue$ValueType.NULL: ##javax.json.JsonValue$ValueType \ {} as get_NULL;
+    //     import static get javax.json.JsonValue$ValueType.NUMBER: ##javax.json.JsonValue$ValueType \ {} as get_NUMBER;
+    //     import static get javax.json.JsonValue$ValueType.OBJECT: ##javax.json.JsonValue$ValueType \ {} as get_OBJECT;
+    //     import static get javax.json.JsonValue$ValueType.STRING: ##javax.json.JsonValue$ValueType \ {} as get_STRING;
+    //     import static get javax.json.JsonValue$ValueType.TRUE: ##javax.json.JsonValue$ValueType \ {} as get_TRUE;
+    //     match x {
+    //         case JsArray    => get_ARRAY()
+    //         case JsFalse    => get_FALSE()
+    //         case JsNull     => get_NULL()
+    //         case JsNumber   => get_NUMBER()
+    //         case JsObject   => get_OBJECT()
+    //         case JsString   => get_STRING()
+    //         case JsTrue     => get_TRUE() 
+    //     }
+
+    // def primEquals(x: ##javax.json.JsonValue$ValueType, y: ##javax.json.JsonValue$ValueType): Bool =
+    //     import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
+    //     let x1 = x as ##java.lang.Enum;
+    //     let y1 = y as ##java.lang.Object;
+    //     equals(x1, y1)
+
+
+    // pub def unmarshal(x: ##javax.json.JsonValue$ValueType): ValueType = 
+    //     import static get javax.json.JsonValue$ValueType.ARRAY: ##javax.json.JsonValue$ValueType \ {} as get_ARRAY;
+    //     import static get javax.json.JsonValue$ValueType.FALSE: ##javax.json.JsonValue$ValueType \ {} as get_FALSE;
+    //     import static get javax.json.JsonValue$ValueType.NULL: ##javax.json.JsonValue$ValueType \ {} as get_NULL;
+    //     import static get javax.json.JsonValue$ValueType.NUMBER: ##javax.json.JsonValue$ValueType \ {} as get_NUMBER;
+    //     import static get javax.json.JsonValue$ValueType.OBJECT: ##javax.json.JsonValue$ValueType \ {} as get_OBJECT;
+    //     import static get javax.json.JsonValue$ValueType.STRING: ##javax.json.JsonValue$ValueType \ {} as get_STRING;
+    //     import static get javax.json.JsonValue$ValueType.TRUE: ##javax.json.JsonValue$ValueType \ {} as get_TRUE;
+    //     match x {
+    //         case x1 if primEquals(x1, get_ARRAY())      => JsArray
+    //         case x1 if primEquals(x1, get_FALSE())      => JsFalse
+    //         case x1 if primEquals(x1, get_NULL())       => JsNull
+    //         case x1 if primEquals(x1, get_NUMBER())     => JsNumber
+    //         case x1 if primEquals(x1, get_OBJECT())     => JsObject
+    //         case x1 if primEquals(x1, get_STRING())     => JsString
+    //         case x1 if primEquals(x1, get_TRUE())       => JsTrue
+    //     }
 
 
 
@@ -111,7 +116,7 @@ namespace Interop/Json/JsonValue {
     pub def getValueType(x: JsonValue): ValueType =
         import javax.json.JsonValue.getValueType(): ##javax.json.JsonValue$ValueType \ {};
         let JsonValue(x1) = x;
-        getValueType(x1) |> unmarshal
+        getValueType(x1) |> ValueType
 
     pub def jsonFalse(): JsonValue = 
         import static get javax.json.JsonValue.FALSE: ##javax.json.JsonValue \ {} as get_FALSE;
@@ -147,4 +152,5 @@ namespace Interop/Json/JsonValue {
 
     pub def readFile(path: String): Result[JsonValue, String] \ IO = 
         File.read(path) |> Result.flatMap(readValue)
+        
 }

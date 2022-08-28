@@ -34,94 +34,28 @@ namespace Interop/Json/JsonPatch {
     use Interop/Json.JsonArray.{JsonArray};
     use Interop/Json.JsonObject;
     use Interop/Json.JsonObject.{JsonObject};
+    use Interop/Json.JsonStructure;
+    use Interop/Json.JsonStructure.{JsonStructure};
+    use Interop/Json.ImpJsonStructure;
 
-    pub enum Operation with Eq, Order, ToString, Hash, Boxable {
-        case Add
-        case Copy
-        case Move
-        case Remove
-        case Replace
-        case Test
-    }
-
-
-    pub def marshal(x: Operation): ##javax.json.JsonPatch$Operation =
-        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation \ {} as get_ADD;
-        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation \ {} as get_COPY;
-        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation \ {} as get_MOVE;
-        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation \ {} as get_REMOVE;
-        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation \ {} as get_REPLACE;
-        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation\ {} as get_TEST;
-        match x {
-            case Add        => get_ADD()
-            case Copy       => get_COPY()
-            case Move       => get_MOVE()
-            case Remove     => get_REMOVE()
-            case Replace    => get_REPLACE()
-            case Test       => get_TEST()
-        }
-
-    def primEquals(x: ##javax.json.JsonPatch$Operation, y: ##javax.json.JsonPatch$Operation): Bool =
-        import java.lang.Enum.equals(##java.lang.Object): Bool \ {};
-        let x1 = x as ##java.lang.Enum;
-        let y1 = y as ##java.lang.Object;
-        equals(x1, y1)
-
-
-    pub def unmarshal(x: ##javax.json.JsonPatch$Operation): Operation = 
-        import static get javax.json.JsonPatch$Operation.ADD: ##javax.json.JsonPatch$Operation \ {} as get_ADD;
-        import static get javax.json.JsonPatch$Operation.COPY: ##javax.json.JsonPatch$Operation \ {} as get_COPY;
-        import static get javax.json.JsonPatch$Operation.MOVE: ##javax.json.JsonPatch$Operation \ {} as get_MOVE;
-        import static get javax.json.JsonPatch$Operation.REMOVE: ##javax.json.JsonPatch$Operation \ {} as get_REMOVE;
-        import static get javax.json.JsonPatch$Operation.REPLACE: ##javax.json.JsonPatch$Operation \ {} as get_REPLACE;
-        import static get javax.json.JsonPatch$Operation.TEST: ##javax.json.JsonPatch$Operation\ {} as get_TEST;
-        match x {
-            case x1 if primEquals(x1, get_ADD())        => Add
-            case x1 if primEquals(x1, get_COPY())       => Copy
-            case x1 if primEquals(x1, get_MOVE())       => Move
-            case x1 if primEquals(x1, get_REMOVE())     => Remove
-            case x1 if primEquals(x1, get_REPLACE())    => Replace
-            case x1 if primEquals(x1, get_TEST())       => Test
-        }
+    pub def getHH(p: JsonPatch): ##javax.json.JsonPatch = 
+        let JsonPatch(p1) = p;
+        p1
 
     pub def toJsonArray(x: JsonPatch): JsonArray =
         import javax.json.JsonPatch.toJsonArray(): ##javax.json.JsonArray \ {};
         let JsonPatch(x1) = x;
         JsonArray(toJsonArray(x1))
 
-    pub def createJsonObjectDiff(src: JsonObject, dst: JsonObject): JsonPatch = 
-        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch \ {};
-        let JsonObject(src1) = src;
-        let JsonObject(dst1) = dst;
-        JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
-
-    pub def createJsonArrayDiff(src: JsonArray, dst: JsonArray): JsonPatch = 
-        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch \ {};
-        let JsonArray(src1) = src;
-        let JsonArray(dst1) = dst;
-        JsonPatch(createDiff(src1 as ##javax.json.JsonStructure, dst1 as ##javax.json.JsonStructure))
 
 
-    pub def applyToJsonObject(x: JsonPatch, o: JsonObject): Result[JsonObject, String] =
+    pub def apply(x: JsonPatch, js: t): Result[t, String] with ImpJsonStructure[t] =
         import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure \ {};
         try {
             let JsonPatch(x1) = x;
-            let JsonObject(o1) = o;
-            let ans = apply(x1, o1 as ##javax.json.JsonStructure);
-            JsonObject(ans as ##javax.json.JsonObject) |> Ok
-        } catch {
-            case ex: ##java.lang.Exception =>
-                import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
-        }
-
-    pub def applyToJsonArray(x: JsonPatch, arr: JsonArray): Result[JsonArray, String] =
-        import javax.json.JsonPatch.apply(##javax.json.JsonStructure): ##javax.json.JsonStructure \ {};
-        try {
-            let JsonPatch(x1) = x;
-            let JsonArray(arr1) = arr;
-            let ans = apply(x1, arr1 as ##javax.json.JsonStructure);
-            JsonArray(ans as ##javax.json.JsonArray) |> Ok
+            let st1 = Interop/Json/JsonStructure.toJsonStructureHH(js);
+            let ans = apply(x1, st1);
+            JsonStructure(ans) |> Interop/Json/ImpJsonStructure.fromJsonStructure |> Ok
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};

@@ -39,16 +39,14 @@ namespace Interop/Json/JsonPointer {
     pub def containsValue(ptr: JsonPointer, js: t): Bool with ImpJsonStructure[t] = 
         import javax.json.JsonPointer.containsValue(##javax.json.JsonStructure): Bool \ {};
         let JsonPointer(ptr1) = ptr;
-        Interop/Json/ImpJsonStructure.toJsonStructure(js) 
-            |> Interop/Json/JsonStructure.getHH
+        Interop/Json/JsonStructure.toJsonStructureHH(js) 
             |> containsValue(ptr1)
 
     pub def getValue(ptr: JsonPointer, js: t): Result[JsonValue, String] with ImpJsonStructure[t] = 
         try {
             import javax.json.JsonPointer.getValue(##javax.json.JsonStructure): ##javax.json.JsonValue \ {};
             let JsonPointer(ptr1) = ptr;
-            Interop/Json/ImpJsonStructure.toJsonStructure(js) 
-                |> Interop/Json/JsonStructure.getHH
+            Interop/Json/JsonStructure.toJsonStructureHH(js) 
                 |> getValue(ptr1)
                 |> JsonValue
                 |> Ok

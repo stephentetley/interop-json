@@ -46,6 +46,7 @@ namespace Interop/Json/JsonStructure {
 
     use Interop/Json.JsonStructure;
     use Interop/Json.JsonStructure.{JsonStructure};
+    use Interop/Json.ImpJsonStructure;
     use Interop/Json.JsonValue;
     use Interop/Json.JsonValue.{JsonValue};
 
@@ -53,6 +54,8 @@ namespace Interop/Json/JsonStructure {
         let JsonStructure(js1) = js;
         js1
 
+    pub def toJsonStructureHH[t: Type](v: t): ##javax.json.JsonStructure with ImpJsonStructure[t] = 
+        Interop/Json/ImpJsonStructure.toJsonStructure(v) |> getHH
 
     pub def getValue(pointer: String, js: JsonStructure): Result[JsonValue, String] = 
         try { 

@@ -17,8 +17,16 @@
 
 namespace Interop/Json/Json {
 
+    use Interop/Json.JsonMergePatch;
+    use Interop/Json.JsonMergePatch.{JsonMergePatch};
+    use Interop/Json.JsonPatch;
+    use Interop/Json.JsonPatch.{JsonPatch};
     use Interop/Json.JsonPointer;
     use Interop/Json.JsonPointer.{JsonPointer};
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
+    use Interop/Json.ImpJsonValue;
+    use Interop/Json.ImpJsonStructure;
 
     pub def createPointer(ptr: String): Result[JsonPointer, String] = 
         try {
@@ -29,4 +37,19 @@ namespace Interop/Json/Json {
                 import java.lang.Throwable.getMessage(): String \ {};
                 Err(getMessage(ex as ##java.lang.Throwable))
         }
+
+
+    pub def createJsonDiff(src: t, dst: t): JsonPatch with ImpJsonStructure[t] = 
+        import static javax.json.Json.createDiff(##javax.json.JsonStructure, ##javax.json.JsonStructure): ##javax.json.JsonPatch \ {};
+        let src1 = Interop/Json/JsonStructure.toJsonStructureHH(src);
+        let dst1 = Interop/Json/JsonStructure.toJsonStructureHH(dst);
+        createDiff(src1, dst1) |> JsonPatch
+
+    pub def createMergePatch(patch: t): JsonMergePatch with ImpJsonValue[t] = 
+        import static javax.json.Json.createMergePatch(##javax.json.JsonValue): ##javax.json.JsonMergePatch \ {};
+        let patch1 = Interop/Json/JsonValue.toJsonValueHH(patch);
+        createMergePatch(patch1) |> JsonMergePatch
+
+
+
 }
