@@ -30,9 +30,14 @@ namespace Interop/Json/JsonReader {
 
     use Interop/Json.JsonReader;
     use Interop/Json.JsonReader.{JsonReader};
+    use Interop/Json.JsonArray;
+    use Interop/Json.JsonArray.{JsonArray};
+    use Interop/Json.JsonObject;
+    use Interop/Json.JsonObject.{JsonObject};
+    use Interop/Json.JsonStructure;
+    use Interop/Json.JsonStructure.{JsonStructure};
     use Interop/Json.JsonValue;
     use Interop/Json.JsonValue.{JsonValue};
-    use Interop/Json.ImpJsonStructure;
 
 
     pub def getHH(wr: JsonReader[r]): ##javax.json.JsonReader = 
@@ -51,5 +56,48 @@ namespace Interop/Json/JsonReader {
                 Err(getMessage(ex as ##java.lang.Throwable))
          }
 
+    pub def read(rd: JsonReader[r]): Result[JsonStructure, String] \ Write(r) = 
+        try {
+            import javax.json.JsonReader.read(): ##javax.json.JsonStructure \ r;
+            let JsonReader(rd1) = rd;
+            read(rd1) |> JsonStructure |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+         }
+
+    pub def readArray(rd: JsonReader[r]): Result[JsonArray, String] \ Write(r) = 
+        try {
+            import javax.json.JsonReader.readArray(): ##javax.json.JsonArray \ r;
+            let JsonReader(rd1) = rd;
+            readArray(rd1) |> JsonArray |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+         }
+
+    pub def readObject(rd: JsonReader[r]): Result[JsonObject, String] \ Write(r) = 
+        try {
+            import javax.json.JsonReader.readObject(): ##javax.json.JsonObject \ r;
+            let JsonReader(rd1) = rd;
+            readObject(rd1) |> JsonObject |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+         }
+
+    pub def readValue(rd: JsonReader[r]): Result[JsonValue, String] \ Write(r) = 
+        try {
+            import javax.json.JsonReader.readValue(): ##javax.json.JsonValue \ r;
+            let JsonReader(rd1) = rd;
+            readValue(rd1) |> JsonValue |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+         }
 
 }
