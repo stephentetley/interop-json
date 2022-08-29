@@ -39,7 +39,7 @@ namespace Interop/Json/JsonPatchBuilder {
     use Interop/Json.JsonPatch.{JsonPatch};
     use Interop/Json.JsonStructure;
     use Interop/Json.JsonStructure.{JsonStructure};
-    use Interop/Json.ImpJsonStructure;
+    use Interop/Json.ImpJsonValue;
 
     pub def getHH(bld: JsonPatchBuilder[r]): ##javax.json.JsonPatchBuilder = 
         let JsonPatchBuilder(bld1) = bld;
@@ -51,14 +51,85 @@ namespace Interop/Json/JsonPatchBuilder {
         build(bld1) |> JsonPatch
 
 
-    pub def addBool!(path: String, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+    pub def addBool!(path: {path :: String}, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
         import javax.json.JsonPatchBuilder.add(String, Bool): ##javax.json.JsonPatchBuilder \ r;
         let JsonPatchBuilder(bld1) = bld;
-        add(bld1, path, value) |> JsonPatchBuilder 
+        add(bld1, path.path, value) |> JsonPatchBuilder 
 
-    pub def addInt32!(path: String, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+    pub def addInt32!(path: {path :: String}, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
         import javax.json.JsonPatchBuilder.add(String, Int32): ##javax.json.JsonPatchBuilder \ r;
         let JsonPatchBuilder(bld1) = bld;
-        add(bld1, path, value) |> JsonPatchBuilder 
+        add(bld1, path.path, value) |> JsonPatchBuilder 
+
+
+    pub def addString!(path: {path :: String}, value: String, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.add(String, String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        add(bld1, path.path, value) |> JsonPatchBuilder
+
+    pub def addJsonValue!(path: {path :: String}, value: t, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) with ImpJsonValue[t] =
+        import javax.json.JsonPatchBuilder.add(String, ##javax.json.JsonValue): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
+        add(bld1, path.path, value1) |> JsonPatchBuilder
+
+
+    pub def copy!(path: {path :: String}, src: String, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.copy(String, String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        copy(bld1, path.path, src) |> JsonPatchBuilder
+
+
+    pub def move!(path: {path :: String}, src: String, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.move(String, String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        move(bld1, path.path, src) |> JsonPatchBuilder
+
+    pub def remove!(path: {path :: String}, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.remove(String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        remove(bld1, path.path) |> JsonPatchBuilder 
+
+    pub def replaceBool!(path: {path :: String}, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.replace(String, Bool): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        replace(bld1, path.path, value) |> JsonPatchBuilder 
+
+    pub def replaceInt32!(path: {path :: String}, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.replace(String, Int32): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        replace(bld1, path.path, value) |> JsonPatchBuilder 
+
+    pub def replaceString!(path: {path :: String}, value: String, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.replace(String, String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        replace(bld1, path.path, value) |> JsonPatchBuilder
+
+    pub def replaceJsonValue!(path: {path :: String}, value: t, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) with ImpJsonValue[t] =
+        import javax.json.JsonPatchBuilder.replace(String, ##javax.json.JsonValue): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
+        replace(bld1, path.path, value1) |> JsonPatchBuilder
+
+    pub def testBool!(path: {path :: String}, value: Bool, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.test(String, Bool): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        test(bld1, path.path, value) |> JsonPatchBuilder 
+
+    pub def testInt32!(path: {path :: String}, value: Int32, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.test(String, Int32): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        test(bld1, path.path, value) |> JsonPatchBuilder 
+
+    pub def testString!(path: {path :: String}, value: String, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) =
+        import javax.json.JsonPatchBuilder.test(String, String): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        test(bld1, path.path, value) |> JsonPatchBuilder
+
+    pub def testJsonValue!(path: {path :: String}, value: t, bld: JsonPatchBuilder[r]): JsonPatchBuilder[r] \ Write(r) with ImpJsonValue[t] =
+        import javax.json.JsonPatchBuilder.test(String, ##javax.json.JsonValue): ##javax.json.JsonPatchBuilder \ r;
+        let JsonPatchBuilder(bld1) = bld;
+        let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
+        test(bld1, path.path, value1) |> JsonPatchBuilder
 
 }

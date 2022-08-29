@@ -46,6 +46,9 @@ namespace Interop/Json {
 
 namespace Interop/Json/JsonObject {
 
+    use Interop/Util.MapZ;
+    use Interop/Util.MapZ.{MapZ};
+
     use Interop/Json.JsonObject;
     use Interop/Json.JsonObject.{JsonObject};
     use Interop/Json.JsonArray;
@@ -171,7 +174,33 @@ namespace Interop/Json/JsonObject {
         import javax.json.JsonObject.isNull(String): Bool \ {};
         let JsonObject(o1) = o;
         isNull(o1, name)
+    
+    /// Use Interop/Util.MapZ functionality...
 
+    enum JsonObject3[_k: Type, _v: Type, _r: Region] {
+        case JsonObject3(JsonObject)
+    }
+
+    instance Interop/Util.ImpMapZ[JsonObject3] {
+        pub def toMapZ(t: JsonObject3[k, v, r]): MapZ[k, v, r] = 
+            let JsonObject3(JsonObject(t1)) = t;
+            MapZ(t1 as ##java.util.Map)
+
+        pub def fromMapZ(t: MapZ[k, v, r]): JsonObject3[k, v, r] = 
+            let MapZ(t1) = t;
+            JsonObject3(JsonObject(t1 as ##javax.json.JsonObject))
+    }
+
+    def wrapWithRegion(_: Region[r], o: JsonObject): JsonObject3[k, v, r] = JsonObject3(o)
+
+
+    pub def size(o: JsonObject): Int32 = region r {
+        wrapWithRegion(r, o) |> Interop/Util/MapZ.size
+    }
+    
+    pub def isEmpty(o: JsonObject): Bool = region r {
+        wrapWithRegion(r, o) |> Interop/Util/MapZ.isEmpty
+    }
 
     pub def readObject(src: String): Result[JsonObject, String] = region r {
         import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;

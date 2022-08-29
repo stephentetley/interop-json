@@ -47,6 +47,9 @@ namespace Interop/Json {
 
 namespace Interop/Json/JsonArray {
 
+    use Interop/Util.Collection;
+    use Interop/Util.Collection.{Collection};
+    
     use Interop/Json.JsonArray;
     use Interop/Json.JsonArray.{JsonArray};
     use Interop/Json.JsonNumber;
@@ -55,6 +58,8 @@ namespace Interop/Json/JsonArray {
     use Interop/Json.JsonObject.{JsonObject};
     use Interop/Json.JsonString;
     use Interop/Json.JsonString.{JsonString};
+    use Interop/Json.JsonValue;
+    use Interop/Json.JsonValue.{JsonValue};
 
     pub def getHH(arr: JsonArray): ##javax.json.JsonArray = 
         let JsonArray(arr1) = arr;
@@ -164,6 +169,34 @@ namespace Interop/Json/JsonArray {
         import javax.json.JsonArray.getString(Int32, String): String \ {};
         let JsonArray(arr1) = arr;
         getString(arr1, ix, d)
+
+
+    /// Use Interop/Util.Collection functionality...
+
+    enum JsonArray2[_: Type, _: Region] {
+        case JsonArray2(JsonArray)
+    }
+
+    instance Interop/Util.ImpCollection[JsonArray2] {
+        pub def toCollection(t: JsonArray2[a, r]): Collection[a, r] = 
+            let JsonArray2(JsonArray(t1)) = t;
+            Collection(t1 as ##java.util.Collection)
+
+        pub def fromCollection(t: Collection[a, r]): JsonArray2[a, r] = 
+            let Collection(t1) = t;
+            JsonArray2(JsonArray(t1 as ##javax.json.JsonArray))
+    }
+
+    def wrapWithRegion(_: Region[r], arr: JsonArray): JsonArray2[a, r] = JsonArray2(arr)
+
+    pub def size(arr: JsonArray): Int32 = region r {
+        wrapWithRegion(r, arr) |> Interop/Util/Collection.size
+    }
+
+    pub def isEmpty(arr: JsonArray): Bool = region r {
+        wrapWithRegion(r, arr) |> Interop/Util/Collection.isEmpty
+    }
+
 
 
 
