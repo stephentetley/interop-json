@@ -34,6 +34,10 @@ namespace Interop/Json {
     }
 
 
+    instance ImpJsonValue[JsonValue] {
+        pub def toJsonValue(x: JsonValue): JsonValue = x
+        pub def fromJsonValue(x: JsonValue): JsonValue = x
+    }
 }
 
 namespace Interop/Json/JsonValue {

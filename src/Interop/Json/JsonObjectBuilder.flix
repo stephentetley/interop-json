@@ -76,39 +76,47 @@ namespace Interop/Json/JsonObjectBuilder {
         add(bld1, name, value) |> JsonObjectBuilder
 
 
-    // pub def addFloat64(name: String, value: Float64): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, Float64): ##javax.json.JsonObjectBuilder \ r;
-    //     liftSetter(x1 -> add(x1, name, value))
+    pub def addFloat64!(name: String, value: Float64, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, Float64): ##javax.json.JsonObjectBuilder \ r;
+        let JsonObjectBuilder(bld1) = bld;
+        add(bld1, name, value) |> JsonObjectBuilder
 
-    // pub def addInt32(name: String, value: Int32): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder \ r;
-    //     liftSetter(x1 -> add(x1, name, value))
-
-
-    // pub def addString(name: String, value: String): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder \ r;
-    //     liftSetter(x1 -> add(x1, name, value))
+    pub def addInt32!(name: String, value: Int32, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder \ r;
+        let JsonObjectBuilder(bld1) = bld;
+        add(bld1, name, value) |> JsonObjectBuilder
 
 
+    pub def addString!(name: String, value: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
+        import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder \ r;
+        let JsonObjectBuilder(bld1) = bld;
+        add(bld1, name, value) |> JsonObjectBuilder
 
-    // pub def addJsonArrayBuilder(name: String, value: JsonArrayBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonArrayBuilder): ##javax.json.JsonObjectBuilder \ r;
-    //     import static javax.json.Json.createArrayBuilder(): ##javax.json.JsonArrayBuilder \ r;
-    //     let st = createArrayBuilder();
-    //     match Interop/Json/JsonArrayBuilder.runBuilder(() as Region[r], value, st) {
-    //         case Ok(_)    => liftSetter(x1 -> add(x1, name, st))
-    //         case Err(msg) => throwError(msg)
-    //     }
 
-    // pub def addJsonObjectBuilder(name: String, value: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonObjectBuilder): ##javax.json.JsonObjectBuilder \ r;
-    //     import static javax.json.Json.createObjectBuilder(): ##javax.json.JsonObjectBuilder \ r;
-    //     let st = createObjectBuilder();
-    //     match runBuilder(() as Region[r], value, st) {
-    //         case Ok(_)    => liftSetter(x1 -> add(x1, name, st))
-    //         case Err(msg) => throwError(msg)
-    //     }
-        
+
+    pub def addJsonArrayBuilder!(name: String, value: {value :: JsonArrayBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
+        try {
+            import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonArrayBuilder): ##javax.json.JsonObjectBuilder \ r;
+            let JsonObjectBuilder(bld1) = bld;
+            let JsonArrayBuilder(value1) = value.value;
+            add(bld1, name, value1) |> JsonObjectBuilder |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+        }
+
+    pub def addJsonObjectBuilder!(name: String, value: {value :: JsonObjectBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
+        try {
+            import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonObjectBuilder): ##javax.json.JsonObjectBuilder \ r;
+            let JsonObjectBuilder(bld1) = bld;
+            let JsonObjectBuilder(value1) = value.value;
+            add(bld1, name, value1) |> JsonObjectBuilder |> Ok
+        } catch {
+            case ex: ##java.lang.Exception =>
+                import java.lang.Throwable.getMessage(): String \ {};
+                Err(getMessage(ex as ##java.lang.Throwable))
+        }
 
         
 }
