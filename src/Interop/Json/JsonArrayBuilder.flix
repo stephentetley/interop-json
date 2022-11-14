@@ -90,7 +90,7 @@ namespace Interop/Json/JsonArrayBuilder {
         add(bld1, value1) |> JsonArrayBuilder
 
 
-    pub def addJsonArrayBuilder!(value: { value :: JsonArrayBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
+    pub def addJsonArrayBuilder!(value: {value = JsonArrayBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonArrayBuilder.add(##javax.json.JsonArrayBuilder): ##javax.json.JsonArrayBuilder \ r;
             let JsonArrayBuilder(bld1) = bld;
@@ -102,7 +102,7 @@ namespace Interop/Json/JsonArrayBuilder {
                 Err(getMessage(ex as ##java.lang.Throwable))
         }
 
-    pub def addJsonObjectBuilder!(value: { value :: JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
+    pub def addJsonObjectBuilder!(value: {value = JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonArrayBuilder.add(##javax.json.JsonObjectBuilder): ##javax.json.JsonArrayBuilder \ r;
             let JsonArrayBuilder(bld1) = bld;

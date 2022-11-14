@@ -94,7 +94,7 @@ namespace Interop/Json/JsonObjectBuilder {
 
 
 
-    pub def addJsonArrayBuilder!(name: String, value: {value :: JsonArrayBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
+    pub def addJsonArrayBuilder!(name: String, value: {value = JsonArrayBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonArrayBuilder): ##javax.json.JsonObjectBuilder \ r;
             let JsonObjectBuilder(bld1) = bld;
@@ -106,7 +106,7 @@ namespace Interop/Json/JsonObjectBuilder {
                 Err(getMessage(ex as ##java.lang.Throwable))
         }
 
-    pub def addJsonObjectBuilder!(name: String, value: {value :: JsonObjectBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
+    pub def addJsonObjectBuilder!(name: String, value: {value = JsonObjectBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
         try {
             import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonObjectBuilder): ##javax.json.JsonObjectBuilder \ r;
             let JsonObjectBuilder(bld1) = bld;
