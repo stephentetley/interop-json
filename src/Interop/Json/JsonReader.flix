@@ -23,6 +23,9 @@ namespace Interop/Json {
     ///
     pub enum JsonReader[_: Region](##javax.json.JsonReader)
 
+    instance Scoped[JsonReader] {
+        pub def regionOf(_: JsonReader[r]): Region[r] = unsafe_cast () as Region[r]
+    }
 
 }
 
@@ -53,7 +56,7 @@ namespace Interop/Json/JsonReader {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
     pub def read(rd: JsonReader[r]): Result[JsonStructure, String] \ Write(r) = 
@@ -64,7 +67,7 @@ namespace Interop/Json/JsonReader {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
     pub def readArray(rd: JsonReader[r]): Result[JsonArray, String] \ Write(r) = 
@@ -75,7 +78,7 @@ namespace Interop/Json/JsonReader {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
     pub def readObject(rd: JsonReader[r]): Result[JsonObject, String] \ Write(r) = 
@@ -86,7 +89,7 @@ namespace Interop/Json/JsonReader {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
     pub def readValue(rd: JsonReader[r]): Result[JsonValue, String] \ Write(r) = 
@@ -97,7 +100,7 @@ namespace Interop/Json/JsonReader {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
 }

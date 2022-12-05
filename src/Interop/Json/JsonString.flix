@@ -32,11 +32,11 @@ namespace Interop/Json {
     instance Interop/Json.ImpJsonValue[JsonString] {
         pub def toJsonValue(x: JsonString): JsonValue = 
             let JsonString(x1) = x;
-            JsonValue(x1 as ##javax.json.JsonValue)
+            JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
 
         pub def fromJsonValue(x: JsonValue): JsonString = 
             let JsonValue(x1) = x;
-            JsonString(x1 as ##javax.json.JsonString)
+            JsonString(unsafe_cast x1 as ##javax.json.JsonString)
     }
 
 
@@ -64,7 +64,7 @@ namespace Interop/Json/JsonString {
         import javax.json.JsonString.equals(##java.lang.Object): Bool \ {};
         let JsonString(x1) = x;
         let JsonString(y1) = y;
-        equals(x1, y1 as ##java.lang.Object)
+        equals(x1, unsafe_cast y1 as ##java.lang.Object)
 
     pub def getString(x: JsonString): String =
         import javax.json.JsonString.getString(): String \ {};

@@ -23,7 +23,9 @@ namespace Interop/Json {
     ///
     pub enum JsonObjectBuilder[_: Region](##javax.json.JsonObjectBuilder)
 
-
+    instance Scoped[JsonObjectBuilder] {
+        pub def regionOf(_: JsonObjectBuilder[r]): Region[r] = unsafe_cast () as Region[r]
+    }
 
 }
 
@@ -103,7 +105,7 @@ namespace Interop/Json/JsonObjectBuilder {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
         }
 
     pub def addJsonObjectBuilder!(name: String, value: {value = JsonObjectBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
@@ -115,7 +117,7 @@ namespace Interop/Json/JsonObjectBuilder {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
         }
 
         

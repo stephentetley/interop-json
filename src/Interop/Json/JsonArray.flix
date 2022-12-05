@@ -26,21 +26,21 @@ namespace Interop/Json {
     instance Interop/Json.ImpJsonValue[JsonArray] {
         pub def toJsonValue(x: JsonArray): JsonValue = 
             let JsonArray(x1) = x;
-            JsonValue(x1 as ##javax.json.JsonValue)
+            JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
 
         pub def fromJsonValue(x: JsonValue): JsonArray = 
             let JsonValue(x1) = x;
-            JsonArray(x1 as ##javax.json.JsonArray)
+            JsonArray(unsafe_cast x1 as ##javax.json.JsonArray)
     }
 
     instance Interop/Json.ImpJsonStructure[JsonArray] {
         pub def toJsonStructure(x: JsonArray): JsonStructure = 
             let JsonArray(x1) = x;
-            JsonStructure(x1 as ##javax.json.JsonStructure)
+            JsonStructure(unsafe_cast x1 as ##javax.json.JsonStructure)
 
         pub def fromJsonStructure(x: JsonStructure): JsonArray = 
             let JsonStructure(x1) = x;
-            JsonArray(x1 as ##javax.json.JsonArray) 
+            JsonArray(unsafe_cast x1 as ##javax.json.JsonArray) 
     }
 
 }
@@ -66,9 +66,7 @@ namespace Interop/Json/JsonArray {
         arr1
 
     pub def toString(x: JsonArray): String =
-        import javax.json.JsonValue.toString(): String \ {};
-        let JsonArray(x1) = x;
-        toString(x1 as ##javax.json.JsonValue)
+        Interop/Json/ImpJsonValue.toJsonValue(x) |> Interop/Json/JsonValue.toString
 
 
     pub def getJsonObject(ix: Int32, arr: JsonArray): Result[JsonObject, String] =
@@ -79,7 +77,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -91,7 +89,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -103,7 +101,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -115,7 +113,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -127,7 +125,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -144,7 +142,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -161,7 +159,7 @@ namespace Interop/Json/JsonArray {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -180,21 +178,21 @@ namespace Interop/Json/JsonArray {
     instance Interop/Util.ImpCollection[JsonArray2] {
         pub def toCollection(t: JsonArray2[a, r]): Collection[a, r] = 
             let JsonArray2(JsonArray(t1)) = t;
-            Collection(t1 as ##java.util.Collection)
+            Collection(unsafe_cast t1 as ##java.util.Collection)
 
         pub def fromCollection(t: Collection[a, r]): JsonArray2[a, r] = 
             let Collection(t1) = t;
-            JsonArray2(JsonArray(t1 as ##javax.json.JsonArray))
+            JsonArray2(JsonArray(unsafe_cast t1 as ##javax.json.JsonArray))
     }
 
     def wrapWithRegion(_: Region[r], arr: JsonArray): JsonArray2[a, r] = JsonArray2(arr)
 
     pub def size(arr: JsonArray): Int32 = region r {
-        wrapWithRegion(r, arr) |> Interop/Util/Collection.size
+        wrapWithRegion(r, arr) |> Interop/Util/ImpCollection.toCollection |> Interop/Util/Collection.size
     }
 
     pub def isEmpty(arr: JsonArray): Bool = region r {
-        wrapWithRegion(r, arr) |> Interop/Util/Collection.isEmpty
+        wrapWithRegion(r, arr) |> Interop/Util/ImpCollection.toCollection |> Interop/Util/Collection.isEmpty
     }
 
 
@@ -214,14 +212,14 @@ namespace Interop/Json/JsonArray {
         try {
             let _ = [] @ r;
             let strReader = newStringReader(src);
-            let jsonReader = createReader(strReader as ##java.io.Reader);
+            let jsonReader = createReader(unsafe_cast strReader as ##java.io.Reader);
             let ans = readArray(jsonReader);
             close(jsonReader);
             Ok(JsonArray(ans))
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
     }

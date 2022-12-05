@@ -25,20 +25,20 @@ namespace Interop/Json/JsonPatch {
     instance Interop/Flix.Marshal[Operation] {
         pub def toJavaObject(x: Operation): ##java.lang.Object =
             let Operation(x1) = x;
-            x1 as ##java.lang.Object
+            unsafe_cast x1 as ##java.lang.Object
 
         pub def fromJavaObject(o: ##java.lang.Object): Operation = 
-            Operation(o as ##javax.json.JsonPatch$Operation)
+            Operation(unsafe_cast o as ##javax.json.JsonPatch$Operation)
     }
 
     instance Interop/Lang.SubEnum[Operation] {
         pub def toEnum(x: Operation): Enum[a] = 
             let Operation(x1) = x;
-            Enum(x1 as ##java.lang.Enum)
+            Enum(unsafe_cast x1 as ##java.lang.Enum)
 
         pub def fromEnum(x: Enum[a]): Operation = 
             let Enum(x1) = x;
-            Operation(x1 as ##javax.json.JsonPatch$Operation) 
+            Operation(unsafe_cast x1 as ##javax.json.JsonPatch$Operation) 
     }
 
 }

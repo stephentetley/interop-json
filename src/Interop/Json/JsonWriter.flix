@@ -23,6 +23,9 @@ namespace Interop/Json {
     ///
     pub enum JsonWriter[_: Region](##javax.json.JsonWriter)
 
+    instance Scoped[JsonWriter] {
+        pub def regionOf(_: JsonWriter[r]): Region[r] = unsafe_cast () as Region[r]
+    }
 
 }
 
@@ -57,7 +60,7 @@ namespace Interop/Json/JsonWriter {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
             }
         }
 
@@ -70,7 +73,7 @@ namespace Interop/Json/JsonWriter {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
             }
         }
 
@@ -83,7 +86,7 @@ namespace Interop/Json/JsonWriter {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
             }
         }
 
@@ -97,7 +100,7 @@ namespace Interop/Json/JsonWriter {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
             }
         }
 

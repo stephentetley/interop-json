@@ -26,21 +26,21 @@ namespace Interop/Json {
     instance Interop/Json.ImpJsonValue[JsonObject] {
         pub def toJsonValue(x: JsonObject): JsonValue = 
             let JsonObject(x1) = x;
-            JsonValue(x1 as ##javax.json.JsonValue)
+            JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
 
         pub def fromJsonValue(x: JsonValue): JsonObject = 
             let JsonValue(x1) = x;
-            JsonObject(x1 as ##javax.json.JsonObject)
+            JsonObject(unsafe_cast x1 as ##javax.json.JsonObject)
     }
 
     instance Interop/Json.ImpJsonStructure[JsonObject] {
         pub def toJsonStructure(x: JsonObject): JsonStructure = 
             let JsonObject(x1) = x;
-            JsonStructure(x1 as ##javax.json.JsonStructure)
+            JsonStructure(unsafe_cast x1 as ##javax.json.JsonStructure)
 
         pub def fromJsonStructure(x: JsonStructure): JsonObject = 
             let JsonStructure(x1) = x;
-            JsonObject(x1 as ##javax.json.JsonObject) 
+            JsonObject(unsafe_cast x1 as ##javax.json.JsonObject) 
     }
 }
 
@@ -63,9 +63,7 @@ namespace Interop/Json/JsonObject {
         o1
 
     pub def toString(x: JsonObject): String =
-        import javax.json.JsonValue.toString(): String \ {};
-        let JsonObject(x1) = x;
-        toString(x1 as ##javax.json.JsonValue)
+        Interop/Json/ImpJsonValue.toJsonValue(x) |> Interop/Json/JsonValue.toString
 
 
     pub def getJsonArray(name: String, o: JsonObject): Result[JsonArray, String] =
@@ -76,7 +74,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -88,7 +86,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -101,7 +99,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -113,7 +111,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -125,7 +123,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -143,7 +141,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -161,7 +159,7 @@ namespace Interop/Json/JsonObject {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -184,40 +182,40 @@ namespace Interop/Json/JsonObject {
     instance Interop/Util.ImpMapZ[JsonObject3] {
         pub def toMapZ(t: JsonObject3[k, v, r]): MapZ[k, v, r] = 
             let JsonObject3(JsonObject(t1)) = t;
-            MapZ(t1 as ##java.util.Map)
+            MapZ(unsafe_cast t1 as ##java.util.Map)
 
         pub def fromMapZ(t: MapZ[k, v, r]): JsonObject3[k, v, r] = 
             let MapZ(t1) = t;
-            JsonObject3(JsonObject(t1 as ##javax.json.JsonObject))
+            JsonObject3(JsonObject(unsafe_cast t1 as ##javax.json.JsonObject))
     }
 
     def wrapWithRegion(_: Region[r], o: JsonObject): JsonObject3[k, v, r] = JsonObject3(o)
 
 
     pub def size(o: JsonObject): Int32 = region r {
-        wrapWithRegion(r, o) |> Interop/Util/MapZ.size
+        wrapWithRegion(r, o) |> Interop/Util/ImpMapZ.toMapZ |> Interop/Util/MapZ.size
     }
     
     pub def isEmpty(o: JsonObject): Bool = region r {
-        wrapWithRegion(r, o) |> Interop/Util/MapZ.isEmpty
+        wrapWithRegion(r, o) |> Interop/Util/ImpMapZ.toMapZ|> Interop/Util/MapZ.isEmpty
     }
 
     pub def readObject(src: String): Result[JsonObject, String] = region r {
-        import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;
-        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader & r;
-        import javax.json.JsonReader.readObject(): ##javax.json.JsonObject & r;
-        import javax.json.JsonReader.close(): Unit & r;
+        import new java.io.StringReader(String): ##java.io.StringReader \ r as newStringReader;
+        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader \ r;
+        import javax.json.JsonReader.readObject(): ##javax.json.JsonObject \ r;
+        import javax.json.JsonReader.close(): Unit \ r;
         try {
             let _ = [] @ r;
             let strReader = newStringReader(src);
-            let jsonReader = createReader(strReader as ##java.io.Reader);
+            let jsonReader = createReader(unsafe_cast strReader as ##java.io.Reader);
             let ans = readObject(jsonReader);
             close(jsonReader);
             Ok(JsonObject(ans))
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
     }

@@ -23,6 +23,10 @@ namespace Interop/Json {
     ///
     pub enum JsonPatchBuilder[_: Region](##javax.json.JsonPatchBuilder)
 
+    instance Scoped[JsonPatchBuilder] {
+        pub def regionOf(_: JsonPatchBuilder[r]): Region[r] = unsafe_cast () as Region[r]
+    }
+
 
 }
 

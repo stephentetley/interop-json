@@ -25,20 +25,20 @@ namespace Interop/Json/JsonValue {
     instance Interop/Flix.Marshal[ValueType] {
         pub def toJavaObject(x: ValueType): ##java.lang.Object =
             let ValueType(x1) = x;
-            x1 as ##java.lang.Object
+            unsafe_cast x1 as ##java.lang.Object
 
         pub def fromJavaObject(o: ##java.lang.Object): ValueType = 
-            ValueType(o as ##javax.json.JsonValue$ValueType)
+            ValueType(unsafe_cast o as ##javax.json.JsonValue$ValueType)
     }
 
     instance Interop/Lang.SubEnum[ValueType] {
         pub def toEnum(x: ValueType): Enum[a] = 
             let ValueType(x1) = x;
-            Enum(x1 as ##java.lang.Enum)
+            Enum(unsafe_cast x1 as ##java.lang.Enum)
 
         pub def fromEnum(x: Enum[a]): ValueType = 
             let Enum(x1) = x;
-            ValueType(x1 as ##javax.json.JsonValue$ValueType) 
+            ValueType(unsafe_cast x1 as ##javax.json.JsonValue$ValueType) 
     }
 
 }

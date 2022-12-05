@@ -32,11 +32,11 @@ namespace Interop/Json {
     instance Interop/Json.ImpJsonValue[JsonStructure] {
         pub def toJsonValue(x: JsonStructure): JsonValue = 
             let JsonStructure(x1) = x;
-            JsonValue(x1 as ##javax.json.JsonValue)
+            JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
 
         pub def fromJsonValue(x: JsonValue): JsonStructure = 
             let JsonValue(x1) = x;
-            JsonStructure(x1 as ##javax.json.JsonStructure)
+            JsonStructure(unsafe_cast x1 as ##javax.json.JsonStructure)
     }
 
 

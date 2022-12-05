@@ -81,21 +81,21 @@ namespace Interop/Json/JsonValue {
         JsonValue(get_NULL())
 
     pub def readValue(src: String): Result[JsonValue, String] = region r {
-        import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;
-        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader & r;
-        import javax.json.JsonReader.readValue(): ##javax.json.JsonValue & r;
-        import javax.json.JsonReader.close(): Unit & r;
+        import new java.io.StringReader(String): ##java.io.StringReader \ r as newStringReader;
+        import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader \ r;
+        import javax.json.JsonReader.readValue(): ##javax.json.JsonValue \ r;
+        import javax.json.JsonReader.close(): Unit \ r;
         try {
             let _ = [] @ r;
             let strReader = newStringReader(src);
-            let jsonReader = createReader(strReader as ##java.io.Reader);
+            let jsonReader = createReader(unsafe_cast strReader as ##java.io.Reader);
             let ans = readValue(jsonReader);
             close(jsonReader);
             Ok(JsonValue(ans))
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
             }
         }
     }

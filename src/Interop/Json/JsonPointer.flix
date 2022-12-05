@@ -53,7 +53,7 @@ namespace Interop/Json/JsonPointer {
          } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
          }
 
 

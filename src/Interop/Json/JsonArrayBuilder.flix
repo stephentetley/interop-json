@@ -25,6 +25,10 @@ namespace Interop/Json {
     pub enum JsonArrayBuilder[_: Region](##javax.json.JsonArrayBuilder)
 
 
+    instance Scoped[JsonArrayBuilder] {
+        pub def regionOf(_: JsonArrayBuilder[r]): Region[r] = unsafe_cast () as Region[r]
+    }
+
 }
 
 namespace Interop/Json/JsonArrayBuilder {
@@ -99,7 +103,7 @@ namespace Interop/Json/JsonArrayBuilder {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
         }
 
     pub def addJsonObjectBuilder!(value: {value = JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
@@ -111,7 +115,7 @@ namespace Interop/Json/JsonArrayBuilder {
         } catch {
             case ex: ##java.lang.Exception =>
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
         }
         
     // TODO EE8 has set and remove methods...

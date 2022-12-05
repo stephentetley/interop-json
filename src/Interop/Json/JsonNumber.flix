@@ -34,11 +34,11 @@ namespace Interop/Json {
     instance Interop/Json.ImpJsonValue[JsonNumber] {
         pub def toJsonValue(x: JsonNumber): JsonValue = 
             let JsonNumber(x1) = x;
-            JsonValue(x1 as ##javax.json.JsonValue)
+            JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
 
         pub def fromJsonValue(x: JsonValue): JsonNumber = 
             let JsonValue(x1) = x;
-            JsonNumber(x1 as ##javax.json.JsonNumber)
+            JsonNumber(unsafe_cast x1 as ##javax.json.JsonNumber)
     }
 
 }
@@ -51,13 +51,13 @@ namespace Interop/Json/JsonNumber {
     pub def toString(x: JsonNumber): String =
         import javax.json.JsonValue.toString(): String \ {};
         let JsonNumber(x1) = x;
-        toString(x1 as ##javax.json.JsonValue)
+        toString(unsafe_cast x1 as ##javax.json.JsonValue)
 
     pub def equals(x: JsonNumber, y: JsonNumber): Bool =
         import javax.json.JsonNumber.equals(##java.lang.Object): Bool \ {};
         let JsonNumber(x1) = x;
         let JsonNumber(y1) = y;
-        equals(x1, y1 as ##java.lang.Object)
+        equals(x1, unsafe_cast y1 as ##java.lang.Object)
 
     pub def hashCode(x: JsonNumber): Int32 =
         import javax.json.JsonNumber.hashCode(): Int32 \ {};
@@ -83,7 +83,7 @@ namespace Interop/Json/JsonNumber {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -100,7 +100,7 @@ namespace Interop/Json/JsonNumber {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
@@ -117,7 +117,7 @@ namespace Interop/Json/JsonNumber {
         } catch {
             case ex: ##java.lang.Exception => {
                 import java.lang.Throwable.getMessage(): String \ {};
-                Err(getMessage(ex as ##java.lang.Throwable))
+                Err(getMessage(ex))
             }
         }
 
