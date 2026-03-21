@@ -26,6 +26,7 @@ pub mod InteropJson.JsonNumber {
             let JsonNumber.JsonNumber(x1) = x;
             unsafe IO { x1.toString() }
     }
+    
     instance Eq[JsonNumber] {
         pub def eq(x: JsonNumber, y: JsonNumber): Bool = 
             let JsonNumber.JsonNumber(x1) = x;
