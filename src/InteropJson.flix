@@ -15,8 +15,9 @@
  */
 
 
-namespace Interop/Json/Json {
+pub mod InteropJson {
 
+    /*
     use Interop/IO.InputStream;
     use Interop/IO.InputStream.{InputStream};
     use Interop/IO.OutputStream;
@@ -102,5 +103,5 @@ namespace Interop/Json/Json {
     pub def createPatchBuilder(_: Region[r]): JsonPatchBuilder[r] \ {Write(r)} = 
         import static javax.json.Json.createPatchBuilder(): ##javax.json.JsonPatchBuilder \ r;
         createPatchBuilder() |> JsonPatchBuilder
-
+*/
 }
