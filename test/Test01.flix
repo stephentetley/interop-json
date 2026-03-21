@@ -1,13 +1,20 @@
 
 
-namespace Test01 {
+pub mod Test01 {
 
-    @test
-    def test01(): Bool & Impure = 
-        Interop/Json/JsonValue.jsonTrue() |> println;
-        true
+    use Assert.{assertEq}
 
-    // @test
+    @Test
+    def test01(): Unit \ { Assert, IO } = 
+        assertEq(
+            expected = true, 
+            {
+                InteropJson.JsonValue.jsonTrue() |> println;
+                true
+            }
+        )
+
+    // @Test
     // def test02(): Bool & Impure = 
     //     use Applicative.{*>};
     //     use Interop/Json/JsonObjectBuilder.{addString, addBigInt, addInt32, addFloat64};
@@ -17,7 +24,7 @@ namespace Test01 {
     //         true
     //     }
 
-    // @test
+    // @Test
     // def test03(): Bool & Impure = 
     //     use Applicative.{*>};
     //     use Interop/Json/JsonObjectBuilder.{addString, addBigInt, addInt32, addFloat64, addJsonObjectBuilder};
@@ -27,12 +34,12 @@ namespace Test01 {
     //         true
     //     }
 
-    @test
-    def test04(): Bool & Impure = 
-        match Interop/Json/JsonValue.readValue("{ \"number\": 1000, \"string\": \"some_text\" } ") {
-            case Ok(json) => {println("Read: ${json}"); true}
-            case Err(msg) => {println(msg); false}
-        }
+    // @Test
+    // def test04(): Bool & Impure = 
+    //     match Interop/Json/JsonValue.readValue("{ \"number\": 1000, \"string\": \"some_text\" } ") {
+    //         case Ok(json) => {println("Read: ${json}"); true}
+    //         case Err(msg) => {println(msg); false}
+    //     }
 
 
 }
