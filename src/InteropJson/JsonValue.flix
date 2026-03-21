@@ -17,6 +17,8 @@
 
 pub mod InteropJson.JsonValue {
 
+    use InteropJson.JsonValue.ValueType.ValueType
+
     import jakarta.json.{JsonValue => JJsonValue}
     
     ///
@@ -45,10 +47,9 @@ pub mod InteropJson.JsonValue {
 
 
         
-    // pub def getValueType(x: JsonValue): ValueType =
-    //     import javax.json.JsonValue.getValueType(): ##javax.json.JsonValue$ValueType \ {};
-    //     let JsonValue(x1) = x;
-    //     getValueType(x1) |> ValueType
+    pub def getValueType(x: JsonValue): ValueType =
+        let JsonValue.JsonValue(x1) = x;
+        InteropJson.JsonValue.ValueType.unmarshalValueType(unsafe IO { x1.getValueType() })
 
     pub def jsonFalse(): JsonValue = 
         JsonValue.JsonValue(unsafe IO { JJsonValue.FALSE })
