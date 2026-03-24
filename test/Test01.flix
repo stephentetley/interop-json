@@ -8,10 +8,7 @@ pub mod Test01 {
     def test01(): Unit \ { Assert, IO } = 
         assertEq(
             expected = true, 
-            {
-                InteropJson.JsonValue.jsonTrue() |> println;
-                true
-            }
+            { InteropJson.JsonValue.jsonTrue() |> println; true }
         )
 
     // @Test

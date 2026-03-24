@@ -15,21 +15,7 @@
  */
 
 
-// namespace Interop/Json {
 
-
-//     ///
-//     /// Represents a JsonArrayBuilder.
-//     /// Interface / Mutable
-//     ///
-//     pub enum JsonArrayBuilder[_: Region](##javax.json.JsonArrayBuilder)
-
-
-//     instance Scoped[JsonArrayBuilder] {
-//         pub def regionOf(_: JsonArrayBuilder[r]): Region[r] = unsafe_cast () as Region[r]
-//     }
-
-// }
 
 pub mod InteropJson.JsonArrayBuilder {
 
@@ -38,15 +24,22 @@ pub mod InteropJson.JsonArrayBuilder {
 
     pub eff JsonArrayBuilder {
         def addNull(): Unit
-        def addNullAt(ix: Int32): Unit
+        def addNullAt(index: {index = Int32}): Unit
         def addBool(b: Bool): Unit
-        def addBoolAt(ix: Int32, b: Bool): Unit
+        def addBoolAt(index: {index = Int32}, b: Bool): Unit
         def addInt32(i: Int32): Unit
+        def addInt32At(index: {index = Int32}, i: Int32): Unit
         def addBigInt(i: BigInt): Unit
+        def addBigIntAt(index: {index = Int32}, i: BigInt): Unit
         def addFloat64(d: Float64): Unit
+        def addFloat64At(index: {index = Int32}, d: Float64): Unit
+        def addBigDecimal(d: BigDecimal): Unit
+        def addBigDecimalAt(index: {index = Int32}, d: BigDecimal): Unit
+        def addString(s: String): Unit
+        def addStringAt(index: {index = Int32}, s: String): Unit
     }
 
-    pub enum JsonArrayBuilderHandle (JJsonArrayBuilder)
+    pub enum JsonArrayBuilderHandle(JJsonArrayBuilder)
 
     pub def handle(arrb: JsonArrayBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonArrayBuilder) =
         x -> {
@@ -61,7 +54,7 @@ pub mod InteropJson.JsonArrayBuilder {
                 }
                 
                 def addNullAt(ix, k) =  try {
-                    let _ = unsafe IO { jarrb.addNull(ix) };
+                    let _ = unsafe IO { jarrb.addNull(ix#index) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
@@ -73,7 +66,7 @@ pub mod InteropJson.JsonArrayBuilder {
                 }
 
                 def addBoolAt(ix, value, k) =  try {
-                    let _ = unsafe IO { jarrb.add(ix, value) };
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
@@ -84,15 +77,61 @@ pub mod InteropJson.JsonArrayBuilder {
                     k()
                 }
 
+                def addInt32At(ix, value, k) = try {
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+
                 def addBigInt(value, k) = {
                     let _ = unsafe IO { jarrb.add(value) };
                     k()
+                }
+
+                def addBigIntAt(ix, value, k) = try {
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addFloat64(value, k) = {
                     let _ = unsafe IO { jarrb.add(value) };
                     k()
                 }
+
+                def addFloat64At(ix, value, k) = try {
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+
+                def addBigDecimal(value, k) = {
+                    let _ = unsafe IO { jarrb.add(value) };
+                    k()
+                }
+
+                def addBigDecimalAt(ix, value, k) = try {
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+
+                def addString(value, k) = {
+                    let _ = unsafe IO { jarrb.add(value) };
+                    k()
+                }
+
+                def addStringAt(ix, value, k) = try {
+                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+
             }
         }
 
@@ -105,21 +144,7 @@ pub mod InteropJson.JsonArrayBuilder {
 
 
 
-    // pub def addFloat64!(value: Float64, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
-    //     import javax.json.JsonArrayBuilder.add(Float64): ##javax.json.JsonArrayBuilder \ r;
-    //     let JsonArrayBuilder(bld1) = bld;
-    //     add(bld1, value) |> JsonArrayBuilder 
 
-    // pub def addInt32!(value: Int32, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
-    //     import javax.json.JsonArrayBuilder.add(Int32): ##javax.json.JsonArrayBuilder \ r;
-    //     let JsonArrayBuilder(bld1) = bld;
-    //     add(bld1, value) |> JsonArrayBuilder 
-
-
-    // pub def addString!(value: String, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) =
-    //     import javax.json.JsonArrayBuilder.add(String): ##javax.json.JsonArrayBuilder \ r;
-    //     let JsonArrayBuilder(bld1) = bld;
-    //     add(bld1, value) |> JsonArrayBuilder 
 
     // pub def addJsonValue!(value: t, bld: JsonArrayBuilder[r]): JsonArrayBuilder[r] \ Write(r) with ImpJsonValue[t] =
     //     import javax.json.JsonArrayBuilder.add(##javax.json.JsonValue): ##javax.json.JsonArrayBuilder \ r;
