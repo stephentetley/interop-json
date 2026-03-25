@@ -2,7 +2,7 @@
 name        = "interop-json"
 description = "A Flix wrapper over parts of the javax.json API"
 version     = "0.1.0"
-flix        = "0.69.2"
+flix        = "0.69.3"
 license     = "Apache-2.0"
 authors     = ["Stephen Tetley <stephen.tetley@gmail.com>"]
 

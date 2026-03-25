@@ -19,6 +19,10 @@
 
 pub mod InteropJson.JsonArrayBuilder {
 
+    use InteropJson.JsonValue.JsonValue
+    use InteropJson.JsonArray.JsonArray
+
+    import jakarta.json.Json
     import jakarta.json.{JsonArrayBuilder => JJsonArrayBuilder}
     import java.lang.{Exception}
 
@@ -37,96 +41,113 @@ pub mod InteropJson.JsonArrayBuilder {
         def addBigDecimalAt(index: {index = Int32}, d: BigDecimal): Unit
         def addString(s: String): Unit
         def addStringAt(index: {index = Int32}, s: String): Unit
+        def addJsonValue(v: JsonValue): Unit
+        def addJsonValueAt(index: {index = Int32}, v: JsonValue): Unit
     }
 
-    pub enum JsonArrayBuilderHandle(JJsonArrayBuilder)
 
-    pub def handle(arrb: JsonArrayBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonArrayBuilder) =
+    pub def handle(f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - JsonArrayBuilder) =
         x -> {
-            let JsonArrayBuilderHandle.JsonArrayBuilderHandle(jarrb) = arrb;
+            let builder = unsafe IO { Json.createArrayBuilder() };
             run {
-                Ok(f(x))
+                let ans = f(x);
+                let jsarr = unsafe IO { builder.build() };
+                Ok((JsonArray.JsonArray(jsarr), ans))
             } with handler JsonArrayBuilder {
                 
                 def addNull(k) = {
-                    let _ = unsafe IO { jarrb.addNull() };
+                    let _ = unsafe IO { builder.addNull() };
                     k()
                 }
                 
                 def addNullAt(ix, k) =  try {
-                    let _ = unsafe IO { jarrb.addNull(ix#index) };
+                    let _ = unsafe IO { builder.addNull(ix#index) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addBool(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addBoolAt(ix, value, k) =  try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addInt32(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addInt32At(ix, value, k) = try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addBigInt(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addBigIntAt(ix, value, k) = try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addFloat64(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addFloat64At(ix, value, k) = try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addBigDecimal(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addBigDecimalAt(ix, value, k) = try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
                 }
 
                 def addString(value, k) = {
-                    let _ = unsafe IO { jarrb.add(value) };
+                    let _ = unsafe IO { builder.add(value) };
                     k()
                 }
 
                 def addStringAt(ix, value, k) = try {
-                    let _ = unsafe IO { jarrb.add(ix#index, value) };
+                    let _ = unsafe IO { builder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+
+                def addJsonValue(value, k) = {
+                    let JsonValue.JsonValue(value1) = value;
+                    let _ = unsafe IO { builder.add(value1) };
+                    k()
+                }
+
+                def addJsonValueAt(ix, value, k) = try {
+                    let JsonValue.JsonValue(value1) = value;
+                    let _ = unsafe IO { builder.add(ix#index, value1) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
@@ -179,7 +200,10 @@ pub mod InteropJson.JsonArrayBuilder {
         
     // TODO EE8 has set and remove methods...
 
-    pub def runJsonArrayBuilder(arrb: JsonArrayBuilderHandle, f: Unit -> a \ ef): Result[String, a] \ (ef - JsonArrayBuilder) = 
-        handle(arrb, f)()
+    pub def runJsonArrayBuilder(f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - JsonArrayBuilder) = 
+        handle(f)()
+        
+    pub def evalJsonArrayBuilder(f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - JsonArrayBuilder) = 
+        handle(f)() |> Result.map(fst)
 
 }

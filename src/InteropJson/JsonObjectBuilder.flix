@@ -17,6 +17,10 @@
 
 pub mod InteropJson.JsonObjectBuilder {
 
+    use InteropJson.JsonValue.JsonValue
+    use InteropJson.JsonObject.JsonObject
+
+    import jakarta.json.Json
     import jakarta.json.{JsonObjectBuilder => JJsonObjectBuilder}
     import java.lang.{Exception}
 
@@ -32,54 +36,69 @@ pub mod InteropJson.JsonObjectBuilder {
         def addBigInt(name: {name = String}, i: BigInt): Unit
         def addFloat64(name: {name = String}, d: Float64): Unit
         def addBigDecimal(name: {name = String}, i: BigDecimal): Unit
+        def addString(name: {name = String}, s: String): Unit
+        def addJsonValue(name: {name = String}, v: JsonValue): Unit
     }
 
-    pub enum JsonObjectBuilderHandle(JJsonObjectBuilder)
 
-    pub def handle(objb: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder) =
+
+    pub def handle(f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - JsonObjectBuilder) =
         x -> {
-            let JsonObjectBuilderHandle.JsonObjectBuilderHandle(jobjb) = objb;
+            let builder = unsafe IO { Json.createObjectBuilder() };
             run {
-                Ok(f(x))
+                let ans = f(x);
+                let jsobj = unsafe IO { builder.build() };
+                Ok((JsonObject.JsonObject(jsobj), ans))
             } with handler JsonObjectBuilder {
                 
                 def addNull(name, k) = {
-                    let _ = unsafe IO { jobjb.addNull(name#name) };
+                    let _ = unsafe IO { builder.addNull(name#name) };
                     k()
                 }
                 
                 def addBool(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addInt32(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addInt64(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addBigInt(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addFloat64(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addInt64(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addBigDecimal(name, value, k) = {
-                    let _ = unsafe IO { jobjb.add(name#name, value) };
+                    let _ = unsafe IO { builder.add(name#name, value) };
+                    k()
+                }
+
+                def addString(name, value, k) = {
+                    let _ = unsafe IO { builder.add(name#name, value) };
+                    k()
+                }
+
+                def addJsonValue(name, value, k) = {
+                    let JsonValue.JsonValue(value1) = value;
+                    let _ = unsafe IO { builder.add(name#name, value1) };
                     k()
                 }
 
@@ -92,11 +111,6 @@ pub mod InteropJson.JsonObjectBuilder {
     //     build(bld1) |> JsonObject
 
 
-    // /// Note - the Java exception `addNull` thrown should be "unreachable" in Flix.
-    // pub def addNull!(name: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.addNull(String): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     addNull(bld1, name) |> JsonObjectBuilder 
 
         
     // pub def addJsonValue!(name: String, value: t, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) with ImpJsonValue[t] =
@@ -106,32 +120,7 @@ pub mod InteropJson.JsonObjectBuilder {
     //     add(bld1, name, value1) |> JsonObjectBuilder 
         
 
-    // pub def addBool!(name: String, value: Bool, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, Bool): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     add(bld1, name, value) |> JsonObjectBuilder
 
-    // pub def addBigInt!(name: String, value: BigInt, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, BigInt): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     add(bld1, name, value) |> JsonObjectBuilder
-
-
-    // pub def addFloat64!(name: String, value: Float64, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, Float64): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     add(bld1, name, value) |> JsonObjectBuilder
-
-    // pub def addInt32!(name: String, value: Int32, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, Int32): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     add(bld1, name, value) |> JsonObjectBuilder
-
-
-    // pub def addString!(name: String, value: String, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) =
-    //     import javax.json.JsonObjectBuilder.add(String, String): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     add(bld1, name, value) |> JsonObjectBuilder
 
 
 
@@ -159,5 +148,10 @@ pub mod InteropJson.JsonObjectBuilder {
     //             Err(getMessage(ex))
     //     }
 
+    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder) = 
+        handle(f)()
         
+    pub def evalJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder) = 
+        handle(f)() |> Result.map(fst)
+
 }

@@ -11,15 +11,18 @@ pub mod Test01 {
             { InteropJson.JsonValue.jsonTrue() |> println; true }
         )
 
-    // @Test
-    // def test02(): Bool & Impure = 
-    //     use Applicative.{*>};
-    //     use Interop/Json/JsonObjectBuilder.{addString, addBigInt, addInt32, addFloat64};
-    //     region r {
-    //         let proc = () -> addInt32("number", 12) *> addString("hello", "world") *> addBigInt("big", 1000ii) *> addFloat64("decimal", 1.0763f64);
-    //         Interop/Json/JsonObjectBuilder.createObject(r, proc()) |> println;
-    //         true
-    //     }
+    @Test
+    def test02(): Unit \ { Assert, IO } = 
+        use InteropJson.JsonObjectBuilder.JsonObjectBuilder;
+        let obj = run {
+            let _ = JsonObjectBuilder.addInt32(name = "number", 12);
+            let _ = JsonObjectBuilder.addString(name = "hello", "world");
+            let _ = JsonObjectBuilder.addBigInt(name = "big", 1000ii);
+            let _ = JsonObjectBuilder.addFloat64(name = "decimal", 1.0763f64);
+            true
+        } with InteropJson.JsonObjectBuilder.evalJsonObjectBuilder;
+        println(obj);
+        assertEq(expected = true, true)
 
     // @Test
     // def test03(): Bool & Impure = 
