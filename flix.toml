@@ -1,6 +1,6 @@
 [package]
 name        = "interop-json"
-description = "A Flix wrapper over parts of the javax.json API"
+description = "A Flix wrapper over parts of the jakarta.json API"
 version     = "0.1.0"
 flix        = "0.69.3"
 license     = "Apache-2.0"
@@ -10,5 +10,5 @@ authors     = ["Stephen Tetley <stephen.tetley@gmail.com>"]
 
 
 [mvn-dependencies]
-"jakarta.json:jakarta.json-api" = "2.1.2"
-"org.apache.johnzon:johnzon-core" = "2.0.2"
+"jakarta.json:jakarta.json-api" = "2.0.1"
+"org.glassfish:jakarta.json" = "2.0.1"

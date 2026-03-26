@@ -40,19 +40,16 @@ pub mod InteropJson.JsonObjectBuilder {
         def addJsonValue(name: {name = String}, v: JsonValue): Unit
     }
 
+    // TODO - Flix compiler is optimizing away unsafe IO calls without them being run...
 
-
-    pub def handle(f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - JsonObjectBuilder) =
+    def handle(builder: JJsonObjectBuilder, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + IO) =
         x -> {
-            let builder = unsafe IO { Json.createObjectBuilder() };
             run {
-                let ans = f(x);
-                let jsobj = unsafe IO { builder.build() };
-                Ok((JsonObject.JsonObject(jsobj), ans))
+                Ok(f(x))
             } with handler JsonObjectBuilder {
                 
                 def addNull(name, k) = {
-                    let _ = unsafe IO { builder.addNull(name#name) };
+                    let _ = builder.addNull(name#name);
                     k()
                 }
                 
@@ -62,7 +59,7 @@ pub mod InteropJson.JsonObjectBuilder {
                 }
 
                 def addInt32(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    let _ = builder.add(name#name, value);
                     k()
                 }
 
@@ -72,12 +69,12 @@ pub mod InteropJson.JsonObjectBuilder {
                 }
 
                 def addBigInt(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
                 def addFloat64(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard unsafe IO { builder.add(name#name, value) };
                     k()
                 }
 
@@ -92,7 +89,7 @@ pub mod InteropJson.JsonObjectBuilder {
                 }
 
                 def addString(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    let _ = builder.add(name#name, value);
                     k()
                 }
 
@@ -148,10 +145,26 @@ pub mod InteropJson.JsonObjectBuilder {
     //             Err(getMessage(ex))
     //     }
 
-    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder) = 
-        handle(f)()
+    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + IO) = 
+        let builder = unsafe IO { Json.createObjectBuilder() };
+        match handle(builder, f)() {
+            case Err(s) => Err(s)
+            case Ok(a)  => {
+                let jso = unsafe IO { builder.build() };
+                Ok((JsonObject.JsonObject(jso), a))
+            }
+        }
         
-    pub def evalJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder) = 
-        handle(f)() |> Result.map(fst)
+
+        
+    pub def evalJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder + IO) = 
+        runJsonObjectBuilder(f) |> Result.map(fst)
+
+    pub def temp01(): JsonObject \ IO = 
+        let builder = Json.createObjectBuilder();
+        builder.add("five", 5);
+        builder.add("twelve", 12);
+        JsonObject.JsonObject(builder.build())
+
 
 }
