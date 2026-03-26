@@ -49,53 +49,53 @@ pub mod InteropJson.JsonObjectBuilder {
             } with handler JsonObjectBuilder {
                 
                 def addNull(name, k) = {
-                    let _ = builder.addNull(name#name);
+                    discard builder.addNull(name#name);
                     k()
                 }
                 
                 def addBool(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addInt32(name, value, k) = {
-                    let _ = builder.add(name#name, value);
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addInt64(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addBigInt(name, value, k) = {
-                    discard unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addFloat64(name, value, k) = {
-                    discard unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addInt64(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addBigDecimal(name, value, k) = {
-                    let _ = unsafe IO { builder.add(name#name, value) };
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addString(name, value, k) = {
-                    let _ = builder.add(name#name, value);
+                    discard builder.add(name#name, value);
                     k()
                 }
 
                 def addJsonValue(name, value, k) = {
                     let JsonValue.JsonValue(value1) = value;
-                    let _ = unsafe IO { builder.add(name#name, value1) };
+                    discard builder.add(name#name, value1);
                     k()
                 }
 
