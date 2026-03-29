@@ -1,6 +1,6 @@
 # interop-json
 
-A Flix wrapper over parts of the javax.json API.
+A Flix wrapper over parts of the jakarta.json (javax.json) API.
 
 Reactivated March 2026
 
