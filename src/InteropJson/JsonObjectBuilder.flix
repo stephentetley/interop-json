@@ -51,84 +51,86 @@ pub mod InteropJson.JsonObjectBuilder {
     }
 
     // Can't have a default handler because we have extra input and output requirements
+    // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
 
-    pub def handleWithInstantiatedBuilder(builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + IO) = x -> {
+
+    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + r) = x -> {
         let JsonObjectBuilderHandle.JsonObjectBuilderHandle(builder1) = builder;
         run {
             Ok(f(x))
         } with handler JsonObjectBuilder {
 
             def addNull(name, k) = {
-                discard builder1.addNull(name#name);
+                unchecked_cast(discard builder1.addNull(name#name) as _ \ r);
                 k()
             }
 
             def addBool(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addInt32(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addInt64(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addBigInt(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addFloat64(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addInt64(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addBigDecimal(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addString(name, value, k) = {
-                discard builder1.add(name#name, value);
+                unchecked_cast(discard builder1.add(name#name, value) as _ \ r);
                 k()
             }
 
             def addJsonValue(name, value, k) = {
                 let JsonValue.JsonValue(value1) = value;
-                discard builder1.add(name#name, value1);
+                unchecked_cast(discard builder1.add(name#name, value1) as _ \ r);
                 k()
             }
 
             def addJsonArrayBuilder(name, value, k) = {
                 let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
-                discard builder1.add(name#name, value1);
+                unchecked_cast(discard builder1.add(name#name, value1) as _ \ r);
                 k()
             }
 
             def addJsonObjectBuilder(name, value, k) = {
                 let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
-                discard builder1.add(name#name, value1);
+                unchecked_cast(discard builder1.add(name#name, value1) as _ \ r);
                 k()
             }
 
             def addAll(value, k) = {
                 let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
-                discard builder1.addAll(value1);
+                unchecked_cast(discard builder1.addAll(value1) as _ \ r);
                 k()
             }
 
             def remove(name, k) = try {
-                discard builder1.remove(name#name);
+                unchecked_cast(discard builder1.remove(name#name) as _ \ r);
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -137,25 +139,25 @@ pub mod InteropJson.JsonObjectBuilder {
     }
 
 
-    pub def reifyBuilderHandle(bld: JsonObjectBuilderHandle): JsonObject \ IO =
+    pub def reifyBuilderHandle(_: Region[r], bld: JsonObjectBuilderHandle): JsonObject \ r =
         let JsonObjectBuilderHandle.JsonObjectBuilderHandle(bld1) = bld;
-        JsonObject.JsonObject(bld1.build())
+        JsonObject.JsonObject(unchecked_cast(bld1.build() as _ \ r))
 
-    pub def createJsonObjectBuilderHandle(): JsonObjectBuilderHandle \ IO =
-        JsonObjectBuilderHandle.JsonObjectBuilderHandle(Json.createObjectBuilder())
+    pub def createJsonObjectBuilderHandle(_: Region[r]): JsonObjectBuilderHandle \ r =
+        JsonObjectBuilderHandle.JsonObjectBuilderHandle(unchecked_cast(Json.createObjectBuilder() as _ \ r))
 
 
-    pub def reifyJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - JsonObjectBuilder + IO) =
-        let builder = createJsonObjectBuilderHandle();
-        handleWithInstantiatedBuilder(builder, f)() |> Result.map(_ -> builder)
+    pub def reifyJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - JsonObjectBuilder + r) =
+        let builder = createJsonObjectBuilderHandle(rc);
+        handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(_ -> builder)
 
-    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + IO) =
-        let builder = createJsonObjectBuilderHandle();
-        handleWithInstantiatedBuilder(builder, f)() |> Result.map(x -> (reifyBuilderHandle(builder), x))
+    pub def runJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + r) =
+        let builder = createJsonObjectBuilderHandle(rc);
+        handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
 
         
-    pub def evalJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder + IO) = 
-        runJsonObjectBuilder(f) |> Result.map(fst)
+    pub def evalJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder + r) =
+        runJsonObjectBuilder(rc, f) |> Result.map(fst)
 
 
 
