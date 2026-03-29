@@ -21,7 +21,7 @@ pub mod InteropJson.JsonArrayBuilder {
 
 
     use InteropJson.JsonArray.JsonArray
-    use InteropJson.JsonObjectBuilder.JsonObjectBuilder
+    use InteropJson.JsonObjectBuilder.JsonObjectBuilderHandle
     use InteropJson.JsonValue.JsonValue
 
     import jakarta.json.Json
@@ -53,6 +53,19 @@ pub mod InteropJson.JsonArrayBuilder {
         def addAll(b: JsonArrayBuilderHandle): Unit
         def addJsonArrayBuilder(b: JsonArrayBuilderHandle): Unit
         def addJsonArrayBuilderAt(index: {index = Int32}, b: JsonArrayBuilderHandle): Unit
+        def addJsonObjectBuilder(b: JsonObjectBuilderHandle): Unit
+        def addJsonObjectBuilderAt(index: {index = Int32}, b: JsonObjectBuilderHandle): Unit
+        def remove(index: {index = Int32}): Unit
+        def setNull(index: {index = Int32}): Unit
+        def setBool(index: {index = Int32}, b: Bool): Unit
+        def setInt32(index: {index = Int32}, i: Int32): Unit
+        def setBigInt(index: {index = Int32}, i: BigInt): Unit
+        def setFloat64(index: {index = Int32}, d: Float64): Unit
+        def setBigDecimal(index: {index = Int32}, d: BigDecimal): Unit
+        def setString(index: {index = Int32}, s: String): Unit
+        def setJsonValue(index: {index = Int32}, v: JsonValue): Unit
+        def setJsonArrayBuilder(index: {index = Int32}, b: JsonArrayBuilderHandle): Unit
+        def setJsonObjectBuilder(index: {index = Int32}, b: JsonObjectBuilderHandle): Unit
     }
 
     // Can't have a default handler because we have extra input and output requirements
@@ -181,6 +194,100 @@ pub mod InteropJson.JsonArrayBuilder {
                 case ex: Exception => Err(ex.getMessage())
             }
 
+            def addJsonObjectBuilder(value, k) = {
+                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
+                discard builder1.add(value1);
+                k()
+            }
+
+            def addJsonObjectBuilderAt(ix, value, k) = try {
+                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
+                discard builder1.add(ix#index, value1);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def remove(ix, k) = try {
+                discard builder1.remove(ix#index);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setNull(ix, k) = try {
+                discard builder1.setNull(ix#index);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setBool(ix, value, k) =  try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setInt32(ix, value, k) = try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setBigInt(ix, value, k) = try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setFloat64(ix, value, k) = try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setBigDecimal(ix, value, k) = try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setString(ix, value, k) = try {
+                discard builder1.set(ix#index, value);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setJsonValue(ix, value, k) = try {
+                let JsonValue.JsonValue(value1) = value;
+                discard builder1.set(ix#index, value1);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setJsonArrayBuilder(ix, value, k) = try {
+                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
+                discard builder1.set(ix#index, value1);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def setJsonObjectBuilder(ix, value, k) = try {
+                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
+                discard builder1.set(ix#index, value1);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
         }
     }
 
@@ -192,20 +299,6 @@ pub mod InteropJson.JsonArrayBuilder {
     pub def createJsonArrayBuilderHandle(): JsonArrayBuilderHandle \ IO =
         JsonArrayBuilderHandle.JsonArrayBuilderHandle(Json.createArrayBuilder())
 
-
-    // pub def addJsonObjectBuilder!(value: {value = JsonObjectBuilder[r]}, bld: JsonArrayBuilder[r]): Result[JsonArrayBuilder[r], String] \ Write(r) =
-    //     try {
-    //         import javax.json.JsonArrayBuilder.add(##javax.json.JsonObjectBuilder): ##javax.json.JsonArrayBuilder \ r;
-    //         let JsonArrayBuilder(bld1) = bld;
-    //         let JsonObjectBuilder(value1) = value.value;
-    //         add(bld1, value1) |> JsonArrayBuilder |> Ok
-    //     } catch {
-    //         case ex: ##java.lang.Exception =>
-    //             import java.lang.Throwable.getMessage(): String \ {};
-    //             Err(getMessage(ex))
-    //     }
-        
-    // TODO EE8 has set and remove methods...
 
     pub def reifyJsonArrayBuilder(f: Unit -> a \ ef): Result[String, JsonArrayBuilderHandle] \ (ef - JsonArrayBuilder + IO) =
         let builder = createJsonArrayBuilderHandle();

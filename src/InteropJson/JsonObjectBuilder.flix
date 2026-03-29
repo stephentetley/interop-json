@@ -17,8 +17,9 @@
 
 pub mod InteropJson.JsonObjectBuilder {
 
-    use InteropJson.JsonValue.JsonValue
     use InteropJson.JsonObject.JsonObject
+    use InteropJson.JsonArrayBuilder.JsonArrayBuilderHandle
+    use InteropJson.JsonValue.JsonValue
 
     import jakarta.json.Json
     import jakarta.json.{JsonObjectBuilder => JJsonObjectBuilder}
@@ -43,6 +44,10 @@ pub mod InteropJson.JsonObjectBuilder {
         def addBigDecimal(name: {name = String}, i: BigDecimal): Unit
         def addString(name: {name = String}, s: String): Unit
         def addJsonValue(name: {name = String}, v: JsonValue): Unit
+        def addJsonArrayBuilder(name: {name = String}, b: JsonArrayBuilderHandle): Unit
+        def addJsonObjectBuilder(name: {name = String}, b: JsonObjectBuilderHandle): Unit
+        def addAll(b: JsonObjectBuilderHandle): Unit
+        def remove(name: {name = String}): Unit
     }
 
     // Can't have a default handler because we have extra input and output requirements
@@ -104,6 +109,30 @@ pub mod InteropJson.JsonObjectBuilder {
                 k()
             }
 
+            def addJsonArrayBuilder(name, value, k) = {
+                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
+                discard builder1.add(name#name, value1);
+                k()
+            }
+
+            def addJsonObjectBuilder(name, value, k) = {
+                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
+                discard builder1.add(name#name, value1);
+                k()
+            }
+
+            def addAll(value, k) = {
+                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
+                discard builder1.addAll(value1);
+                k()
+            }
+
+            def remove(name, k) = try {
+                discard builder1.remove(name#name);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
         }
     }
 
@@ -115,43 +144,6 @@ pub mod InteropJson.JsonObjectBuilder {
     pub def createJsonObjectBuilderHandle(): JsonObjectBuilderHandle \ IO =
         JsonObjectBuilderHandle.JsonObjectBuilderHandle(Json.createObjectBuilder())
 
-
-
-        
-    // pub def addJsonValue!(name: String, value: t, bld: JsonObjectBuilder[r]): JsonObjectBuilder[r] \ Write(r) with ImpJsonValue[t] =
-    //     import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonValue): ##javax.json.JsonObjectBuilder \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     let value1 = Interop/Json/JsonValue.toJsonValueHH(value);
-    //     add(bld1, name, value1) |> JsonObjectBuilder 
-        
-
-
-
-
-
-    // pub def addJsonArrayBuilder!(name: String, value: {value = JsonArrayBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
-    //     try {
-    //         import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonArrayBuilder): ##javax.json.JsonObjectBuilder \ r;
-    //         let JsonObjectBuilder(bld1) = bld;
-    //         let JsonArrayBuilder(value1) = value.value;
-    //         add(bld1, name, value1) |> JsonObjectBuilder |> Ok
-    //     } catch {
-    //         case ex: ##java.lang.Exception =>
-    //             import java.lang.Throwable.getMessage(): String \ {};
-    //             Err(getMessage(ex))
-    //     }
-
-    // pub def addJsonObjectBuilder!(name: String, value: {value = JsonObjectBuilder[r]}, bld: JsonObjectBuilder[r]): Result[JsonObjectBuilder[r], String] \ Write(r) =
-    //     try {
-    //         import javax.json.JsonObjectBuilder.add(String, ##javax.json.JsonObjectBuilder): ##javax.json.JsonObjectBuilder \ r;
-    //         let JsonObjectBuilder(bld1) = bld;
-    //         let JsonObjectBuilder(value1) = value.value;
-    //         add(bld1, name, value1) |> JsonObjectBuilder |> Ok
-    //     } catch {
-    //         case ex: ##java.lang.Exception =>
-    //             import java.lang.Throwable.getMessage(): String \ {};
-    //             Err(getMessage(ex))
-    //     }
 
     pub def reifyJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - JsonObjectBuilder + IO) =
         let builder = createJsonObjectBuilderHandle();
