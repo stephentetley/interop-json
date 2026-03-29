@@ -25,8 +25,13 @@ pub mod InteropJson.JsonObjectBuilder {
     import java.lang.{Exception}
 
     ///
-    /// Represents a JsonObjectBuilder.
-    /// Interface / Mutable
+    /// A handle to reify a JsonObjectBuilder.
+    ///
+    pub enum JsonObjectBuilderHandle(JJsonObjectBuilder)
+
+
+    ///
+    /// Represents a JsonObjectBuilder
     ///
     pub eff JsonObjectBuilder {
         def addNull(name: {name = String}): Unit
@@ -40,72 +45,75 @@ pub mod InteropJson.JsonObjectBuilder {
         def addJsonValue(name: {name = String}, v: JsonValue): Unit
     }
 
-    // TODO - Flix compiler is optimizing away unsafe IO calls without them being run...
+    // Can't have a default handler because we have extra input and output requirements
 
-    def handle(builder: JJsonObjectBuilder, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + IO) =
-        x -> {
-            run {
-                Ok(f(x))
-            } with handler JsonObjectBuilder {
-                
-                def addNull(name, k) = {
-                    discard builder.addNull(name#name);
-                    k()
-                }
-                
-                def addBool(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
+    pub def handleWithInstantiatedBuilder(builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + IO) = x -> {
+        let JsonObjectBuilderHandle.JsonObjectBuilderHandle(builder1) = builder;
+        run {
+            Ok(f(x))
+        } with handler JsonObjectBuilder {
 
-                def addInt32(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addInt64(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addBigInt(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addFloat64(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addInt64(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addBigDecimal(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addString(name, value, k) = {
-                    discard builder.add(name#name, value);
-                    k()
-                }
-
-                def addJsonValue(name, value, k) = {
-                    let JsonValue.JsonValue(value1) = value;
-                    discard builder.add(name#name, value1);
-                    k()
-                }
-
+            def addNull(name, k) = {
+                discard builder1.addNull(name#name);
+                k()
             }
-        }
 
-    // pub def build(bld: JsonObjectBuilder[r]): JsonObject \ Read(r) =
-    //     import javax.json.JsonObjectBuilder.build(): ##javax.json.JsonObject \ r;
-    //     let JsonObjectBuilder(bld1) = bld;
-    //     build(bld1) |> JsonObject
+            def addBool(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addInt32(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addInt64(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addBigInt(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addFloat64(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addInt64(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addBigDecimal(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addString(name, value, k) = {
+                discard builder1.add(name#name, value);
+                k()
+            }
+
+            def addJsonValue(name, value, k) = {
+                let JsonValue.JsonValue(value1) = value;
+                discard builder1.add(name#name, value1);
+                k()
+            }
+
+        }
+    }
+
+
+    pub def reifyBuilderHandle(bld: JsonObjectBuilderHandle): JsonObject \ IO =
+        let JsonObjectBuilderHandle.JsonObjectBuilderHandle(bld1) = bld;
+        JsonObject.JsonObject(bld1.build())
+
+    pub def createJsonObjectBuilderHandle(): JsonObjectBuilderHandle \ IO =
+        JsonObjectBuilderHandle.JsonObjectBuilderHandle(Json.createObjectBuilder())
 
 
 
@@ -145,26 +153,18 @@ pub mod InteropJson.JsonObjectBuilder {
     //             Err(getMessage(ex))
     //     }
 
-    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + IO) = 
-        let builder = unsafe IO { Json.createObjectBuilder() };
-        match handle(builder, f)() {
-            case Err(s) => Err(s)
-            case Ok(a)  => {
-                let jso = unsafe IO { builder.build() };
-                Ok((JsonObject.JsonObject(jso), a))
-            }
-        }
-        
+    pub def reifyJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - JsonObjectBuilder + IO) =
+        let builder = createJsonObjectBuilderHandle();
+        handleWithInstantiatedBuilder(builder, f)() |> Result.map(_ -> builder)
+
+    pub def runJsonObjectBuilder(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + IO) =
+        let builder = createJsonObjectBuilderHandle();
+        handleWithInstantiatedBuilder(builder, f)() |> Result.map(x -> (reifyBuilderHandle(builder), x))
 
         
     pub def evalJsonObjectBuilder(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder + IO) = 
         runJsonObjectBuilder(f) |> Result.map(fst)
 
-    pub def temp01(): JsonObject \ IO = 
-        let builder = Json.createObjectBuilder();
-        builder.add("five", 5);
-        builder.add("twelve", 12);
-        JsonObject.JsonObject(builder.build())
 
 
 }

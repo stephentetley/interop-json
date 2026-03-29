@@ -24,12 +24,6 @@ pub mod Test01 {
         println(obj);
         assertEq(expected = true, true)
 
-    @Test
-    def test03(): Unit \ { Assert, IO } = 
-        use InteropJson.JsonObjectBuilder.temp01;
-        let obj = temp01();
-        println(obj);
-        assertEq(expected = true, true)
 
     // @Test
     // def test03(): Bool & Impure = 
