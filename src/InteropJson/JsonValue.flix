@@ -18,11 +18,19 @@
 pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
+    use InteropJson.JsonNumber.JsonNumber
+    use InteropJson.JsonArray.JsonArray
+    use InteropJson.JsonObject.JsonObject
 
+    import java.lang.{Exception => JException}
     import jakarta.json.Json
     import jakarta.json.{JsonValue => JJsonValue}
     import jakarta.json.{JsonValue$ValueType => JValueType}
     import jakarta.json.{JsonString => JJsonString}
+    import jakarta.json.{JsonNumber => JJsonNumber}
+    import jakarta.json.{JsonObject => JJsonObject}
+    import jakarta.json.{JsonArray => JJsonArray}
+
 
     ///
     /// Represents a JsonValue.
@@ -109,6 +117,14 @@ pub mod InteropJson.JsonValue {
         let valueType = unsafe IO { x1.getValueType() };
         unsafe IO { valueType.equals(JValueType.NUMBER) }
     
+    pub def isIntegral(x: JsonValue): Bool = 
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            unsafe IO { jsonnumber.isIntegral() }
+        } else false
+
+
     pub def isString(x: JsonValue): Bool = 
         let JsonValue.JsonValue(x1) = x;
         let valueType = unsafe IO { x1.getValueType() };
@@ -123,7 +139,32 @@ pub mod InteropJson.JsonValue {
         let JsonValue.JsonValue(x1) = x;
         let valueType = unsafe IO { x1.getValueType() };
         unsafe IO { valueType.equals(JValueType.OBJECT) }
-    
+
+
+    pub def getJsonArray(x: JsonValue): Option[JsonArray] =
+        if (isObject(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonarray = unchecked_cast(x1 as JJsonArray);
+            Some(JsonArray.JsonArray(jsonarray))
+        } else None
+
+    pub def getJsonNumber(x: JsonValue): Option[JsonNumber] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(JsonNumber.JsonNumber(jsonnumber))
+        } else None
+
+    pub def getJsonObject(x: JsonValue): Option[JsonObject] =
+        if (isObject(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonobject = unchecked_cast(x1 as JJsonObject);
+            Some(JsonObject.JsonObject(jsonobject))
+        } else None
+
+
+    pub def getNull(x: JsonValue): Option[Unit] = 
+        if (isNull(x)) Some(()) else None
 
     pub def getBool(x: JsonValue): Option[Bool] = match x {
         case x1 if InteropJson.JsonValue.isTrue(x1)     => Some(true)
@@ -136,6 +177,81 @@ pub mod InteropJson.JsonValue {
             let JsonValue.JsonValue(x1) = x;
             let jsonstring = unchecked_cast(x1 as JJsonString);
             Some(unsafe IO { jsonstring.getString() })     
+        } else None
+
+
+
+
+    pub def getInt32(x: JsonValue): Option[Int32] = 
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(unsafe IO { jsonnumber.intValue() })
+        } else None
+
+
+    pub def getInt32Exact(x: JsonValue): Option[Int32] = 
+        if (isNumber(x)) {
+            try {
+                let JsonValue.JsonValue(x1) = x;
+                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+                Some(unsafe IO { jsonnumber.intValueExact() })
+            } catch {
+                case _: JException => None
+            }
+        } else None
+
+    pub def getInt64(x: JsonValue): Option[Int64] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(unsafe IO { jsonnumber.longValue() })
+        } else None
+
+
+    pub def getInt64Exact(x: JsonValue): Option[Int64] =
+        if (isNumber(x)) {
+            try {
+                let JsonValue.JsonValue(x1) = x;
+                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+                Some(unsafe IO { jsonnumber.longValueExact() })
+            } catch {
+                case _: JException => None
+            }
+        } else None
+
+    pub def getBigInt(x: JsonValue): Option[BigInt] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(unsafe IO { jsonnumber.bigIntegerValue() })
+        } else None
+
+
+    pub def getBigIntExact(x: JsonValue): Option[BigInt] =
+        if (isNumber(x)) {
+            try {
+                let JsonValue.JsonValue(x1) = x;
+                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+                Some(unsafe IO { jsonnumber.bigIntegerValueExact() })
+            } catch {
+                case _: JException => None
+            }
+        } else None
+
+
+    pub def getFloat64(x: JsonValue): Option[Float64] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(unsafe IO { jsonnumber.doubleValue() })
+        } else None
+
+    pub def getBigDecimal(x: JsonValue): Option[BigDecimal] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(unsafe IO { jsonnumber.bigDecimalValue() })
         } else None
 
 

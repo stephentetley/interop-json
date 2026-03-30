@@ -108,4 +108,25 @@ pub mod InteropJson {
         pub def fromJson(x: JsonValue): Option[String] = InteropJson.JsonValue.getString(x)
     }
 
+    instance FromJson[Int32] {
+        pub def fromJson(x: JsonValue): Option[Int32] = InteropJson.JsonValue.getInt32Exact(x)
+    }
+
+    instance FromJson[Int64] {
+        pub def fromJson(x: JsonValue): Option[Int64] = InteropJson.JsonValue.getInt64Exact(x)
+    }
+
+    instance FromJson[BigInt] {
+        pub def fromJson(x: JsonValue): Option[BigInt] = InteropJson.JsonValue.getBigIntExact(x)
+    }
+
+    // Not exact
+    instance FromJson[Float64] {
+        pub def fromJson(x: JsonValue): Option[Float64] = InteropJson.JsonValue.getFloat64(x)
+    }
+
+    instance FromJson[BigDecimal] {
+        pub def fromJson(x: JsonValue): Option[BigDecimal] = InteropJson.JsonValue.getBigDecimal(x)
+    }
+
 }
