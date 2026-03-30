@@ -5,6 +5,23 @@ pub mod Test01 {
     use Assert.{assertEq}
 
     @Test
+    def getString01(): Unit \ { Assert } = 
+        assertEq(
+            expected = Some("hello world"),
+            { let json = InteropJson.JsonValue.jsonString("hello world"); 
+            InteropJson.JsonValue.getString(json) }
+        )
+
+    @Test
+    def getString02(): Unit \ { Assert } = 
+        assertEq(
+            expected = None,
+            { let json = InteropJson.JsonValue.jsonNumberFromInt32(5000); 
+            InteropJson.JsonValue.getString(json) }
+        )
+
+
+    @Test
     def test01(): Unit \ { Assert, IO } = 
         assertEq(
             expected = true, 

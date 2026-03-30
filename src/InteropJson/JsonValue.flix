@@ -19,8 +19,11 @@ pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
 
+    import jakarta.json.Json
     import jakarta.json.{JsonValue => JJsonValue}
-    
+    import jakarta.json.{JsonValue$ValueType => JValueType}
+    import jakarta.json.{JsonString => JJsonString}
+
     ///
     /// Represents a JsonValue.
     /// Interface
@@ -60,6 +63,81 @@ pub mod InteropJson.JsonValue {
     
     pub def jsonNull(): JsonValue = 
         JsonValue.JsonValue(unsafe IO { JJsonValue.NULL })
+
+
+    pub def jsonString(s: String): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(s) });
+        JsonValue.JsonValue(value)
+
+    pub def jsonNumberFromInt32(i: Int32): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(i) });
+        JsonValue.JsonValue(value)
+
+    pub def jsonNumberFromInt64(i: Int64): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(i) });
+        JsonValue.JsonValue(value)
+
+    pub def jsonNumberFromFloat64(d: Float64): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(d) });
+        JsonValue.JsonValue(value)
+
+    pub def jsonNumberFromBigInt(i: BigInt): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(i) });
+        JsonValue.JsonValue(value)
+
+    pub def jsonNumberFromBigDecimal(d: BigDecimal): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(d) });
+        JsonValue.JsonValue(value)
+
+    pub def isNull(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.NULL) }
+
+    pub def isTrue(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.TRUE) }
+    
+    pub def isFalse(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.FALSE) }
+    
+    pub def isNumber(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.NUMBER) }
+    
+    pub def isString(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.STRING) }
+    
+    pub def isArray(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.ARRAY) }
+    
+    pub def isObject(x: JsonValue): Bool = 
+        let JsonValue.JsonValue(x1) = x;
+        let valueType = unsafe IO { x1.getValueType() };
+        unsafe IO { valueType.equals(JValueType.OBJECT) }
+    
+
+    pub def getBool(x: JsonValue): Option[Bool] = match x {
+        case x1 if InteropJson.JsonValue.isTrue(x1)     => Some(true)
+        case x1 if InteropJson.JsonValue.isFalse(x1)    => Some(false)
+        case _                                          => None
+    }
+
+    pub def getString(x: JsonValue): Option[String] = 
+        if (isString(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonstring = unchecked_cast(x1 as JJsonString);
+            Some(unsafe IO { jsonstring.getString() })     
+        } else None
+
 
     // pub def readValue(src: String): Result[JsonValue, String] = region r {
     //     import new java.io.StringReader(String): ##java.io.StringReader \ r as newStringReader;
