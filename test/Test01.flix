@@ -30,15 +30,15 @@ pub mod Test01 {
 
     @Test
     def test02(): Unit \ { Assert, IO } = 
-        use InteropJson.JsonObjectBuilder.JsonObjectBuilder;
+        use InteropJson.JsonObjectBuilder.BuildJsonObject;
         region rc {
             let obj = run {
-                JsonObjectBuilder.addInt32(name = "number", 12);
-                JsonObjectBuilder.addString(name = "hello", "world");
-                JsonObjectBuilder.addBigInt(name = "big", 1000ii);
-                JsonObjectBuilder.addFloat64(name = "decimal", 1.0763f64);
+                BuildJsonObject.addInt32(name = "number", 12);
+                BuildJsonObject.addString(name = "hello", "world");
+                BuildJsonObject.addBigInt(name = "big", 1000ii);
+                BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
                 true
-            } with InteropJson.JsonObjectBuilder.evalJsonObjectBuilder(rc);
+            } with InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc);
             println(obj);
             assertEq(expected = true, true)
         }

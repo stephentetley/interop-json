@@ -33,7 +33,7 @@ pub mod InteropJson.JsonArrayBuilder {
     ///
     pub enum JsonArrayBuilderHandle(JJsonArrayBuilder)
 
-    pub eff JsonArrayBuilder {
+    pub eff BuildJsonArray {
         def addNull(): Unit
         def addNullAt(index: {index = Int32}): Unit
         def addBool(b: Bool): Unit
@@ -70,11 +70,11 @@ pub mod InteropJson.JsonArrayBuilder {
 
     // Can't have a default handler because we have extra input and output requirements
 
-    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonArrayBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonArrayBuilder + r) = x -> {
+    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonArrayBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - BuildJsonArray + r) = x -> {
         let JsonArrayBuilderHandle.JsonArrayBuilderHandle(builder1) = builder;
         run {
             Ok(f(x))
-        } with handler JsonArrayBuilder {
+        } with handler BuildJsonArray {
 
             def addNull(k) = {
                 unchecked_cast(discard builder1.addNull() as _ \ r);
@@ -300,15 +300,15 @@ pub mod InteropJson.JsonArrayBuilder {
         JsonArrayBuilderHandle.JsonArrayBuilderHandle(unchecked_cast(Json.createArrayBuilder() as _ \ r))
 
 
-    pub def reifyJsonArrayBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArrayBuilderHandle] \ (ef - JsonArrayBuilder + r) =
+    pub def reifyBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArrayBuilderHandle] \ (ef - BuildJsonArray + r) =
         let builder = createJsonArrayBuilderHandle(rc);
         handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(_ -> builder)
 
-    pub def runJsonArrayBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - JsonArrayBuilder + r) =
+    pub def runBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - BuildJsonArray + r) =
         let builder = createJsonArrayBuilderHandle(rc);
         handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
         
-    pub def evalJsonArrayBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - JsonArrayBuilder + r) =
-        runJsonArrayBuilder(rc, f) |> Result.map(fst)
+    pub def evalBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray + r) =
+        runBuildJsonArray(rc, f) |> Result.map(fst)
 
 }

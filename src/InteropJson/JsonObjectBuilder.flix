@@ -34,7 +34,7 @@ pub mod InteropJson.JsonObjectBuilder {
     ///
     /// Represents a JsonObjectBuilder
     ///
-    pub eff JsonObjectBuilder {
+    pub eff BuildJsonObject {
         def addNull(name: {name = String}): Unit
         def addBool(name: {name = String}, b: Bool): Unit
         def addInt32(name: {name = String}, i: Int32): Unit
@@ -54,11 +54,11 @@ pub mod InteropJson.JsonObjectBuilder {
     // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
 
 
-    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - JsonObjectBuilder + r) = x -> {
+    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - BuildJsonObject + r) = x -> {
         let JsonObjectBuilderHandle.JsonObjectBuilderHandle(builder1) = builder;
         run {
             Ok(f(x))
-        } with handler JsonObjectBuilder {
+        } with handler BuildJsonObject {
 
             def addNull(name, k) = {
                 unchecked_cast(discard builder1.addNull(name#name) as _ \ r);
@@ -147,17 +147,17 @@ pub mod InteropJson.JsonObjectBuilder {
         JsonObjectBuilderHandle.JsonObjectBuilderHandle(unchecked_cast(Json.createObjectBuilder() as _ \ r))
 
 
-    pub def reifyJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - JsonObjectBuilder + r) =
+    pub def reifyBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - BuildJsonObject + r) =
         let builder = createJsonObjectBuilderHandle(rc);
         handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(_ -> builder)
 
-    pub def runJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - JsonObjectBuilder + r) =
+    pub def runBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - BuildJsonObject + r) =
         let builder = createJsonObjectBuilderHandle(rc);
         handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
 
         
-    pub def evalJsonObjectBuilder(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - JsonObjectBuilder + r) =
-        runJsonObjectBuilder(rc, f) |> Result.map(fst)
+    pub def evalBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject + r) =
+        runBuildJsonObject(rc, f) |> Result.map(fst)
 
 
 
