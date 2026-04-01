@@ -15,15 +15,21 @@
  */
 
 
-pub mod InteropJson.JsonObject {
+pub mod InteropJson.JsonObjectReader {
 
-    use InteropJson.JsonArray.JsonArray
+    use InteropJson.JsonArrayReader.JsonArray
     use InteropJson.JsonNumber.JsonNumber
     use InteropJson.JsonString.JsonString
 
     import jakarta.json.{JsonObject => JJsonObject}
 
     pub enum JsonObject(JJsonObject)
+
+    pub eff ReadJsonObject {
+        def isNull(name: String): Bool
+    }
+
+
 
     instance ToString[JsonObject] {
         pub def toString(x: JsonObject): String =

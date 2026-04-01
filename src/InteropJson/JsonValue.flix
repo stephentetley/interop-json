@@ -19,8 +19,8 @@ pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
     use InteropJson.JsonNumber.JsonNumber
-    use InteropJson.JsonArray.JsonArray
-    use InteropJson.JsonObject.JsonObject
+    use InteropJson.JsonArrayReader.JsonArray
+    use InteropJson.JsonObjectReader.JsonObject
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json

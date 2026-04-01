@@ -15,9 +15,9 @@
  */
 
 
-pub mod InteropJson.JsonArray {
+pub mod InteropJson.JsonArrayReader {
 
-    use InteropJson.JsonObject.JsonObject
+    use InteropJson.JsonObjectReader.JsonObject
     use InteropJson.JsonNumber.JsonNumber
     use InteropJson.JsonString.JsonString
 
@@ -26,8 +26,23 @@ pub mod InteropJson.JsonArray {
     pub enum JsonArray(JJsonArray)
 
 
+    pub eff ReadJsonArray {
+        def isNull(index: Int32): Bool
+    }
 
+    pub def handle(_: Region[r], jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray + r) = x -> {
+        let JsonArray.JsonArray(jsarray1) = jsarray;
+        run {
+            Ok(f(x))
+        } with handler ReadJsonArray {
 
+            def isNull(ix, k) = {
+                let ans = unchecked_cast(jsarray1.isNull(ix) as _ \ r);
+                k(ans)
+            }
+
+        }
+    }
 
     instance ToString[JsonArray] {
         pub def toString(x: JsonArray): String =
