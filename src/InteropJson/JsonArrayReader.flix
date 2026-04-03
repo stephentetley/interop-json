@@ -22,12 +22,19 @@ pub mod InteropJson.JsonArrayReader {
     use InteropJson.JsonString.JsonString
 
     import jakarta.json.{JsonArray => JJsonArray}
-    
+    import java.lang.{Exception}
+
     pub enum JsonArray(JJsonArray)
 
 
     pub eff ReadJsonArray {
-        def isNull(index: Int32): Bool
+        def isNull(index: {index = Int32}): Bool
+        def getBool(index: {index = Int32}): Bool
+        def getBoolWithDefault(index: {index = Int32}, d: Bool): Bool
+        def getInt32(index: {index = Int32}): Int32
+        def getInt32WithDefault(index: {index = Int32}, d: Int32): Int32
+        def getString(index: {index = Int32}): String
+        def getStringWithDefault(index: {index = Int32}, d: String): String
     }
 
     pub def handle(_: Region[r], jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray + r) = x -> {
@@ -36,9 +43,53 @@ pub mod InteropJson.JsonArrayReader {
             Ok(f(x))
         } with handler ReadJsonArray {
 
-            def isNull(ix, k) = {
-                let ans = unchecked_cast(jsarray1.isNull(ix) as _ \ r);
+            def isNull(ix, k) = try {
+                let ans = unchecked_cast(jsarray1.isNull(ix#index) as _ \ r);
                 k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+        
+            def getBool(ix, k) = try {
+                let ans = unchecked_cast(jsarray1.getBoolean(ix#index) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBoolWithDefault(ix, d, k) = try {
+                let ans = unchecked_cast(jsarray1.getBoolean(ix#index, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt32(ix, k) = try {
+                let ans = unchecked_cast(jsarray1.getInt(ix#index) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt32WithDefault(ix, d, k) = try {
+                let ans = unchecked_cast(jsarray1.getInt(ix#index, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+            
+            def getString(ix, k) = try {
+                let ans = unchecked_cast(jsarray1.getString(ix#index) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getStringWithDefault(ix, d, k) = try {
+                let ans = unchecked_cast(jsarray1.getString(ix#index, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
             }
 
         }

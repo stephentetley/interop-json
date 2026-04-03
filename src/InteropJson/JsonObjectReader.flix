@@ -22,13 +22,77 @@ pub mod InteropJson.JsonObjectReader {
     use InteropJson.JsonString.JsonString
 
     import jakarta.json.{JsonObject => JJsonObject}
+    import java.lang.{Exception}
 
     pub enum JsonObject(JJsonObject)
 
     pub eff ReadJsonObject {
-        def isNull(name: String): Bool
+        def isNull(name: {name = String}): Bool
+        def getBool(name: {name = String}): Bool
+        def getBoolWithDefault(name: {name = String}, d: Bool): Bool
+        def getInt32(name: {name = String}): Int32
+        def getInt32WithDefault(name: {name = String}, d: Int32): Int32
+        def getString(name: {name = String}): String
+        def getStringWithDefault(name: {name = String}, d: String): String        
     }
 
+    pub def handle(_: Region[r], jsobject: JsonObject, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonObject + r) = x -> {
+        let JsonObject.JsonObject(jsobject1) = jsobject;
+        run {
+            Ok(f(x))
+        } with handler ReadJsonObject {
+
+            def isNull(name, k) = try {
+                let ans = unchecked_cast(jsobject1.isNull(name#name) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+        
+            def getBool(name, k) = try {
+                let ans = unchecked_cast(jsobject1.getBoolean(name#name) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBoolWithDefault(name, d, k) = try {
+                let ans = unchecked_cast(jsobject1.getBoolean(name#name, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt32(name, k) = try {
+                let ans = unchecked_cast(jsobject1.getInt(name#name) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt32WithDefault(name, d, k) = try {
+                let ans = unchecked_cast(jsobject1.getInt(name#name, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+            
+            def getString(name, k) = try {
+                let ans = unchecked_cast(jsobject1.getString(name#name) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getStringWithDefault(name, d, k) = try {
+                let ans = unchecked_cast(jsobject1.getString(name#name, d) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+        }
+    }
 
 
     instance ToString[JsonObject] {
@@ -83,44 +147,6 @@ pub mod InteropJson.JsonObjectReader {
             JsonString.JsonString(unsafe IO { o1.getJsonString(name) })
         })
 
-    pub def getString(name: String, o: JsonObject): Result[String, String] =
-        Result.tryCatch(_ -> {
-            let JsonObject.JsonObject(o1) = o;
-            unsafe IO { o1.getString(name) }
-        })
-
-
-    pub def getStringWithDefault(name: String, d: String, o: JsonObject): String =
-        let JsonObject.JsonObject(o1) = o;
-        unsafe IO { o1.getString(name, d) }
-
-
-    pub def getInt(name: String, o: JsonObject): Result[String, Int32] =
-        Result.tryCatch(_ -> {
-            let JsonObject.JsonObject(o1) = o;
-            unsafe IO { o1.getInt(name) }
-        })
-
-    pub def getIntWithDefault(name: String, d: Int32, o: JsonObject): Int32 =
-        let JsonObject.JsonObject(o1) = o;
-        unsafe IO { o1.getInt(name, d) }
-
-
-    pub def getBoolean(name: String, o: JsonObject): Result[String, Bool] =
-        Result.tryCatch(_ -> {
-            let JsonObject.JsonObject(o1) = o;
-            unsafe IO { o1.getBoolean(name) }
-        })
-
-
-    pub def getBooleanWithDefault(name: String, d: Bool, o: JsonObject): Bool =
-        let JsonObject.JsonObject(o1) = o;
-        unsafe IO { o1.getBoolean(name, d) }
-
-
-    pub def isNull(name: String, o: JsonObject): Bool =
-        let JsonObject.JsonObject(o1) = o;
-        unsafe IO { o1.isNull(name) }
     
     // /// Use Interop/Util.MapZ functionality...
 
