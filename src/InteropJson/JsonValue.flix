@@ -18,6 +18,9 @@
 pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
+    use InteropJson.JsonValue
+    use InteropJson.JsonArray
+    use InteropJson.JsonObject
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -28,46 +31,6 @@ pub mod InteropJson.JsonValue {
     import jakarta.json.{JsonObject => JJsonObject}
     import jakarta.json.{JsonArray => JJsonArray}
 
-
-    ///
-    /// Represents a JsonValue.
-    /// Interface
-    ///
-    pub enum JsonValue(JJsonValue)
-
-    instance ToString[JsonValue] {
-        pub def toString(x: JsonValue): String =
-            let JsonValue.JsonValue(x1) = x;
-            unsafe IO { x1.toString() }
-    }
-
-
-    pub trait JsonValueInterop[t: Type] {
-        pub def toJsonValue(x: t): JsonValue
-        pub def fromJsonValue(x: JsonValue): t
-    }
-
-
-    instance JsonValueInterop[JsonValue] {
-        pub def toJsonValue(x: JsonValue): JsonValue = x
-        pub def fromJsonValue(x: JsonValue): JsonValue = x
-    }
-
-    pub enum JsonObject(JJsonObject)
-
-    instance ToString[JsonObject] {
-        pub def toString(x: JsonObject): String =
-            let JsonObject.JsonObject(x1) = x;
-            unsafe IO { x1.toString() }
-    }
-
-    pub enum JsonArray(JJsonArray)
-
-    instance ToString[JsonArray] {
-        pub def toString(x: JsonArray): String =
-            let JsonArray.JsonArray(x1) = x;
-            unsafe IO { x1.toString() }
-    }
 
         
     pub def getValueType(x: JsonValue): ValueType =
@@ -108,6 +71,18 @@ pub mod InteropJson.JsonValue {
     pub def jsonNumberFromBigDecimal(d: BigDecimal): JsonValue = 
         let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(d) });
         JsonValue.JsonValue(value)
+
+    pub def jsonArrayToJsonValue(x: JsonArray): JsonValue =
+        let JsonArray.JsonArray(x1) = x;
+        let jsonvalue: JJsonValue = checked_cast(x1);
+        JsonValue.JsonValue(jsonvalue)
+
+
+    pub def jsonObjectToJsonValue(x: JsonObject): JsonValue =
+        let JsonObject.JsonObject(x1) = x;
+        let jsonvalue: JJsonValue = checked_cast(x1);
+        JsonValue.JsonValue(jsonvalue)
+
 
     pub def isNull(x: JsonValue): Bool = 
         let JsonValue.JsonValue(x1) = x;

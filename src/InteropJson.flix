@@ -17,116 +17,177 @@
 
 pub mod InteropJson { 
     
-    use InteropJson.JsonValue.JsonValue
-
+    
     import jakarta.json.Json
+    import jakarta.json.{JsonValue => JJsonValue}
+    import jakarta.json.{JsonArray => JJsonArray}
+    import jakarta.json.{JsonObject => JJsonObject}
+
+    ///
+    /// Represents a JsonValue.
+    /// Interface
+    ///
+    pub enum JsonValue(JJsonValue)
 
 
+    pub enum JsonObject(JJsonObject)
+
+    instance ToString[JsonObject] {
+        pub def toString(x: JsonObject): String =
+            let JsonObject.JsonObject(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+
+
+    pub enum JsonArray(JJsonArray)
+
+    instance ToString[JsonArray] {
+        pub def toString(x: JsonArray): String =
+            let JsonArray.JsonArray(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+
+
+    instance ToString[JsonValue] {
+        pub def toString(x: JsonValue): String =
+            let JsonValue.JsonValue(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+    
 
     ///
     /// A trait for types that can be converted to Json.
     ///
-    pub trait ToJson[t] {
+    pub trait ToJsonValue[t] {
         ///
         /// Return a Json value representing `x`.
         ///
-        pub def toJson(x: t): JsonValue
+        pub def toJsonValue(x: t): JsonValue
     }
 
-    instance ToJson[Bool] {
-        pub def toJson(x: Bool): JsonValue = match x {
+    instance ToJsonValue[Bool] {
+        pub def toJsonValue(x: Bool): JsonValue = match x {
             case true => InteropJson.JsonValue.jsonTrue()
             case false => InteropJson.JsonValue.jsonFalse()
         }
     }
 
-    instance ToJson[Char] {
-        pub def toJson(x: Char): JsonValue =
+    instance ToJsonValue[Char] {
+        pub def toJsonValue(x: Char): JsonValue =
             InteropJson.JsonValue.jsonString(Char.toString(x))
     }
 
-    instance ToJson[String] {
-        pub def toJson(x: String): JsonValue =
+    instance ToJsonValue[String] {
+        pub def toJsonValue(x: String): JsonValue =
             InteropJson.JsonValue.jsonString(x)
     }
 
-    instance ToJson[Int8] {
-        pub def toJson(x: Int8): JsonValue =
+    instance ToJsonValue[Int8] {
+        pub def toJsonValue(x: Int8): JsonValue =
             InteropJson.JsonValue.jsonNumberFromInt32(Int8.toInt32(x))
     }
 
-    instance ToJson[Int16] {
-        pub def toJson(x: Int16): JsonValue =
+    instance ToJsonValue[Int16] {
+        pub def toJsonValue(x: Int16): JsonValue =
             InteropJson.JsonValue.jsonNumberFromInt32(Int16.toInt32(x))
     }
 
-    instance ToJson[Int32] {
-        pub def toJson(x: Int32): JsonValue =
+    instance ToJsonValue[Int32] {
+        pub def toJsonValue(x: Int32): JsonValue =
             InteropJson.JsonValue.jsonNumberFromInt32(x)
     }
 
-    instance ToJson[Int64] {
-        pub def toJson(x: Int64): JsonValue =
+    instance ToJsonValue[Int64] {
+        pub def toJsonValue(x: Int64): JsonValue =
             InteropJson.JsonValue.jsonNumberFromInt64(x)
     }
 
-    instance ToJson[Float32] {
-        pub def toJson(x: Float32): JsonValue =
+    instance ToJsonValue[Float32] {
+        pub def toJsonValue(x: Float32): JsonValue =
             InteropJson.JsonValue.jsonNumberFromFloat64(Float32.toFloat64(x))
     }
 
-    instance ToJson[Float64] {
-        pub def toJson(x: Float64): JsonValue =
+    instance ToJsonValue[Float64] {
+        pub def toJsonValue(x: Float64): JsonValue =
             InteropJson.JsonValue.jsonNumberFromFloat64(x)
     }
 
-    instance ToJson[BigInt] {
-        pub def toJson(x: BigInt): JsonValue =
+    instance ToJsonValue[BigInt] {
+        pub def toJsonValue(x: BigInt): JsonValue =
             InteropJson.JsonValue.jsonNumberFromBigInt(x)
     }
 
-    instance ToJson[BigDecimal] {
-        pub def toJson(x: BigDecimal): JsonValue =
+    instance ToJsonValue[BigDecimal] {
+        pub def toJsonValue(x: BigDecimal): JsonValue =
             InteropJson.JsonValue.jsonNumberFromBigDecimal(x)
+    }
+
+    instance ToJsonValue[JsonValue] {
+        pub def toJsonValue(x: JsonValue): JsonValue = x
+    }
+
+
+    instance ToJsonValue[JsonArray] {
+        pub def toJsonValue(x: JsonArray): JsonValue =
+            InteropJson.JsonValue.jsonArrayToJsonValue(x)
+    }
+
+    instance ToJsonValue[JsonObject] {
+        pub def toJsonValue(x: JsonObject): JsonValue =
+            InteropJson.JsonValue.jsonObjectToJsonValue(x)
     }
 
     ///
     /// A trait for types that can be parsed from Json.
     ///
-    pub trait FromJson[t] {
+    pub trait FromJsonValue[t] {
         ///
         /// Return a value of `t` from a Json document if it can be parsed.
         ///
-        pub def fromJson(x: JsonValue): Option[t]
+        pub def fromJsonValue(x: JsonValue): Option[t]
     }
 
-    instance FromJson[Bool] {
-        pub def fromJson(x: JsonValue): Option[Bool] = InteropJson.JsonValue.getBool(x)
+    instance FromJsonValue[Bool] {
+        pub def fromJsonValue(x: JsonValue): Option[Bool] = InteropJson.JsonValue.getBool(x)
     }
 
-    instance FromJson[String] {
-        pub def fromJson(x: JsonValue): Option[String] = InteropJson.JsonValue.getString(x)
+    instance FromJsonValue[String] {
+        pub def fromJsonValue(x: JsonValue): Option[String] = InteropJson.JsonValue.getString(x)
     }
 
-    instance FromJson[Int32] {
-        pub def fromJson(x: JsonValue): Option[Int32] = InteropJson.JsonValue.getInt32Exact(x)
+    instance FromJsonValue[Int32] {
+        pub def fromJsonValue(x: JsonValue): Option[Int32] = InteropJson.JsonValue.getInt32Exact(x)
     }
 
-    instance FromJson[Int64] {
-        pub def fromJson(x: JsonValue): Option[Int64] = InteropJson.JsonValue.getInt64Exact(x)
+    instance FromJsonValue[Int64] {
+        pub def fromJsonValue(x: JsonValue): Option[Int64] = InteropJson.JsonValue.getInt64Exact(x)
     }
 
-    instance FromJson[BigInt] {
-        pub def fromJson(x: JsonValue): Option[BigInt] = InteropJson.JsonValue.getBigIntExact(x)
+    instance FromJsonValue[BigInt] {
+        pub def fromJsonValue(x: JsonValue): Option[BigInt] = InteropJson.JsonValue.getBigIntExact(x)
     }
 
     // Not exact
-    instance FromJson[Float64] {
-        pub def fromJson(x: JsonValue): Option[Float64] = InteropJson.JsonValue.getFloat64(x)
+    instance FromJsonValue[Float64] {
+        pub def fromJsonValue(x: JsonValue): Option[Float64] = InteropJson.JsonValue.getFloat64(x)
     }
 
-    instance FromJson[BigDecimal] {
-        pub def fromJson(x: JsonValue): Option[BigDecimal] = InteropJson.JsonValue.getBigDecimal(x)
+    instance FromJsonValue[BigDecimal] {
+        pub def fromJsonValue(x: JsonValue): Option[BigDecimal] = InteropJson.JsonValue.getBigDecimal(x)
+    }
+
+    instance FromJsonValue[JsonValue] {
+        pub def fromJsonValue(x: JsonValue): Option[JsonValue] = Some(x)
+    }
+
+    instance FromJsonValue[JsonArray] {
+        pub def fromJsonValue(x: JsonValue): Option[JsonArray] = 
+            InteropJson.JsonValue.getJsonArray(x)
+    }
+
+    instance FromJsonValue[JsonObject] {
+        pub def fromJsonValue(x: JsonValue): Option[JsonObject] = 
+            InteropJson.JsonValue.getJsonObject(x)
     }
 
 }

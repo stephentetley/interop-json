@@ -17,8 +17,8 @@
 
 pub mod InteropJson.JsonArrayReader {
 
-    use InteropJson.JsonValue.JsonArray
-    use InteropJson.JsonValue.JsonObject
+    use InteropJson.JsonArray
+    use InteropJson.JsonObject
 
     import jakarta.json.{JsonArray => JJsonArray}
     import jakarta.json.{JsonNumber => JJsonNumber}

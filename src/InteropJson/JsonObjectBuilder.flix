@@ -17,9 +17,10 @@
 
 pub mod InteropJson.JsonObjectBuilder {
 
-    use InteropJson.JsonValue.JsonObject
+    use InteropJson.JsonObject
+    use InteropJson.JsonValue
     use InteropJson.JsonArrayBuilder.JsonArrayBuilderHandle
-    use InteropJson.JsonValue.JsonValue
+    
 
     import jakarta.json.Json
     import jakarta.json.{JsonObjectBuilder => JJsonObjectBuilder}
