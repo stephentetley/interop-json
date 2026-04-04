@@ -18,7 +18,6 @@
 pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
-    use InteropJson.JsonNumber.JsonNumber
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -159,13 +158,6 @@ pub mod InteropJson.JsonValue {
             let JsonValue.JsonValue(x1) = x;
             let jsonarray = unchecked_cast(x1 as JJsonArray);
             Some(JsonArray.JsonArray(jsonarray))
-        } else None
-
-    pub def getJsonNumber(x: JsonValue): Option[JsonNumber] =
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(JsonNumber.JsonNumber(jsonnumber))
         } else None
 
     pub def getJsonObject(x: JsonValue): Option[JsonObject] =

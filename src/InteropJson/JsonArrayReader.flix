@@ -19,7 +19,6 @@ pub mod InteropJson.JsonArrayReader {
 
     use InteropJson.JsonValue.JsonArray
     use InteropJson.JsonValue.JsonObject
-    use InteropJson.JsonNumber.JsonNumber
 
     import jakarta.json.{JsonArray => JJsonArray}
     import jakarta.json.{JsonNumber => JJsonNumber}
@@ -178,6 +177,12 @@ pub mod InteropJson.JsonArrayReader {
 
         }
     }
+
+    pub def runReadJsonArray(jsarr: JsonArray, f: Unit -> a \ ef): Result[String, a] \ (ef - ReadJsonArray) =
+        region rc {
+            handle(rc, jsarr, f)() 
+        }
+
 
 
     // pub def readFile(path: String): Result[JsonArray, String] \ IO = 

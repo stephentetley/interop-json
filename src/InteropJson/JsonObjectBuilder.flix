@@ -54,7 +54,7 @@ pub mod InteropJson.JsonObjectBuilder {
     // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
 
 
-    pub def handleWithInstantiatedBuilder(_: Region[r], builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - BuildJsonObject + r) = x -> {
+    pub def handle(_: Region[r], builder: JsonObjectBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - BuildJsonObject + r) = x -> {
         let JsonObjectBuilderHandle.JsonObjectBuilderHandle(builder1) = builder;
         run {
             Ok(f(x))
@@ -149,11 +149,11 @@ pub mod InteropJson.JsonObjectBuilder {
 
     pub def reifyBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObjectBuilderHandle] \ (ef - BuildJsonObject + r) =
         let builder = createJsonObjectBuilderHandle(rc);
-        handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(_ -> builder)
+        handle(rc, builder, f)() |> Result.map(_ -> builder)
 
     pub def runBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - BuildJsonObject + r) =
         let builder = createJsonObjectBuilderHandle(rc);
-        handleWithInstantiatedBuilder(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
+        handle(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
 
         
     pub def evalBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject + r) =

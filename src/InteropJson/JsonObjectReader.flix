@@ -19,9 +19,9 @@ pub mod InteropJson.JsonObjectReader {
 
     use InteropJson.JsonValue.JsonArray
     use InteropJson.JsonValue.JsonObject
-    use InteropJson.JsonNumber.JsonNumber
 
-
+    import jakarta.json.{JsonArray => JJsonArray}
+    import jakarta.json.{JsonNumber => JJsonNumber}
     import jakarta.json.{JsonObject => JJsonObject}
     import java.lang.{Exception}
 
@@ -33,8 +33,18 @@ pub mod InteropJson.JsonObjectReader {
         def getBoolWithDefault(name: {name = String}, d: Bool): Bool
         def getInt32(name: {name = String}): Int32
         def getInt32WithDefault(name: {name = String}, d: Int32): Int32
+        def getInt64(name: {name = String}): Int64
+        def getInt64WithDefault(name: {name = String}, d: Int64): Int64
+        def getBigInt(name: {name = String}): BigInt
+        def getBigIntWithDefault(name: {name = String}, d: BigInt): BigInt
+        def getFloat64(name: {name = String}): Float64
+        def getFloat64WithDefault(name: {name = String}, d: Float64): Float64
+        def getBigDecimal(name: {name = String}): BigDecimal
+        def getBigDecimalWithDefault(name: {name = String}, d: BigDecimal): BigDecimal
         def getString(name: {name = String}): String
-        def getStringWithDefault(name: {name = String}, d: String): String        
+        def getStringWithDefault(name: {name = String}, d: String): String
+        def getJsonArray(name: {name = String}): JsonArray
+        def getJsonObject(name: {name = String}): JsonObject      
     }
 
     pub def handle(_: Region[r], jsobject: JsonObject, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonObject + r) = x -> {
@@ -73,7 +83,84 @@ pub mod InteropJson.JsonObjectReader {
                 let ans = unchecked_cast(jsobject1.getInt(name#name, d) as _ \ r);
                 k(ans)
             } 
+
+            def getInt32(name, k) = try {
+                let ans = unchecked_cast(jsobject1.getInt(name#name) as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt32WithDefault(name, d, k) = {
+                let ans = unchecked_cast(jsobject1.getInt(name#name, d) as _ \ r);
+                k(ans)
+            } 
             
+            def getInt64(name, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.longValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getInt64WithDefault(name, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.longValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getBigInt(name, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.bigIntegerValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBigIntWithDefault(name, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.bigIntegerValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getFloat64(name, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.doubleValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getFloat64WithDefault(name, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.doubleValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getBigDecimal(name, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.bigDecimalValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBigDecimalWithDefault(name, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsobject1.getJsonNumber(name#name) as _ \ r);
+                let ans = unchecked_cast(num.bigDecimalValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+
             def getString(name, k) = try {
                 let ans = unchecked_cast(jsobject1.getString(name#name) as _ \ r);
                 k(ans)
@@ -86,10 +173,26 @@ pub mod InteropJson.JsonObjectReader {
                 k(ans)
             } 
 
+            def getJsonArray(name, k) = try {
+                let arr: JJsonArray = unchecked_cast(jsobject1.getJsonArray(name#name) as _ \ r);
+                k(JsonArray.JsonArray(arr))
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getJsonObject(name, k) = try {
+                let obj: JJsonObject = unchecked_cast(jsobject1.getJsonObject(name#name) as _ \ r);
+                k(JsonObject.JsonObject(obj))
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
         }
     }
 
-
+    pub def runReadJsonObject(jsobj: JsonObject, f: Unit -> a \ ef): Result[String, a] \ (ef - ReadJsonObject) =
+        region rc {
+            handle(rc, jsobj, f)() 
+        }
 
     // pub def readFile(path: String): Result[JsonObject, String] \ IO = 
     //     File.read(path) |> Result.flatMap(readObject)
