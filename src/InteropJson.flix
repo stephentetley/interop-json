@@ -16,6 +16,8 @@
 
 
 pub mod InteropJson { 
+    use InteropJson.FromJsonValue
+    use InteropJson.ToJsonValue
     
     
     import jakarta.json.Json
@@ -121,6 +123,14 @@ pub mod InteropJson {
         pub def toJsonValue(x: BigDecimal): JsonValue =
             InteropJson.JsonValue.jsonNumberFromBigDecimal(x)
     }
+
+    instance ToJsonValue[Option[t]] with ToJsonValue[t] {
+        pub def toJsonValue(x: Option[t]): JsonValue = match x {
+            case None => InteropJson.JsonValue.jsonNull()
+            case Some(x1) => ToJsonValue.toJsonValue(x1)
+        }
+    }
+
 
     instance ToJsonValue[JsonValue] {
         pub def toJsonValue(x: JsonValue): JsonValue = x

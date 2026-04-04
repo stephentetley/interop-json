@@ -21,19 +21,17 @@ pub mod InteropJson.JsonArrayBuilder {
 
 
     use InteropJson.JsonArray
+    use InteropJson.JsonObject
     use InteropJson.JsonValue
     use InteropJson.ToJsonValue
-    use InteropJson.JsonObjectBuilder.JsonObjectBuilderHandle
     
 
-    import jakarta.json.Json
+    import jakarta.json.{Json => JJson}
     import jakarta.json.{JsonArrayBuilder => JJsonArrayBuilder}
+    import jakarta.json.{JsonArray => JJsonArray}
     import java.lang.{Exception}
 
-    ///
-    /// A handle to reify a JsonArrayBuilder.
-    ///
-    pub enum JsonArrayBuilderHandle(JJsonArrayBuilder)
+
 
     pub eff BuildJsonArray {
         def addNull(): Unit
@@ -52,11 +50,8 @@ pub mod InteropJson.JsonArrayBuilder {
         def addStringAt(index: {index = Int32}, s: String): Unit
         def addJsonValue(v: JsonValue): Unit
         def addJsonValueAt(index: {index = Int32}, v: JsonValue): Unit
-        def addAll(b: JsonArrayBuilderHandle): Unit
-        def addJsonArrayBuilder(b: JsonArrayBuilderHandle): Unit
-        def addJsonArrayBuilderAt(index: {index = Int32}, b: JsonArrayBuilderHandle): Unit
-        def addJsonObjectBuilder(b: JsonObjectBuilderHandle): Unit
-        def addJsonObjectBuilderAt(index: {index = Int32}, b: JsonObjectBuilderHandle): Unit
+        def addNestedJsonValue(v: Result[String, JsonValue]): Unit
+        def addNestedJsonValueAt(index: {index = Int32}, v: Result[String, JsonValue]): Unit
         def remove(index: {index = Int32}): Unit
         def setNull(index: {index = Int32}): Unit
         def setBool(index: {index = Int32}, b: Bool): Unit
@@ -66,17 +61,13 @@ pub mod InteropJson.JsonArrayBuilder {
         def setBigDecimal(index: {index = Int32}, d: BigDecimal): Unit
         def setString(index: {index = Int32}, s: String): Unit
         def setJsonValue(index: {index = Int32}, v: JsonValue): Unit
-        def setJsonArrayBuilder(index: {index = Int32}, b: JsonArrayBuilderHandle): Unit
-        def setJsonObjectBuilder(index: {index = Int32}, b: JsonObjectBuilderHandle): Unit
-        def addNestedJsonValue(v: Result[String, JsonValue]): Unit
-        def addNestedJsonValueAt(index: {index = Int32}, v: Result[String, JsonValue]): Unit        
     }
 
     // Can't have a default handler because we have extra input and output requirements
 
-    pub def handle(_: Region[r], builder: JsonArrayBuilderHandle, f: a -> b \ ef): a -> Result[String, b] \ (ef - BuildJsonArray + r) = x -> {
-        let JsonArrayBuilderHandle.JsonArrayBuilderHandle(builder1) = builder;
-        run {
+    pub def handle(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray + r) = x -> {
+        let builder1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
+        let ans = run {
             Ok(f(x))
         } with handler BuildJsonArray {
 
@@ -178,40 +169,26 @@ pub mod InteropJson.JsonArrayBuilder {
                 case ex: Exception => Err(ex.getMessage())
             }
 
-            def addAll(value, k) = {
-                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.addAll(value1) as _ \ r);
-                k()
+
+            def addNestedJsonValue(rvalue, k) = match rvalue {
+                case Err(msg)   => Err(msg)
+                case Ok(value)  => {
+                    let JsonValue.JsonValue(value1) = value;
+                    unchecked_cast(discard builder1.add(value1) as _ \ r);
+                    k()
+                } 
             }
 
-            def addJsonArrayBuilder(value, k) = {
-                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.add(value1) as _ \ r);
-                k()
+            def addNestedJsonValueAt(ix, rvalue, k) = match rvalue {
+                case Err(msg)   => Err(msg)
+                case Ok(value)  => try {
+                    let JsonValue.JsonValue(value1) = value;
+                    unchecked_cast(discard builder1.add(ix#index, value1) as _ \ r);
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
             }
-
-            def addJsonArrayBuilderAt(ix, value, k) = try {
-                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.add(ix#index, value1) as _ \ r);
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
-
-            def addJsonObjectBuilder(value, k) = {
-                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.add(value1) as _ \ r);
-                k()
-            }
-
-            def addJsonObjectBuilderAt(ix, value, k) = try {
-                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.add(ix#index, value1) as _ \ r);
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
-
             def remove(ix, k) = try {
                 unchecked_cast(discard builder1.remove(ix#index) as _ \ r);
                 k()
@@ -275,64 +252,21 @@ pub mod InteropJson.JsonArrayBuilder {
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
-
-            def setJsonArrayBuilder(ix, value, k) = try {
-                let JsonArrayBuilderHandle.JsonArrayBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.set(ix#index, value1) as _ \ r);
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
+        };
+        match ans { 
+            case Err(msg) => Err(msg)
+            case Ok(ans1) => {
+                let jsarr: JJsonArray = unchecked_cast(builder1.build() as _ \ r);
+                Ok((JsonArray.JsonArray(jsarr), ans1))
             }
-
-            def setJsonObjectBuilder(ix, value, k) = try {
-                let JsonObjectBuilderHandle.JsonObjectBuilderHandle(value1) = value;
-                unchecked_cast(discard builder1.set(ix#index, value1) as _ \ r);
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
-
-
-            def addNestedJsonValue(rvalue, k) = match rvalue {
-                case Err(msg)   => Err(msg)
-                case Ok(value)  => {
-                    let JsonValue.JsonValue(value1) = value;
-                    unchecked_cast(discard builder1.add(value1) as _ \ r);
-                    k()
-                } 
-            }
-
-            def addNestedJsonValueAt(ix, rvalue, k) = match rvalue {
-                case Err(msg)   => Err(msg)
-                case Ok(value)  => try {
-                    let JsonValue.JsonValue(value1) = value;
-                    unchecked_cast(discard builder1.add(ix#index, value1) as _ \ r);
-                    k()
-                } catch {
-                    case ex: Exception => Err(ex.getMessage())
-                }
-            }
-            
-
         }
     }
 
 
-    pub def reifyBuilderHandle(_: Region[r], bld: JsonArrayBuilderHandle): JsonArray \ r =
-        let JsonArrayBuilderHandle.JsonArrayBuilderHandle(bld1) = bld;
-        JsonArray.JsonArray(unchecked_cast(bld1.build() as _ \ r))
 
-    pub def createJsonArrayBuilderHandle(_: Region[r]): JsonArrayBuilderHandle \ r =
-        JsonArrayBuilderHandle.JsonArrayBuilderHandle(unchecked_cast(Json.createArrayBuilder() as _ \ r))
-
-
-    pub def reifyBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArrayBuilderHandle] \ (ef - BuildJsonArray + r) =
-        let builder = createJsonArrayBuilderHandle(rc);
-        handle(rc, builder, f)() |> Result.map(_ -> builder)
 
     pub def runBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - BuildJsonArray + r) =
-        let builder = createJsonArrayBuilderHandle(rc);
-        handle(rc, builder, f)() |> Result.map(x -> (reifyBuilderHandle(rc, builder), x))
+        handle(rc, f)()
         
     pub def evalBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray + r) =
         runBuildJsonArray(rc, f) |> Result.map(fst)
