@@ -152,6 +152,9 @@ pub mod InteropJson.JsonValue {
         case _                                          => None
     }
 
+    pub def getBoolWithDefault(d: Bool, x: JsonValue): Bool = 
+        InteropJson.JsonValue.getBool(x) |> Option.getWithDefault(d)
+
     pub def getString(x: JsonValue): Option[String] = 
         if (isString(x)) {
             let JsonValue.JsonValue(x1) = x;
@@ -160,7 +163,8 @@ pub mod InteropJson.JsonValue {
         } else None
 
 
-
+    pub def getStringWithDefault(d: String, x: JsonValue): String = 
+        InteropJson.JsonValue.getString(x) |> Option.getWithDefault(d)
 
     pub def getInt32(x: JsonValue): Option[Int32] = 
         if (isNumber(x)) {
@@ -169,6 +173,8 @@ pub mod InteropJson.JsonValue {
             Some(unsafe IO { jsonnumber.intValue() })
         } else None
 
+    pub def getInt32WithDefault(d: Int32, x: JsonValue): Int32 = 
+        InteropJson.JsonValue.getInt32(x) |> Option.getWithDefault(d)
 
     pub def getInt32Exact(x: JsonValue): Option[Int32] = 
         if (isNumber(x)) {
@@ -188,6 +194,8 @@ pub mod InteropJson.JsonValue {
             Some(unsafe IO { jsonnumber.longValue() })
         } else None
 
+    pub def getInt64WithDefault(d: Int64, x: JsonValue): Int64 = 
+        InteropJson.JsonValue.getInt64(x) |> Option.getWithDefault(d)
 
     pub def getInt64Exact(x: JsonValue): Option[Int64] =
         if (isNumber(x)) {
@@ -206,6 +214,9 @@ pub mod InteropJson.JsonValue {
             let jsonnumber = unchecked_cast(x1 as JJsonNumber);
             Some(unsafe IO { jsonnumber.bigIntegerValue() })
         } else None
+
+    pub def getBigIntWithDefault(d: BigInt, x: JsonValue): BigInt = 
+        InteropJson.JsonValue.getBigInt(x) |> Option.getWithDefault(d)
 
 
     pub def getBigIntExact(x: JsonValue): Option[BigInt] =
@@ -227,12 +238,18 @@ pub mod InteropJson.JsonValue {
             Some(unsafe IO { jsonnumber.doubleValue() })
         } else None
 
+    pub def getFloat64WithDefault(d: Float64, x: JsonValue): Float64 = 
+        InteropJson.JsonValue.getFloat64(x) |> Option.getWithDefault(d)
+
     pub def getBigDecimal(x: JsonValue): Option[BigDecimal] =
         if (isNumber(x)) {
             let JsonValue.JsonValue(x1) = x;
             let jsonnumber = unchecked_cast(x1 as JJsonNumber);
             Some(unsafe IO { jsonnumber.bigDecimalValue() })
         } else None
+
+    pub def getBigDecimalWithDefault(d: BigDecimal, x: JsonValue): BigDecimal = 
+        InteropJson.JsonValue.getBigDecimal(x) |> Option.getWithDefault(d)
 
 
     // pub def readValue(src: String): Result[JsonValue, String] = region r {
