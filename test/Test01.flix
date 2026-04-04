@@ -43,15 +43,23 @@ pub mod Test01 {
             assertEq(expected = true, true)
         }
 
-    // @Test
-    // def test03(): Bool & Impure = 
-    //     use Applicative.{*>};
-    //     use Interop/Json/JsonObjectBuilder.{addString, addBigInt, addInt32, addFloat64, addJsonObjectBuilder};
-    //     region r {
-    //         let proc = () -> addInt32("number", 12) *> addString("hello", "world") *> addBigInt("big", 1000ii) *> addJsonObjectBuilder("object", addFloat64("decimal", 1.0763f64));
-    //         Interop/Json/JsonObjectBuilder.createObject(r, proc()) |> println;
-    //         true
-    //     }
+    @Test
+    def test03(): Unit \ { Assert, IO } = 
+        use InteropJson.JsonObjectBuilder.BuildJsonObject;
+        region rc {
+            let obj = run {
+                BuildJsonObject.addString(name = "title", "hello world");
+                BuildJsonObject.addNestedJsonValue(name = "nesting", run {
+                    BuildJsonObject.addString(name = "location", "uk");
+                    BuildJsonObject.addInt32(name = "year", 2026);
+                    ()
+                } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue(rc));
+                true
+            } with InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc);
+            println(obj);
+            assertEq(expected = true, true)
+        }
+
 
     // @Test
     // def test04(): Bool & Impure = 

@@ -19,6 +19,7 @@ pub mod InteropJson.JsonObjectBuilder {
 
     use InteropJson.JsonObject
     use InteropJson.JsonValue
+    use InteropJson.ToJsonValue
     use InteropJson.JsonArrayBuilder.JsonArrayBuilderHandle
     
 
@@ -49,6 +50,7 @@ pub mod InteropJson.JsonObjectBuilder {
         def addJsonObjectBuilder(name: {name = String}, b: JsonObjectBuilderHandle): Unit
         def addAll(b: JsonObjectBuilderHandle): Unit
         def remove(name: {name = String}): Unit
+        def addNestedJsonValue(name: {name = String}, v: Result[String, JsonValue]): Unit
     }
 
     // Can't have a default handler because we have extra input and output requirements
@@ -136,6 +138,17 @@ pub mod InteropJson.JsonObjectBuilder {
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
+
+            def addNestedJsonValue(name, rvalue, k) = match rvalue {
+                case Err(msg)   => Err(msg)
+                case Ok(value)  => {
+                    let JsonValue.JsonValue(value1) = value;
+                    unchecked_cast(discard builder1.add(name#name, value1) as _ \ r);
+                    k()
+                }
+            }
+
+
         }
     }
 
@@ -160,6 +173,7 @@ pub mod InteropJson.JsonObjectBuilder {
     pub def evalBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject + r) =
         runBuildJsonObject(rc, f) |> Result.map(fst)
 
-
+    pub def evalBuildJsonObjectValue(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject + r) =
+        InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc, f) |> Result.map(ToJsonValue.toJsonValue)
 
 }

@@ -22,6 +22,7 @@ pub mod InteropJson.JsonArrayBuilder {
 
     use InteropJson.JsonArray
     use InteropJson.JsonValue
+    use InteropJson.ToJsonValue
     use InteropJson.JsonObjectBuilder.JsonObjectBuilderHandle
     
 
@@ -67,6 +68,8 @@ pub mod InteropJson.JsonArrayBuilder {
         def setJsonValue(index: {index = Int32}, v: JsonValue): Unit
         def setJsonArrayBuilder(index: {index = Int32}, b: JsonArrayBuilderHandle): Unit
         def setJsonObjectBuilder(index: {index = Int32}, b: JsonObjectBuilderHandle): Unit
+        def addNestedJsonValue(v: Result[String, JsonValue]): Unit
+        def addNestedJsonValueAt(index: {index = Int32}, v: Result[String, JsonValue]): Unit        
     }
 
     // Can't have a default handler because we have extra input and output requirements
@@ -289,6 +292,28 @@ pub mod InteropJson.JsonArrayBuilder {
                 case ex: Exception => Err(ex.getMessage())
             }
 
+
+            def addNestedJsonValue(rvalue, k) = match rvalue {
+                case Err(msg)   => Err(msg)
+                case Ok(value)  => {
+                    let JsonValue.JsonValue(value1) = value;
+                    unchecked_cast(discard builder1.add(value1) as _ \ r);
+                    k()
+                } 
+            }
+
+            def addNestedJsonValueAt(ix, rvalue, k) = match rvalue {
+                case Err(msg)   => Err(msg)
+                case Ok(value)  => try {
+                    let JsonValue.JsonValue(value1) = value;
+                    unchecked_cast(discard builder1.add(ix#index, value1) as _ \ r);
+                    k()
+                } catch {
+                    case ex: Exception => Err(ex.getMessage())
+                }
+            }
+            
+
         }
     }
 
@@ -311,5 +336,8 @@ pub mod InteropJson.JsonArrayBuilder {
         
     pub def evalBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray + r) =
         runBuildJsonArray(rc, f) |> Result.map(fst)
+
+    pub def evalBuildJsonArrayValue(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray + r) =
+        InteropJson.JsonArrayBuilder.evalBuildJsonArray(rc, f) |> Result.map(ToJsonValue.toJsonValue)
 
 }
