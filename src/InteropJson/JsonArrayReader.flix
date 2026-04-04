@@ -17,14 +17,16 @@
 
 pub mod InteropJson.JsonArrayReader {
 
-    use InteropJson.JsonObjectReader.JsonObject
+    use InteropJson.JsonValue.JsonArray
+    use InteropJson.JsonValue.JsonObject
     use InteropJson.JsonNumber.JsonNumber
-    use InteropJson.JsonString.JsonString
 
     import jakarta.json.{JsonArray => JJsonArray}
+    import jakarta.json.{JsonNumber => JJsonNumber}
+    import jakarta.json.{JsonObject => JJsonObject}
     import java.lang.{Exception}
 
-    pub enum JsonArray(JJsonArray)
+
 
 
     pub eff ReadJsonArray {
@@ -33,8 +35,18 @@ pub mod InteropJson.JsonArrayReader {
         def getBoolWithDefault(index: {index = Int32}, d: Bool): Bool
         def getInt32(index: {index = Int32}): Int32
         def getInt32WithDefault(index: {index = Int32}, d: Int32): Int32
+        def getInt64(index: {index = Int32}): Int64
+        def getInt64WithDefault(index: {index = Int32}, d: Int64): Int64
+        def getBigInt(index: {index = Int32}): BigInt
+        def getBigIntWithDefault(index: {index = Int32}, d: BigInt): BigInt
+        def getFloat64(index: {index = Int32}): Float64
+        def getFloat64WithDefault(index: {index = Int32}, d: Float64): Float64
+        def getBigDecimal(index: {index = Int32}): BigDecimal
+        def getBigDecimalWithDefault(index: {index = Int32}, d: BigDecimal): BigDecimal
         def getString(index: {index = Int32}): String
         def getStringWithDefault(index: {index = Int32}, d: String): String
+        def getJsonArray(index: {index = Int32}): JsonArray
+        def getJsonObject(index: {index = Int32}): JsonObject
     }
 
     pub def handle(_: Region[r], jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray + r) = x -> {
@@ -57,12 +69,10 @@ pub mod InteropJson.JsonArrayReader {
                 case ex: Exception => Err(ex.getMessage())
             }
 
-            def getBoolWithDefault(ix, d, k) = try {
+            def getBoolWithDefault(ix, d, k) = {
                 let ans = unchecked_cast(jsarray1.getBoolean(ix#index, d) as _ \ r);
                 k(ans)
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            } 
 
             def getInt32(ix, k) = try {
                 let ans = unchecked_cast(jsarray1.getInt(ix#index) as _ \ r);
@@ -71,13 +81,75 @@ pub mod InteropJson.JsonArrayReader {
                 case ex: Exception => Err(ex.getMessage())
             }
 
-            def getInt32WithDefault(ix, d, k) = try {
+            def getInt32WithDefault(ix, d, k) = {
                 let ans = unchecked_cast(jsarray1.getInt(ix#index, d) as _ \ r);
+                k(ans)
+            } 
+            
+            def getInt64(ix, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.longValue() as _ \ r);
                 k(ans)
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
-            
+
+            def getInt64WithDefault(ix, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.longValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getBigInt(ix, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.bigIntegerValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBigIntWithDefault(ix, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.bigIntegerValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getFloat64(ix, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.doubleValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getFloat64WithDefault(ix, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.doubleValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
+            def getBigDecimal(ix, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.bigDecimalValue() as _ \ r);
+                k(ans)
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getBigDecimalWithDefault(ix, d, k) = try {
+                let num: JJsonNumber = unchecked_cast(jsarray1.getJsonNumber(ix#index) as _ \ r);
+                let ans = unchecked_cast(num.bigDecimalValue() as _ \ r);
+                k(ans)
+            } catch {
+                case _: Exception => k(d)
+            }
+
             def getString(ix, k) = try {
                 let ans = unchecked_cast(jsarray1.getString(ix#index) as _ \ r);
                 k(ans)
@@ -85,9 +157,21 @@ pub mod InteropJson.JsonArrayReader {
                 case ex: Exception => Err(ex.getMessage())
             }
 
-            def getStringWithDefault(ix, d, k) = try {
+            def getStringWithDefault(ix, d, k) = {
                 let ans = unchecked_cast(jsarray1.getString(ix#index, d) as _ \ r);
                 k(ans)
+            } 
+
+            def getJsonArray(ix, k) = try {
+                let arr: JJsonArray = unchecked_cast(jsarray1.getJsonArray(ix#index) as _ \ r);
+                k(JsonArray.JsonArray(arr))
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
+            def getJsonObject(ix, k) = try {
+                let obj: JJsonObject = unchecked_cast(jsarray1.getJsonObject(ix#index) as _ \ r);
+                k(JsonObject.JsonObject(obj))
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
@@ -95,148 +179,6 @@ pub mod InteropJson.JsonArrayReader {
         }
     }
 
-    instance ToString[JsonArray] {
-        pub def toString(x: JsonArray): String =
-            let JsonArray.JsonArray(x1) = x;
-            unsafe IO { x1.toString() }
-    }
-
-
-
-    // instance Interop/Json.ImpJsonValue[JsonArray] {
-    //     pub def toJsonValue(x: JsonArray): JsonValue = 
-    //         let JsonArray(x1) = x;
-    //         JsonValue(unsafe_cast x1 as ##javax.json.JsonValue)
-
-    //     pub def fromJsonValue(x: JsonValue): JsonArray = 
-    //         let JsonValue(x1) = x;
-    //         JsonArray(unsafe_cast x1 as ##javax.json.JsonArray)
-    // }
-
-    // instance Interop/Json.ImpJsonStructure[JsonArray] {
-    //     pub def toJsonStructure(x: JsonArray): JsonStructure = 
-    //         let JsonArray(x1) = x;
-    //         JsonStructure(unsafe_cast x1 as ##javax.json.JsonStructure)
-
-    //     pub def fromJsonStructure(x: JsonStructure): JsonArray = 
-    //         let JsonStructure(x1) = x;
-    //         JsonArray(unsafe_cast x1 as ##javax.json.JsonArray) 
-    // }
-
-
-
-    pub def getJsonObject(ix: Int32, arr: JsonArray): Result[String, JsonObject] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            JsonObject.JsonObject(unsafe IO { arr1.getJsonObject(ix) })
-        })
-
-
-    pub def getJsonArray(ix: Int32, arr: JsonArray): Result[String, JsonArray] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            JsonArray.JsonArray(unsafe IO { arr1.getJsonArray(ix) })
-        })
-
-    pub def getJsonNumber(ix: Int32, arr: JsonArray): Result[String, JsonNumber] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            JsonNumber.JsonNumber(unsafe IO { arr1.getJsonNumber(ix) })
-        })
-
-    pub def getJsonString(ix: Int32, arr: JsonArray): Result[String, JsonString] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            JsonString.JsonString(unsafe IO { arr1.getJsonString(ix) })
-        })
-
-
-
-    pub def getBoolean(ix: Int32, arr: JsonArray): Result[String, Bool] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            unsafe IO { arr1.getBoolean(ix) }
-        })
-
-
-    pub def getBooleanWithDefault(ix: Int32, d: Bool, arr: JsonArray): Bool =
-        let JsonArray.JsonArray(arr1) = arr;
-        unsafe IO { arr1.getBoolean(ix, d) }
-
-    pub def getInt(ix: Int32, arr: JsonArray): Result[String, Int32] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            unsafe IO { arr1.getInt(ix) }
-        })
-
-    pub def getIntWithDefault(ix: Int32, d: Int32, arr: JsonArray): Int32 =
-        let JsonArray.JsonArray(arr1) = arr;
-        unsafe IO { arr1.getInt(ix, d) }
-
-    pub def getString(ix: Int32, arr: JsonArray): Result[String, String] =
-        Result.tryCatch(_ -> {
-            let JsonArray.JsonArray(arr1) = arr;
-            unsafe IO { arr1.getString(ix) }
-        })
-
-    pub def getStringWithDefault(ix: Int32, d: String, arr: JsonArray): String =
-        let JsonArray.JsonArray(arr1) = arr;
-        unsafe IO { arr1.getString(ix, d) }
-
-
-    // /// Use Interop/Util.Collection functionality...
-
-    // enum JsonArray2[_: Type, _: Region] {
-    //     case JsonArray2(JsonArray)
-    // }
-
-    // instance Interop/Util.ImpCollection[JsonArray2] {
-    //     pub def toCollection(t: JsonArray2[a, r]): Collection[a, r] = 
-    //         let JsonArray2(JsonArray(t1)) = t;
-    //         Collection(unsafe_cast t1 as ##java.util.Collection)
-
-    //     pub def fromCollection(t: Collection[a, r]): JsonArray2[a, r] = 
-    //         let Collection(t1) = t;
-    //         JsonArray2(JsonArray(unsafe_cast t1 as ##javax.json.JsonArray))
-    // }
-
-    // def wrapWithRegion(_: Region[r], arr: JsonArray): JsonArray2[a, r] = JsonArray2(arr)
-
-    // pub def size(arr: JsonArray): Int32 = region r {
-    //     wrapWithRegion(r, arr) |> Interop/Util/ImpCollection.toCollection |> Interop/Util/Collection.size
-    // }
-
-    // pub def isEmpty(arr: JsonArray): Bool = region r {
-    //     wrapWithRegion(r, arr) |> Interop/Util/ImpCollection.toCollection |> Interop/Util/Collection.isEmpty
-    // }
-
-
-
-
-    pub def isNull(ix: Int32, arr: JsonArray): Bool =
-        let JsonArray.JsonArray(arr1) = arr;
-        unsafe IO { arr1.isNull(ix) }
-
-
-    // pub def readArray(src: String): Result[JsonArray, String] = region r {
-    //     import new java.io.StringReader(String): ##java.io.StringReader & r as newStringReader;
-    //     import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader & r;
-    //     import javax.json.JsonReader.readArray(): ##javax.json.JsonArray & r;
-    //     import javax.json.JsonReader.close(): Unit & r;
-    //     try {
-    //         let _ = [] @ r;
-    //         let strReader = newStringReader(src);
-    //         let jsonReader = createReader(unsafe_cast strReader as ##java.io.Reader);
-    //         let ans = readArray(jsonReader);
-    //         close(jsonReader);
-    //         Ok(JsonArray(ans))
-    //     } catch {
-    //         case ex: ##java.lang.Exception => {
-    //             import java.lang.Throwable.getMessage(): String \ {};
-    //             Err(getMessage(ex))
-    //         }
-    //     }
-    // }
 
     // pub def readFile(path: String): Result[JsonArray, String] \ IO = 
     //     File.read(path) |> Result.flatMap(readArray)

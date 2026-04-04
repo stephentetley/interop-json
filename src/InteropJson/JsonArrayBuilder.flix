@@ -20,7 +20,7 @@
 pub mod InteropJson.JsonArrayBuilder {
 
 
-    use InteropJson.JsonArrayReader.JsonArray
+    use InteropJson.JsonValue.JsonArray
     use InteropJson.JsonObjectBuilder.JsonObjectBuilderHandle
     use InteropJson.JsonValue.JsonValue
 

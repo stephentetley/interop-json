@@ -19,8 +19,6 @@ pub mod InteropJson.JsonValue {
 
     use InteropJson.JsonValue.ValueType.ValueType
     use InteropJson.JsonNumber.JsonNumber
-    use InteropJson.JsonArrayReader.JsonArray
-    use InteropJson.JsonObjectReader.JsonObject
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -56,6 +54,21 @@ pub mod InteropJson.JsonValue {
         pub def fromJsonValue(x: JsonValue): JsonValue = x
     }
 
+    pub enum JsonObject(JJsonObject)
+
+    instance ToString[JsonObject] {
+        pub def toString(x: JsonObject): String =
+            let JsonObject.JsonObject(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+
+    pub enum JsonArray(JJsonArray)
+
+    instance ToString[JsonArray] {
+        pub def toString(x: JsonArray): String =
+            let JsonArray.JsonArray(x1) = x;
+            unsafe IO { x1.toString() }
+    }
 
         
     pub def getValueType(x: JsonValue): ValueType =
