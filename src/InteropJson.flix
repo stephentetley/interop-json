@@ -200,4 +200,12 @@ pub mod InteropJson {
             InteropJson.JsonValue.getJsonObject(x)
     }
 
+    pub eff ReadJson {
+        def readJson(path: String): Result[IoError, JsonValue]
+    }
+
+    pub eff WriteJson {
+        def writeJson(path: String, value: JsonValue): Result[IoError, Unit]
+    }
+
 }

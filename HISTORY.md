@@ -1,5 +1,6 @@
 ### v0.4.0
    Added "get with default" functions to `JsonValue`.
+   Added `ReadJson` and `WriteJson` effects.
 
 ### v0.3.0
    Moved `JsonValue`, `JsonArray` and `JsonObject` types into the 
