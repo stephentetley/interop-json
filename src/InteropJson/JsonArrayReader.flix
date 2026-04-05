@@ -48,7 +48,10 @@ pub mod InteropJson.JsonArrayReader {
         def getJsonObject(index: {index = Int32}): JsonObject
     }
 
-    pub def handle(_: Region[r], jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray + r) = x -> {
+    pub def handle(jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray) = x -> 
+        region rc { handleHelper(rc, jsarray, f, x) }
+    
+    def handleHelper(_: Region[r], jsarray: JsonArray, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonArray + r) = x -> {
         let JsonArray.JsonArray(jsarray1) = jsarray;
         run {
             Ok(f(x))
@@ -179,13 +182,7 @@ pub mod InteropJson.JsonArrayReader {
     }
 
     pub def runReadJsonArray(jsarr: JsonArray, f: Unit -> a \ ef): Result[String, a] \ (ef - ReadJsonArray) =
-        region rc {
-            handle(rc, jsarr, f)() 
-        }
-
-
-
-    // pub def readFile(path: String): Result[JsonArray, String] \ IO = 
-    //     File.read(path) |> Result.flatMap(readArray)
+        handle(jsarr, f)() 
 
 }
+

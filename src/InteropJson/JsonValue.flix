@@ -21,6 +21,8 @@ pub mod InteropJson.JsonValue {
     use InteropJson.JsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonObject
+    use InteropJson.JsonArrayBuilder.BuildJsonArray
+    use InteropJson.JsonObjectBuilder.BuildJsonObject
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -46,6 +48,14 @@ pub mod InteropJson.JsonValue {
     
     pub def jsonNull(): JsonValue = 
         JsonValue.JsonValue(unsafe IO { JJsonValue.NULL })
+
+    pub def jsonEmptyArray(): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { JJsonValue.EMPTY_JSON_ARRAY });
+        JsonValue.JsonValue(value)
+        
+    pub def jsonEmptyObject(): JsonValue = 
+        let value: JJsonValue = checked_cast(unsafe IO { JJsonValue.EMPTY_JSON_OBJECT });
+        JsonValue.JsonValue(value)
 
 
     pub def jsonString(s: String): JsonValue = 
@@ -82,6 +92,48 @@ pub mod InteropJson.JsonValue {
         let JsonObject.JsonObject(x1) = x;
         let jsonvalue: JJsonValue = checked_cast(x1);
         JsonValue.JsonValue(jsonvalue)
+
+    pub def jsonArraySingleton(v: JsonValue): JsonValue =
+        let ans = run {
+            BuildJsonArray.addJsonValue(v)
+        } with InteropJson.JsonArrayBuilder.evalBuildJsonArrayValue;
+        match ans {
+            // Never fails because `v` are always valid
+            case Err(_)   => bug!("unreachable - jsonArraySingleton")
+            case Ok(ans1) => ans1
+        }
+    
+
+    pub def jsonObjectSingleton(k: String, v: JsonValue): JsonValue =
+        let ans = run {
+            BuildJsonObject.addJsonValue(name = k, v)
+        } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue;
+        match ans {
+            // Never fails because `k` and `v` are always valid
+            case Err(_)   => bug!("unreachable - jsonObjectSingleton")
+            case Ok(ans1) => ans1
+        }
+    
+
+    pub def jsonArrayFromList(t: List[JsonValue]): JsonValue =
+        let ans = run {
+            List.forEach(v -> BuildJsonArray.addJsonValue(v), t)
+        } with InteropJson.JsonArrayBuilder.evalBuildJsonArrayValue;
+        match ans {
+            // Never fails because containter `t` is valid
+            case Err(_)   => bug!("unreachable - jsonArrayFromFoldable")
+            case Ok(ans1) => ans1
+        }
+    
+    pub def jsonObjectFromMap(m: Map[String, JsonValue]): JsonValue =
+        let ans = run {
+            Map.forEach((k,v) -> BuildJsonObject.addJsonValue(name = k, v), m)
+        } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue;
+        match ans {
+            // Never fails because Map `m` is valid
+            case Err(_)   => bug!("unreachable - jsonObjectFromMap")
+            case Ok(ans1) => ans1
+        }
 
 
     pub def isNull(x: JsonValue): Bool = 

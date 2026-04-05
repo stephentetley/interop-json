@@ -1,3 +1,8 @@
+### v0.5.0
+   Pushed regions inside the `__Builder` and `__Reader` effects 
+   so they aren't visible to clients.
+   Added more utility functions to `JsonValue`.
+
 ### v0.4.0
    Added "get with default" functions to `JsonValue`.
    Added `ReadJson` and `WriteJson` effects.

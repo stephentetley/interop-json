@@ -47,7 +47,10 @@ pub mod InteropJson.JsonObjectReader {
         def getJsonObject(name: {name = String}): JsonObject      
     }
 
-    pub def handle(_: Region[r], jsobject: JsonObject, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonObject + r) = x -> {
+    pub def handle(jsobject: JsonObject, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonObject) = x -> 
+        region rc { handleHelper(rc, jsobject, f, x) }
+
+    def handleHelper(_: Region[r], jsobject: JsonObject, f: a -> b \ ef): a -> Result[String, b] \ (ef - ReadJsonObject + r) = x -> {
         let JsonObject.JsonObject(jsobject1) = jsobject;
         run {
             Ok(f(x))
@@ -190,11 +193,6 @@ pub mod InteropJson.JsonObjectReader {
     }
 
     pub def runReadJsonObject(jsobj: JsonObject, f: Unit -> a \ ef): Result[String, a] \ (ef - ReadJsonObject) =
-        region rc {
-            handle(rc, jsobj, f)() 
-        }
-
-    // pub def readFile(path: String): Result[JsonObject, String] \ IO = 
-    //     File.read(path) |> Result.flatMap(readObject)
+        handle(jsobj, f)() 
         
 }

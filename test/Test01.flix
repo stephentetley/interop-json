@@ -30,35 +30,32 @@ pub mod Test01 {
 
     @Test
     def test02(): Unit \ { Assert, IO } = 
-        use InteropJson.JsonObjectBuilder.BuildJsonObject;
-        region rc {
-            let obj = run {
-                BuildJsonObject.addInt32(name = "number", 12);
-                BuildJsonObject.addString(name = "hello", "world");
-                BuildJsonObject.addBigInt(name = "big", 1000ii);
-                BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
-                true
-            } with InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc);
-            println(obj);
-            assertEq(expected = true, true)
-        }
+        use InteropJson.JsonObjectBuilder.BuildJsonObject;        
+        let obj = run {
+            BuildJsonObject.addInt32(name = "number", 12);
+            BuildJsonObject.addString(name = "hello", "world");
+            BuildJsonObject.addBigInt(name = "big", 1000ii);
+            BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
+            true
+        } with InteropJson.JsonObjectBuilder.evalBuildJsonObject;
+        println(obj);
+        assertEq(expected = true, true)
 
     @Test
     def test03(): Unit \ { Assert, IO } = 
         use InteropJson.JsonObjectBuilder.BuildJsonObject;
-        region rc {
-            let obj = run {
-                BuildJsonObject.addString(name = "title", "hello world");
-                BuildJsonObject.addNestedJsonValue(name = "nesting", run {
-                    BuildJsonObject.addString(name = "location", "uk");
-                    BuildJsonObject.addInt32(name = "year", 2026);
-                    ()
-                } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue(rc));
-                true
-            } with InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc);
-            println(obj);
-            assertEq(expected = true, true)
-        }
+        let obj = run {
+            BuildJsonObject.addString(name = "title", "hello world");
+            BuildJsonObject.addNestedJsonValue(name = "nesting", run {
+                BuildJsonObject.addString(name = "location", "uk");
+                BuildJsonObject.addInt32(name = "year", 2026);
+                ()
+            } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue);
+            true
+        } with InteropJson.JsonObjectBuilder.evalBuildJsonObject;
+        println(obj);
+        assertEq(expected = true, true)
+
 
 
     // @Test

@@ -63,9 +63,22 @@ pub mod InteropJson.JsonArrayBuilder {
         def setJsonValue(index: {index = Int32}, v: JsonValue): Unit
     }
 
+
+    // polymorphic type - cannot go in effect (??)
+    pub def add(value: t): Unit \ BuildJsonArray with ToJsonValue[t] = 
+        BuildJsonArray.addJsonValue(ToJsonValue.toJsonValue(value))
+
+    // polymorphic type - cannot go in effect (??)
+    pub def addAt(index: {index = Int32}, value: t): Unit \ BuildJsonArray with ToJsonValue[t] = 
+        BuildJsonArray.addJsonValueAt(index, ToJsonValue.toJsonValue(value))
+
+
     // Can't have a default handler because we have extra input and output requirements
 
-    pub def handle(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray + r) = x -> {
+    pub def handle(f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray) = x -> 
+        region rc { handleHelper(rc, f, x) }
+
+    def handleHelper(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray + r) = x -> {
         let builder1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
         let ans = run {
             Ok(f(x))
@@ -265,13 +278,13 @@ pub mod InteropJson.JsonArrayBuilder {
 
 
 
-    pub def runBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - BuildJsonArray + r) =
-        handle(rc, f)()
+    pub def runBuildJsonArray(f: Unit -> a \ ef): Result[String, (JsonArray, a)] \ (ef - BuildJsonArray) =
+        handle(f)()
         
-    pub def evalBuildJsonArray(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray + r) =
-        runBuildJsonArray(rc, f) |> Result.map(fst)
+    pub def evalBuildJsonArray(f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray) =
+        runBuildJsonArray(f) |> Result.map(fst)
 
-    pub def evalBuildJsonArrayValue(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray + r) =
-        InteropJson.JsonArrayBuilder.evalBuildJsonArray(rc, f) |> Result.map(ToJsonValue.toJsonValue)
+    pub def evalBuildJsonArrayValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray) =
+        InteropJson.JsonArrayBuilder.evalBuildJsonArray(f) |> Result.map(ToJsonValue.toJsonValue)
 
 }

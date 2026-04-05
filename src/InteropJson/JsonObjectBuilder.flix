@@ -45,11 +45,18 @@ pub mod InteropJson.JsonObjectBuilder {
         def remove(name: {name = String}): Unit
     }
 
+
+    pub def add(name: {name = String}, value: t): Unit \ BuildJsonObject with ToJsonValue[t] = 
+        BuildJsonObject.addJsonValue(name, ToJsonValue.toJsonValue(value))
+
     // Can't have a default handler because we have extra input and output requirements
     // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
 
 
-    pub def handle(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject + r) = x -> {
+    pub def handle(f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject) = x -> 
+        region rc { handleHelper(rc, f, x) }
+
+    def handleHelper(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject + r) = x -> {
         let builder1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
         let ans = run {
             Ok(f(x))
@@ -133,14 +140,14 @@ pub mod InteropJson.JsonObjectBuilder {
 
     }
 
-    pub def runBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - BuildJsonObject + r) =
-        handle(rc, f)()
+    pub def runBuildJsonObject(f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - BuildJsonObject) =
+        handle(f)()
 
         
-    pub def evalBuildJsonObject(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject + r) =
-        runBuildJsonObject(rc, f) |> Result.map(fst)
+    pub def evalBuildJsonObject(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject) =
+        runBuildJsonObject(f) |> Result.map(fst)
 
-    pub def evalBuildJsonObjectValue(rc: Region[r], f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject + r) =
-        InteropJson.JsonObjectBuilder.evalBuildJsonObject(rc, f) |> Result.map(ToJsonValue.toJsonValue)
+    pub def evalBuildJsonObjectValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject) =
+        InteropJson.JsonObjectBuilder.evalBuildJsonObject(f) |> Result.map(ToJsonValue.toJsonValue)
 
 }
