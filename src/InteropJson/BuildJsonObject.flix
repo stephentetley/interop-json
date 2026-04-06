@@ -15,7 +15,7 @@
  */
 
 
-pub mod InteropJson.JsonObjectBuilder {
+pub mod InteropJson.BuildJsonObject {
 
     use InteropJson.JsonObject
     use InteropJson.JsonValue
@@ -147,7 +147,7 @@ pub mod InteropJson.JsonObjectBuilder {
     pub def evalBuildJsonObject(f: Unit -> a \ ef): Result[String, JsonObject] \ (ef - BuildJsonObject) =
         runBuildJsonObject(f) |> Result.map(fst)
 
-    pub def evalBuildJsonObjectValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject) =
-        InteropJson.JsonObjectBuilder.evalBuildJsonObject(f) |> Result.map(ToJsonValue.toJsonValue)
+    pub def evalBuildJsonValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject) =
+        evalBuildJsonObject(f) |> Result.map(ToJsonValue.toJsonValue)
 
 }

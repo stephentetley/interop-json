@@ -15,7 +15,7 @@
  */
 
 
-pub mod InteropJson.JsonObjectReader {
+pub mod InteropJson.ReadJsonObject {
 
     use InteropJson.JsonArray
     use InteropJson.JsonObject

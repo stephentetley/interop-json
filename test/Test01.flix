@@ -30,40 +30,43 @@ pub mod Test01 {
 
     @Test
     def test02(): Unit \ { Assert, IO } = 
-        use InteropJson.JsonObjectBuilder.BuildJsonObject;        
+        use InteropJson.BuildJsonObject.BuildJsonObject;        
         let obj = run {
             BuildJsonObject.addInt32(name = "number", 12);
             BuildJsonObject.addString(name = "hello", "world");
             BuildJsonObject.addBigInt(name = "big", 1000ii);
             BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
             true
-        } with InteropJson.JsonObjectBuilder.evalBuildJsonObject;
+        } with InteropJson.BuildJsonObject.evalBuildJsonObject;
         println(obj);
         assertEq(expected = true, true)
 
     @Test
     def test03(): Unit \ { Assert, IO } = 
-        use InteropJson.JsonObjectBuilder.BuildJsonObject;
+        use InteropJson.BuildJsonObject.BuildJsonObject;
         let obj = run {
             BuildJsonObject.addString(name = "title", "hello world");
             BuildJsonObject.addNestedJsonValue(name = "nesting", run {
                 BuildJsonObject.addString(name = "location", "uk");
                 BuildJsonObject.addInt32(name = "year", 2026);
                 ()
-            } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue);
-            true
-        } with InteropJson.JsonObjectBuilder.evalBuildJsonObject;
+            } with InteropJson.BuildJsonObject.evalBuildJsonValue);
+            ()
+        } with InteropJson.BuildJsonObject.evalBuildJsonObject;
         println(obj);
         assertEq(expected = true, true)
 
 
 
-    // @Test
-    // def test04(): Bool & Impure = 
-    //     match Interop/Json/JsonValue.readValue("{ \"number\": 1000, \"string\": \"some_text\" } ") {
-    //         case Ok(json) => {println("Read: ${json}"); true}
-    //         case Err(msg) => {println(msg); false}
-    //     }
+    @Test
+    def test04(): Unit \ { Assert, IO } = 
+        use InteropJson.ReadJsonFromString; 
+        let rvalue = run {
+            ReadJsonFromString.readJson("[1, \"hello\"]") 
+        } with InteropJson.ReadJsonFromString.runReadJsonFromString;
+        println("Read from String: ${rvalue}");
+        
+        assertEq(expected = true, true)
 
 
 }

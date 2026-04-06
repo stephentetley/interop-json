@@ -208,4 +208,8 @@ pub mod InteropJson {
         def writeJson(path: String, value: JsonValue): Result[IoError, Unit]
     }
 
+    pub eff ReadJsonFromString {
+        def readJson(s: String): Result[String, JsonValue]
+    }
+
 }

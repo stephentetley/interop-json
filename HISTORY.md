@@ -1,4 +1,6 @@
 ### v0.5.0
+   Renamed modules for building and read JsonObject and JsonArray 
+   so the module names match the effect names.
    Pushed regions inside the `__Builder` and `__Reader` effects 
    so they aren't visible to clients.
    Added more utility functions to `JsonValue`.

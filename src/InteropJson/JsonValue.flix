@@ -21,8 +21,8 @@ pub mod InteropJson.JsonValue {
     use InteropJson.JsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonObject
-    use InteropJson.JsonArrayBuilder.BuildJsonArray
-    use InteropJson.JsonObjectBuilder.BuildJsonObject
+    use InteropJson.BuildJsonArray.BuildJsonArray
+    use InteropJson.BuildJsonObject.BuildJsonObject
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -32,7 +32,7 @@ pub mod InteropJson.JsonValue {
     import jakarta.json.{JsonNumber => JJsonNumber}
     import jakarta.json.{JsonObject => JJsonObject}
     import jakarta.json.{JsonArray => JJsonArray}
-
+    import java.util.{Iterator => JIterator}
 
         
     pub def getValueType(x: JsonValue): ValueType =
@@ -96,7 +96,7 @@ pub mod InteropJson.JsonValue {
     pub def jsonArraySingleton(v: JsonValue): JsonValue =
         let ans = run {
             BuildJsonArray.addJsonValue(v)
-        } with InteropJson.JsonArrayBuilder.evalBuildJsonArrayValue;
+        } with InteropJson.BuildJsonArray.evalBuildJsonValue;
         match ans {
             // Never fails because `v` are always valid
             case Err(_)   => bug!("unreachable - jsonArraySingleton")
@@ -107,7 +107,7 @@ pub mod InteropJson.JsonValue {
     pub def jsonObjectSingleton(k: String, v: JsonValue): JsonValue =
         let ans = run {
             BuildJsonObject.addJsonValue(name = k, v)
-        } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue;
+        } with InteropJson.BuildJsonObject.evalBuildJsonValue;
         match ans {
             // Never fails because `k` and `v` are always valid
             case Err(_)   => bug!("unreachable - jsonObjectSingleton")
@@ -118,7 +118,7 @@ pub mod InteropJson.JsonValue {
     pub def jsonArrayFromList(t: List[JsonValue]): JsonValue =
         let ans = run {
             List.forEach(v -> BuildJsonArray.addJsonValue(v), t)
-        } with InteropJson.JsonArrayBuilder.evalBuildJsonArrayValue;
+        } with InteropJson.BuildJsonArray.evalBuildJsonValue;
         match ans {
             // Never fails because containter `t` is valid
             case Err(_)   => bug!("unreachable - jsonArrayFromFoldable")
@@ -128,7 +128,7 @@ pub mod InteropJson.JsonValue {
     pub def jsonObjectFromMap(m: Map[String, JsonValue]): JsonValue =
         let ans = run {
             Map.forEach((k,v) -> BuildJsonObject.addJsonValue(name = k, v), m)
-        } with InteropJson.JsonObjectBuilder.evalBuildJsonObjectValue;
+        } with InteropJson.BuildJsonObject.evalBuildJsonValue;
         match ans {
             // Never fails because Map `m` is valid
             case Err(_)   => bug!("unreachable - jsonObjectFromMap")
@@ -181,7 +181,7 @@ pub mod InteropJson.JsonValue {
 
 
     pub def getJsonArray(x: JsonValue): Option[JsonArray] =
-        if (isObject(x)) {
+        if (isArray(x)) {
             let JsonValue.JsonValue(x1) = x;
             let jsonarray = unchecked_cast(x1 as JJsonArray);
             Some(JsonArray.JsonArray(jsonarray))
@@ -304,27 +304,39 @@ pub mod InteropJson.JsonValue {
         InteropJson.JsonValue.getBigDecimal(x) |> Option.getWithDefault(d)
 
 
-    // pub def readValue(src: String): Result[JsonValue, String] = region r {
-    //     import new java.io.StringReader(String): ##java.io.StringReader \ r as newStringReader;
-    //     import static javax.json.Json.createReader(##java.io.Reader): ##javax.json.JsonReader \ r;
-    //     import javax.json.JsonReader.readValue(): ##javax.json.JsonValue \ r;
-    //     import javax.json.JsonReader.close(): Unit \ r;
-    //     try {
-    //         let _ = [] @ r;
-    //         let strReader = newStringReader(src);
-    //         let jsonReader = createReader(unsafe_cast strReader as ##java.io.Reader);
-    //         let ans = readValue(jsonReader);
-    //         close(jsonReader);
-    //         Ok(JsonValue(ans))
-    //     } catch {
-    //         case ex: ##java.lang.Exception => {
-    //             import java.lang.Throwable.getMessage(): String \ {};
-    //             Err(getMessage(unsafe_cast ex as ##java.lang.Throwable))
-    //         }
-    //     }
-    // }
+    pub def getJsonArrayElements(x: JsonValue): Option[List[JsonValue]] = region rc {
+        if (InteropJson.JsonValue.isArray(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let proxy: Proxy[JJsonValue] = Proxy.Proxy; 
+            let javaJsonArray: JJsonArray = unchecked_cast(x1 as JJsonArray);
+            let javaIter: JIterator[JJsonValue] = unsafe IO { javaJsonArray.iterator() };
+            let flixIter = Adaptor.fromIterator(rc, proxy, javaIter);
+            let ans = Iterator.toList(flixIter);
+            let ans1 = List.map(JsonValue.JsonValue, ans);
+            Some(ans1)
+        } else None
+    }
 
-    // pub def readFile(path: String): Result[JsonValue, String] \ IO = 
-    //     File.read(path) |> Result.flatMap(readValue)
+    // TODO JsonObject version of `getJsonArrayElements` - needs to use Java's `entrySet` or `forEach`
+
+    pub def readJsonString(s: String): Result[String, JsonValue] = 
+        use InteropJson.ReadJsonFromString;
+        run {
+            ReadJsonFromString.readJson(s) 
+        } with InteropJson.ReadJsonFromString.runReadJsonFromString
+
+    pub def readJsonFile(path: String): Result[IoError, JsonValue] \ IO = 
+        use InteropJson.ReadJson;
+        run {
+            ReadJson.readJson(path) 
+        } with InteropJson.ReadJson.runWithIO
+
+    pub def writeJsonFile(path: String, value: JsonValue): Result[IoError, Unit] \ IO = 
+        use InteropJson.WriteJson;
+        run {
+            WriteJson.writeJson(path, value) 
+        } with InteropJson.WriteJson.runWithIO
+
 
 }
+

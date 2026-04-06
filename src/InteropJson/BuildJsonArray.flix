@@ -17,7 +17,7 @@
 
 
 
-pub mod InteropJson.JsonArrayBuilder {
+pub mod InteropJson.BuildJsonArray {
 
 
     use InteropJson.JsonArray
@@ -284,7 +284,7 @@ pub mod InteropJson.JsonArrayBuilder {
     pub def evalBuildJsonArray(f: Unit -> a \ ef): Result[String, JsonArray] \ (ef - BuildJsonArray) =
         runBuildJsonArray(f) |> Result.map(fst)
 
-    pub def evalBuildJsonArrayValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray) =
-        InteropJson.JsonArrayBuilder.evalBuildJsonArray(f) |> Result.map(ToJsonValue.toJsonValue)
+    pub def evalBuildJsonValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray) =
+        evalBuildJsonArray(f) |> Result.map(ToJsonValue.toJsonValue)
 
 }
