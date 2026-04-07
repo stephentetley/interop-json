@@ -98,7 +98,7 @@ pub mod InteropJson.JsonValue {
     pub def jsonObjectFromMap(m: Map[String, JsonValue]): JsonValue =
         let ans = run {
             Map.forEach((k,v) -> BuildJsonObject.addJsonValue(name = k, v), m)
-        } with InteropJson.BuildJsonObject.evalBuildJsonValue;
+        } with InteropJson.BuildJsonObject.evalBuildJsonValue(None);
         match ans {
             // Never fails because Map `m` is valid
             case Err(_)   => bug!("unreachable - jsonObjectFromMap")

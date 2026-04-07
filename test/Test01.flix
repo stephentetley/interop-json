@@ -37,7 +37,7 @@ pub mod Test01 {
             BuildJsonObject.addBigInt(name = "big", 1000ii);
             BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
             true
-        } with InteropJson.BuildJsonObject.evalBuildJsonObject;
+        } with InteropJson.BuildJsonObject.evalBuildJsonObject(None);
         println(obj);
         assertEq(expected = true, true)
 
@@ -50,9 +50,9 @@ pub mod Test01 {
                 BuildJsonObject.addString(name = "location", "uk");
                 BuildJsonObject.addInt32(name = "year", 2026);
                 ()
-            } with InteropJson.BuildJsonObject.evalBuildJsonValue);
+            } with InteropJson.BuildJsonObject.evalBuildJsonValue(None));
             ()
-        } with InteropJson.BuildJsonObject.evalBuildJsonObject;
+        } with InteropJson.BuildJsonObject.evalBuildJsonObject(None);
         println(obj);
         assertEq(expected = true, true)
 
