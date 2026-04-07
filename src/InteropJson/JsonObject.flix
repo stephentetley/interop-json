@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Stephen Tetley
+ * Copyright 2026 Stephen Tetley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 
 pub mod InteropJson.JsonObject {
-    use InteropJson.JsonObject.singletonHelper
-    use Map.singleton
 
     use InteropJson.JsonObject
     use InteropJson.JsonValue
@@ -27,7 +25,7 @@ pub mod InteropJson.JsonObject {
     import jakarta.json.{JsonObject => JJsonObject}
     import jakarta.json.{JsonObjectBuilder => JJsonObjectBuilder}
 
-    // Use a threaded region if you will be discarding operations
+    // Use a threaded region if we will be discarding operations
     // otherwise use unsafe IO { ... }
 
 

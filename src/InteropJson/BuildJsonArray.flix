@@ -32,6 +32,8 @@ pub mod InteropJson.BuildJsonArray {
     import java.lang.{Exception}
 
 
+    // `addAll` has different type to Java version but is equally
+    // expressve
 
     pub eff BuildJsonArray {
         def addNull(): Unit
@@ -52,6 +54,7 @@ pub mod InteropJson.BuildJsonArray {
         def addJsonValueAt(index: {index = Int32}, v: JsonValue): Unit
         def addNestedJsonValue(v: Result[String, JsonValue]): Unit
         def addNestedJsonValueAt(index: {index = Int32}, v: Result[String, JsonValue]): Unit
+        def addAll(v: JsonArray): Unit
         def remove(index: {index = Int32}): Unit
         def setNull(index: {index = Int32}): Unit
         def setBool(index: {index = Int32}, b: Bool): Unit
@@ -202,6 +205,16 @@ pub mod InteropJson.BuildJsonArray {
                     case ex: Exception => Err(ex.getMessage())
                 }
             }
+                        
+            def addAll(arr, k) = try {
+                let JsonArray.JsonArray(arr1) = arr;
+                let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder(arr1) as _ \ r );
+                unchecked_cast(discard builder1.addAll(b1) as _ \ r);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
             def remove(ix, k) = try {
                 unchecked_cast(discard builder1.remove(ix#index) as _ \ r);
                 k()
