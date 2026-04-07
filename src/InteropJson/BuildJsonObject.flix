@@ -43,11 +43,16 @@ pub mod InteropJson.BuildJsonObject {
         def addJsonValue(name: {name = String}, v: JsonValue): Unit
         def addNestedJsonValue(name: {name = String}, v: Result[String, JsonValue]): Unit
         def remove(name: {name = String}): Unit
+        def addAll(o: JsonObject): Unit
     }
 
 
     pub def add(name: {name = String}, value: t): Unit \ BuildJsonObject with ToJsonValue[t] = 
         BuildJsonObject.addJsonValue(name, ToJsonValue.toJsonValue(value))
+
+    // pub def addAll(o: JsonObject): Unit \ BuildJsonObject = 
+    //     let 
+    //     BuildJsonObject.addJsonValue(name, ToJsonValue.toJsonValue(value))
 
     // Can't have a default handler because we have extra input and output requirements
     // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
@@ -56,6 +61,7 @@ pub mod InteropJson.BuildJsonObject {
     pub def handle(f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject) = x -> 
         region rc { handleHelper(rc, f, x) }
 
+    // TODO - make builder a param so we can initialize from empty or a JJsonObject
     def handleHelper(_: Region[r], f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject + r) = x -> {
         let builder1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
         let ans = run {
@@ -129,6 +135,16 @@ pub mod InteropJson.BuildJsonObject {
                     k()
                 }
             }
+            
+            def addAll(obj, k) = try {
+                let JsonObject.JsonObject(obj1) = obj;
+                let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(obj1) as _ \ r );
+                unchecked_cast(discard builder1.addAll(b1) as _ \ r);
+                k()
+            } catch {
+                case ex: Exception => Err(ex.getMessage())
+            }
+
         };
         match ans { 
             case Err(msg) => Err(msg)
@@ -149,5 +165,11 @@ pub mod InteropJson.BuildJsonObject {
 
     pub def evalBuildJsonValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonObject) =
         evalBuildJsonObject(f) |> Result.map(ToJsonValue.toJsonValue)
-
+    
+    // On failure generates a Json object with a single field "error" : msg
+    pub def evalToJsonValue(f: Unit -> a \ ef): JsonValue \ (ef - BuildJsonObject) =
+        match evalBuildJsonValue(f) {
+            case Ok(v)    => v
+            case Err(msg) => InteropJson.JsonValue.jsonObjectSingleton("error", InteropJson.JsonValue.jsonString(msg))
+        }
 }

@@ -16,6 +16,7 @@
 
 
 pub mod InteropJson.JsonValue {
+    use InteropJson.JsonValue.jsonArrayFromList
 
     use InteropJson.JsonValue.ValueType.ValueType
     use InteropJson.JsonValue
@@ -23,6 +24,7 @@ pub mod InteropJson.JsonValue {
     use InteropJson.JsonObject
     use InteropJson.BuildJsonArray.BuildJsonArray
     use InteropJson.BuildJsonObject.BuildJsonObject
+    
 
     import java.lang.{Exception => JException}
     import jakarta.json.Json
@@ -33,6 +35,9 @@ pub mod InteropJson.JsonValue {
     import jakarta.json.{JsonObject => JJsonObject}
     import jakarta.json.{JsonArray => JJsonArray}
     import java.util.{Iterator => JIterator}
+    import java.util.{Set => JSet}
+    import java.util.{Map$Entry => JMapEntry}
+    import java.util.{Collection => JCollection}
 
         
     pub def getValueType(x: JsonValue): ValueType =
@@ -125,6 +130,13 @@ pub mod InteropJson.JsonValue {
             case Ok(ans1) => ans1
         }
     
+    // This should be implmented as per `jsonArrayFromList` with the effect step:
+    // Foldable.forEach(v -> BuildJsonArray.addJsonValue(v), t)
+    // However it currently doesn't type check so we have to traverse twice
+    pub def jsonArrayFromFoldable(t: t[JsonValue]): JsonValue \ Foldable.Aef[t] with Foldable[t] =
+        Foldable.toList(t) |> jsonArrayFromList
+
+
     pub def jsonObjectFromMap(m: Map[String, JsonValue]): JsonValue =
         let ans = run {
             Map.forEach((k,v) -> BuildJsonObject.addJsonValue(name = k, v), m)
@@ -317,7 +329,43 @@ pub mod InteropJson.JsonValue {
         } else None
     }
 
-    // TODO JsonObject version of `getJsonArrayElements` - needs to use Java's `entrySet` or `forEach`
+    def mapEntryKey(x: JMapEntry[k, v]): k = x.getKey()
+    def mapEntryValue(x: JMapEntry[k, v]): v = x.getValue()
+
+    pub def getJsonObjectEntries(x: JsonValue): Option[List[(String, JsonValue)]] = region rc {
+        if (InteropJson.JsonValue.isObject(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let javaJsonObject: JJsonObject = unchecked_cast(x1 as JJsonObject);
+            let javaValues: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { javaJsonObject.entrySet() };
+            let flixIter = Adaptor.fromSetToIterator(rc, javaValues);
+            let ans = Iterator.toList(flixIter);
+            let ans1 = List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans);
+            Some(ans1)
+        } else None
+    } 
+
+    pub def getJsonObjectNames(x: JsonValue): Option[List[String]] = region rc {
+        if (InteropJson.JsonValue.isObject(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let javaJsonObject: JJsonObject = unchecked_cast(x1 as JJsonObject);
+            let javaKeys: JSet[String] = unsafe IO { javaJsonObject.keySet() };
+            let flixIter = Adaptor.fromSetToIterator(rc, javaKeys);
+            let ans = Iterator.toList(flixIter);
+            Some(ans)
+        } else None
+    }
+    
+    pub def getJsonObjectValues(x: JsonValue): Option[List[JsonValue]] = region rc {
+        if (InteropJson.JsonValue.isObject(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let javaJsonObject: JJsonObject = unchecked_cast(x1 as JJsonObject);
+            let javaValues: JCollection[JJsonValue] = unsafe IO { javaJsonObject.values() };
+            let flixIter = Adaptor.fromCollectionToIterator(rc, javaValues);
+            let ans = Iterator.toList(flixIter);
+            let ans1 = List.map(JsonValue.JsonValue, ans);
+            Some(ans1)
+        } else None
+    }
 
     pub def readJsonString(s: String): Result[String, JsonValue] = 
         use InteropJson.ReadJsonFromString;

@@ -287,4 +287,10 @@ pub mod InteropJson.BuildJsonArray {
     pub def evalBuildJsonValue(f: Unit -> a \ ef): Result[String, JsonValue] \ (ef - BuildJsonArray) =
         evalBuildJsonArray(f) |> Result.map(ToJsonValue.toJsonValue)
 
+    // On failure generates a Json object with a single field "error" : msg
+    pub def evalToJsonValueA(f: Unit -> a \ ef): JsonValue \ (ef - BuildJsonArray) =
+        match evalBuildJsonValue(f) {
+            case Ok(v)    => v
+            case Err(msg) => InteropJson.JsonValue.jsonObjectSingleton("error", InteropJson.JsonValue.jsonString(msg))
+        }
 }

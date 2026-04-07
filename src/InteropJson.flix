@@ -16,8 +16,7 @@
 
 
 pub mod InteropJson { 
-    use InteropJson.FromJsonValue
-    use InteropJson.ToJsonValue
+
     
     
     import jakarta.json.Json
@@ -129,6 +128,30 @@ pub mod InteropJson {
             case None => InteropJson.JsonValue.jsonNull()
             case Some(x1) => ToJsonValue.toJsonValue(x1)
         }
+    }
+
+    instance ToJsonValue[List[t]] with ToJsonValue[t] {
+        pub def toJsonValue(x: List[t]): JsonValue = 
+            let xs = List.map(ToJsonValue.toJsonValue, x);
+            InteropJson.JsonValue.jsonArrayFromList(xs)
+    }
+
+    instance ToJsonValue[Chain[t]] with ToJsonValue[t] {
+        pub def toJsonValue(x: Chain[t]): JsonValue = 
+            let xs = Chain.map(ToJsonValue.toJsonValue, x);
+            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
+    }
+
+    instance ToJsonValue[Nel[t]] with ToJsonValue[t] {
+        pub def toJsonValue(x: Nel[t]): JsonValue = 
+            let xs = Nel.map(ToJsonValue.toJsonValue, x);
+            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
+    }
+
+    instance ToJsonValue[Nec[t]] with ToJsonValue[t] {
+        pub def toJsonValue(x: Nec[t]): JsonValue = 
+            let xs = Nec.map(ToJsonValue.toJsonValue, x);
+            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
     }
 
 
