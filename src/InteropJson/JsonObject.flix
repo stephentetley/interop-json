@@ -104,6 +104,20 @@ pub mod InteropJson.JsonObject {
         List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans)
     } 
      
+    pub def fromMap(m: Map[String, v]): JsonObject with ToJsonValue[v] = region rc {
+        fromMapHelper(rc, m)
+    }
+
+    def fromMapHelper(_: Region[r], m: Map[String, v]): JsonObject \ r with ToJsonValue[v] =
+        def unwrap(v) = { 
+            let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
+            v1 
+        }; 
+        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        Map.forEach((k, v) -> { let v1 = unwrap(v); unchecked_cast(discard b1.add(k, v1) as _ \ r) }, m);
+        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        JsonObject.JsonObject(ans)
+
 
     pub def getKeys(obj: JsonObject): List[String] = region rc {
         let JsonObject.JsonObject(obj1) = obj;
