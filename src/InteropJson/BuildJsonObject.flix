@@ -170,6 +170,6 @@ pub mod InteropJson.BuildJsonObject {
     pub def evalToJsonValue(f: Unit -> a \ ef): JsonValue \ (ef - BuildJsonObject) =
         match evalBuildJsonValue(f) {
             case Ok(v)    => v
-            case Err(msg) => InteropJson.JsonValue.jsonObjectSingleton("error", InteropJson.JsonValue.jsonString(msg))
+            case Err(msg) => InteropJson.JsonObject.singleton("error", msg) |> ToJsonValue.toJsonValue
         }
 }

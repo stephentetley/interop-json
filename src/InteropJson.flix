@@ -16,7 +16,7 @@
 
 
 pub mod InteropJson { 
-
+    
     
     
     import jakarta.json.Json
@@ -132,26 +132,22 @@ pub mod InteropJson {
 
     instance ToJsonValue[List[t]] with ToJsonValue[t] {
         pub def toJsonValue(x: List[t]): JsonValue = 
-            let xs = List.map(ToJsonValue.toJsonValue, x);
-            InteropJson.JsonValue.jsonArrayFromList(xs)
+            InteropJson.JsonArray.fromList(x) |> InteropJson.JsonArray.toJsonValue
     }
 
     instance ToJsonValue[Chain[t]] with ToJsonValue[t] {
         pub def toJsonValue(x: Chain[t]): JsonValue = 
-            let xs = Chain.map(ToJsonValue.toJsonValue, x);
-            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
+            InteropJson.JsonArray.fromFoldable(x) |> InteropJson.JsonArray.toJsonValue
     }
 
     instance ToJsonValue[Nel[t]] with ToJsonValue[t] {
         pub def toJsonValue(x: Nel[t]): JsonValue = 
-            let xs = Nel.map(ToJsonValue.toJsonValue, x);
-            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
+            InteropJson.JsonArray.fromFoldable(x) |> InteropJson.JsonArray.toJsonValue
     }
 
     instance ToJsonValue[Nec[t]] with ToJsonValue[t] {
         pub def toJsonValue(x: Nec[t]): JsonValue = 
-            let xs = Nec.map(ToJsonValue.toJsonValue, x);
-            InteropJson.JsonValue.jsonArrayFromFoldable(xs)
+            InteropJson.JsonArray.fromFoldable(x) |> InteropJson.JsonArray.toJsonValue
     }
 
 
@@ -162,12 +158,12 @@ pub mod InteropJson {
 
     instance ToJsonValue[JsonArray] {
         pub def toJsonValue(x: JsonArray): JsonValue =
-            InteropJson.JsonValue.jsonArrayToJsonValue(x)
+            InteropJson.JsonArray.toJsonValue(x)
     }
 
     instance ToJsonValue[JsonObject] {
         pub def toJsonValue(x: JsonObject): JsonValue =
-            InteropJson.JsonValue.jsonObjectToJsonValue(x)
+            InteropJson.JsonObject.toJsonValue(x)
     }
 
     ///

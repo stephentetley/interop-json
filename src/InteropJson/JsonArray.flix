@@ -17,6 +17,7 @@
 
 pub mod InteropJson.JsonArray {
     
+    use InteropJson.ToJsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonObject
     use InteropJson.JsonValue
@@ -28,16 +29,21 @@ pub mod InteropJson.JsonArray {
     import jakarta.json.{JsonNumber => JJsonNumber}
     import jakarta.json.{JsonArrayBuilder => JJsonArrayBuilder}
     import java.lang.{Exception => JException}
+    import java.util.{Iterator => JIterator}
 
     // Use a threaded region if we will be discarding operations
     // otherwise use unsafe IO { ... }
 
+    pub def toJsonValue(x: JsonArray): JsonValue = 
+        let JsonArray.JsonArray(x1) = x;
+        let jsonvalue: JJsonValue = checked_cast(x1);
+        JsonValue.JsonValue(jsonvalue)
 
     pub def empty(): JsonArray = 
         JsonArray.JsonArray(unsafe IO { JJsonValue.EMPTY_JSON_ARRAY })
 
-    pub def singleton(v: JsonValue): JsonArray = region rc {
-        singletonHelper(rc, v)
+    pub def singleton(v: t): JsonArray with ToJsonValue[t] = region rc {
+        singletonHelper(rc, ToJsonValue.toJsonValue(v))
     }
 
 
@@ -49,8 +55,8 @@ pub mod InteropJson.JsonArray {
         JsonArray.JsonArray(ans)
 
 
-    pub def add(v: JsonValue, o: JsonArray): JsonArray = region rc {
-        addHelper(rc, v, o)
+    pub def add(v: t, o: JsonArray): JsonArray with ToJsonValue[t] = region rc {
+        addHelper(rc, ToJsonValue.toJsonValue(v), o)
     }
 
 
@@ -81,6 +87,43 @@ pub mod InteropJson.JsonArray {
     pub def size(o: JsonArray): Int32 = 
         let JsonArray.JsonArray(o1) = o;
         unsafe IO {o1.size()}
+
+
+    pub def toList(arr: JsonArray): List[JsonValue] = region rc {
+        let JsonArray.JsonArray(arr1) = arr;
+        let proxy: Proxy[JJsonValue] = Proxy.Proxy; 
+        let javaIter: JIterator[JJsonValue] = unsafe IO { arr1.iterator() };
+        let flixIter = Adaptor.fromIterator(rc, proxy, javaIter);
+        let ans = Iterator.toList(flixIter);
+        List.map(JsonValue.JsonValue, ans)
+    }
+
+
+    pub def fromList(t: List[v]): JsonArray with ToJsonValue[v] = region rc {
+        fromFoldableHelper(rc, t)
+    }
+    
+    pub def fromFoldable(t: t[v]): JsonArray \ Foldable.Aef[t] with Foldable[t], ToJsonValue[v]  = region rc {
+        fromFoldableHelper(rc, t)
+    }
+
+    def fromFoldableHelper(_: Region[r], xs: t[v]): JsonArray \ r + Foldable.Aef[t] with Foldable[t], ToJsonValue[v]=
+        def unwrap(v) = { 
+            let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
+            v1 
+        }; 
+        let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
+        Foldable.forEach(v -> { let v1 = unwrap(v); unchecked_cast(discard b1.add(v1) as _ \ r) }, xs);
+        let ans: JJsonArray = unchecked_cast(b1.build() as _ \ r);
+        JsonArray.JsonArray(ans)
+
+
+
+    // // This should be implmented as per `jsonArrayFromList` with the effect step:
+    // // Foldable.forEach(v -> BuildJsonArray.addJsonValue(v), t)
+    // // However it currently doesn't type check so we have to traverse twice
+    // pub def jsonArrayFromFoldable(t: t[JsonValue]): JsonValue \ Foldable.Aef[t] with Foldable[t] =
+    //     Foldable.toList(t) |> jsonArrayFromList
 
     pub def isNull(ix: {index = Int32}, arr: JsonArray): Option[Bool] = try {
         let JsonArray.JsonArray(arr1) = arr;
