@@ -1,3 +1,7 @@
+### v0.6.0
+   Added `JsonArray` and `JsonObject` modules back. Added enough
+   functions to them to be generally useful.
+
 ### v0.5.0
    Renamed modules for building and read JsonObject and JsonArray 
    so the module names match the effect names.
