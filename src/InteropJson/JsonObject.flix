@@ -199,8 +199,22 @@ pub mod InteropJson.JsonObject {
         };
         loop()
         
-    
-
+    pub def find(f: (String, JsonValue) -> Bool \ ef, obj: JsonObject): Option[(String, JsonValue)] \ ef =
+        let JsonObject.JsonObject(obj1) = obj;
+        let eset1: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { obj1.entrySet() };
+        let javaiter: JIterator[JMapEntry[String, JJsonValue]] = unsafe IO { eset1.iterator() };
+        def loop(): Option[(String, JsonValue)] =  {
+            let bnext: Bool = unsafe IO { javaiter.hasNext() };
+            if (bnext) {
+                let entry1: JMapEntry[String, JJsonValue] = unsafe IO { javaiter.next() };
+                let k1: String = getMapEntryKey(entry1);
+                let v1: JJsonValue = getMapEntryValue(entry1);
+                let vw1 = JsonValue.JsonValue(v1); 
+                let bfound = f(k1, vw1);
+                if (bfound) Some((k1, vw1)) else loop()
+            } else None
+        };
+        loop()
 
 
     pub def fromMap(m: Map[String, v]): JsonObject with ToJsonValue[v] = region rc {

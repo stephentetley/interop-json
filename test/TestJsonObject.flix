@@ -93,7 +93,7 @@ pub mod TestJsonObject {
         let xm: Map[String, Int32] = Map#{};
         let json = InteropJson.JsonObject.fromMap(xm);
         let ans = InteropJson.JsonObject.exists(
-                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "c", 
+                    (k, x) -> k == "c" and InteropJson.JsonValue.getInt32(x) == Some(3), 
                     json);
         assertEq(
             expected = false,
@@ -105,7 +105,7 @@ pub mod TestJsonObject {
         let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
         let json = InteropJson.JsonObject.fromMap(xm);
         let ans = InteropJson.JsonObject.exists(
-                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "c", 
+                    (k, x) -> k == "c" and InteropJson.JsonValue.getInt32(x) == Some(3), 
                     json);
         assertEq(
             expected = true,
@@ -117,13 +117,49 @@ pub mod TestJsonObject {
         let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
         let json = InteropJson.JsonObject.fromMap(xm);
         let ans = InteropJson.JsonObject.exists(
-                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "notc", 
+                    (k, x) -> k == "NOT-c" and InteropJson.JsonValue.getInt32(x) == Some(3),
                     json);
         assertEq(
             expected = false,
             ans
         )
 
+
+    @Test
+    def find01(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.find(
+                    (k, x) -> k == "c" and InteropJson.JsonValue.getInt32(x) == Some(3), 
+                    json);
+        assertEq(
+            expected = None,
+            ans
+        )
+
+    @Test
+    def find02(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.find(
+                    (k, x) -> k == "c" and InteropJson.JsonValue.getInt32(x) == Some(3), 
+                    json);
+        assertEq(
+            expected = Some(("c", InteropJson.JsonValue.jsonNumberFromInt32(3) )),
+            ans
+        )
+
+    @Test
+    def find03(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.find(
+                    (k, x) -> k == "NOT-c" and InteropJson.JsonValue.getInt32(x) == Some(3),
+                    json);
+        assertEq(
+            expected = None,
+            ans
+        )
 
 }
 
