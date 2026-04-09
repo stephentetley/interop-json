@@ -16,8 +16,7 @@
 
 
 pub mod InteropJson.JsonValue {
-    use InteropJson.JsonValue.jsonString
-        
+
 
     use InteropJson.JsonValue.ValueType.ValueType
     use InteropJson.JsonValue
@@ -142,6 +141,12 @@ pub mod InteropJson.JsonValue {
         unsafe IO { valueType.equals(JValueType.OBJECT) }
 
 
+    // Null or empty Array or empty Object
+    pub def isEmpty(x: JsonValue): Bool = 
+        isNull(x) or existsJsonArray(InteropJson.JsonArray.isEmpty, x) or existsJsonObject(InteropJson.JsonObject.isEmpty, x)
+
+    pub def nonEmpty(x: JsonValue): Bool = not isEmpty(x)
+
     pub def getJsonArray(x: JsonValue): Option[JsonArray] =
         if (isArray(x)) {
             let JsonValue.JsonValue(x1) = x;
@@ -265,22 +270,145 @@ pub mod InteropJson.JsonValue {
     pub def getBigDecimalWithDefault(d: BigDecimal, x: JsonValue): BigDecimal = 
         InteropJson.JsonValue.getBigDecimal(x) |> Option.getWithDefault(d)
 
+
+
+
+    pub def existsBool(f: Bool -> Bool \ ef, x: JsonValue): Bool \ ef = match getBool(x) {
+        case Some(b) => f(b)
+        case None    => false
+    } 
+
+    pub def existsString(f: String -> Bool \ ef, x: JsonValue): Bool \ ef = match getString(x) {
+        case Some(s) => f(s)
+        case None    => false
+    } 
+
+    pub def existsInt32(f: Int32 -> Bool \ ef, x: JsonValue): Bool \ ef = match getInt32(x) {
+        case Some(i) => f(i)
+        case None    => false
+    }
+
+    pub def existsInt64(f: Int64 -> Bool \ ef, x: JsonValue): Bool \ ef = match getInt64(x) {
+        case Some(i) => f(i)
+        case None    => false
+    }
+
+    pub def existsBigInt(f: BigInt -> Bool \ ef, x: JsonValue): Bool \ ef = match getBigInt(x) {
+        case Some(i) => f(i)
+        case None    => false
+    }
+    pub def existsFloat64(f: Float64 -> Bool \ ef, x: JsonValue): Bool \ ef = match getFloat64(x) {
+        case Some(d) => f(d)
+        case None    => false
+    }
+
+    pub def existsBigDecimal(f: BigDecimal -> Bool \ ef, x: JsonValue): Bool \ ef = match getBigDecimal(x) {
+        case Some(d) => f(d)
+        case None    => false
+    }
+
+
+    pub def existsJsonArray(f: JsonArray -> Bool \ ef, x: JsonValue): Bool \ ef = match getJsonArray(x) {
+        case Some(arr) => f(arr)
+        case None      => false
+    }
+
+    pub def existsJsonObject(f: JsonObject -> Bool \ ef, x: JsonValue): Bool \ ef = match getJsonObject(x) {
+        case Some(obj) => f(obj)
+        case None      => false
+    }
+
+    pub def filterBool(f: Bool -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBool(x) {
+        case Some(b) => if (f(b)) jsonBool(b) else jsonNull()
+        case None    => jsonNull()
+    } 
+
+    pub def filterString(f: String -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getString(x) {
+        case Some(s) => if (f(s)) jsonString(s) else jsonNull()
+        case None    => jsonNull()
+    } 
+
+    pub def filterInt32(f: Int32 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getInt32(x) {
+        case Some(i) => if (f(i)) jsonNumberFromInt32(i) else jsonNull()
+        case None    => jsonNull()
+    }
+
+    pub def filterInt64(f: Int64 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getInt64(x) {
+        case Some(i) => if (f(i)) jsonNumberFromInt64(i) else jsonNull()
+        case None    => jsonNull()
+    }
+
+    pub def filterBigInt(f: BigInt -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBigInt(x) {
+        case Some(i) => if (f(i)) jsonNumberFromBigInt(i) else jsonNull()
+        case None    => jsonNull()
+    }
+
+    pub def filterFloat64(f: Float64 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getFloat64(x) {
+        case Some(d) => if (f(d)) jsonNumberFromFloat64(d) else jsonNull()
+        case None    => jsonNull()
+    }
+
+    pub def filterBigDecimal(f: BigDecimal -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBigDecimal(x) {
+        case Some(d) => if (f(d)) jsonNumberFromBigDecimal(d) else jsonNull()
+        case None    => jsonNull()
+    }
+
+    pub def filterJsonArray(f: JsonArray -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getJsonArray(x) {
+        case Some(arr) => if (f(arr)) InteropJson.JsonArray.toJsonValue(arr) else jsonNull()
+        case None      => jsonNull()
+    }
+
+    pub def filterJsonObject(f: JsonObject -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getJsonObject(x) {
+        case Some(obj) => if (f(obj)) InteropJson.JsonObject.toJsonValue(obj) else jsonNull()
+        case None      => jsonNull()
+    }
+
+
     pub def mapBool(f: Bool -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBool(x) {
         case Some(b) => jsonBool(f(b))
         case None    => x
     } 
-
 
     pub def mapString(f: String -> String \ ef, x: JsonValue): JsonValue \ ef = match getString(x) {
         case Some(s) => jsonString(f(s))
         case None    => x
     }
 
-
     pub def mapInt32(f: Int32 -> Int32 \ ef, x: JsonValue): JsonValue \ ef = match getInt32(x) {
         case Some(s) => jsonNumberFromInt32(f(s))
         case None    => x
     }
+
+    pub def mapInt64(f: Int64 -> Int64 \ ef, x: JsonValue): JsonValue \ ef = match getInt64(x) {
+        case Some(i) => jsonNumberFromInt64(f(i))
+        case None    => x
+    }
+
+    pub def mapBigInt(f: BigInt -> BigInt \ ef, x: JsonValue): JsonValue \ ef = match getBigInt(x) {
+        case Some(i) => jsonNumberFromBigInt(f(i))
+        case None    => x
+    }
+
+    pub def mapFloat64(f: Float64 -> Float64 \ ef, x: JsonValue): JsonValue \ ef = match getFloat64(x) {
+        case Some(d) => jsonNumberFromFloat64(f(d))
+        case None    => x
+    }
+
+    pub def mapBigDecimal(f: BigDecimal -> BigDecimal \ ef, x: JsonValue): JsonValue \ ef = match getBigDecimal(x) {
+        case Some(d) => jsonNumberFromBigDecimal(f(d))
+        case None    => x
+    }
+
+    pub def mapJsonArray(f: JsonArray -> JsonArray \ ef, x: JsonValue): JsonValue \ ef = match getJsonArray(x) {
+        case Some(arr) => f(arr) |> InteropJson.JsonArray.toJsonValue
+        case None      => x
+    }
+
+    pub def mapJsonObject(f: JsonObject -> JsonObject \ ef, x: JsonValue): JsonValue \ ef = match getJsonObject(x) {
+        case Some(arr) => f(arr) |> InteropJson.JsonObject.toJsonValue
+        case None      => x
+    }
+
 
     pub def readJsonString(s: String): Result[String, JsonValue] = 
         use InteropJson.ReadJsonFromString;

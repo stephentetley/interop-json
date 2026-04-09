@@ -54,6 +54,7 @@ pub mod InteropJson.JsonArray {
         let JsonArray.JsonArray(arr1) = arr;
         unsafe IO { arr1.isEmpty() }
 
+    pub def nonEmpty(x: JsonArray): Bool = not isEmpty(x)
 
     pub def singleton(v: t): JsonArray with ToJsonValue[t] = region rc {
         singletonHelper(rc, ToJsonValue.toJsonValue(v))
@@ -132,6 +133,28 @@ pub mod InteropJson.JsonArray {
         let ans: JJsonArray = unchecked_cast(builder.build() as _ \ r);
         JsonArray.JsonArray(ans)
     
+    pub def filter(f: JsonValue -> Bool \ ef, arr: JsonArray): JsonArray \ ef = region rc {
+        filterHelper(rc, f, arr)
+    }
+
+
+    pub def filterHelper(_: Region[r], f: JsonValue -> Bool \ ef, arr: JsonArray): JsonArray \ ef + r = 
+        let len = size(arr); 
+        let JsonArray.JsonArray(arr1) = arr;
+        let builder: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
+        @Tailrec
+        def loop(ix) = 
+            if (ix < len) {
+                let jv: JJsonValue = unchecked_cast(arr1.get(ix) as _ \ r);
+                if (f(JsonValue.JsonValue(jv)))
+                    unchecked_cast(discard builder.add(jv) as _ \ r)
+                else ();
+                loop(ix + 1)
+            } else ();
+        loop(0);
+        let ans: JJsonArray = unchecked_cast(builder.build() as _ \ r);
+        JsonArray.JsonArray(ans)
+
 
     pub def foldLeft(f: (b, JsonValue) -> b \ ef, s: b, arr: JsonArray): b \ ef =
         let len = size(arr); 

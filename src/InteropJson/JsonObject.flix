@@ -55,6 +55,8 @@ pub mod InteropJson.JsonObject {
         let JsonObject.JsonObject(obj1) = obj;
         unsafe IO { obj1.isEmpty() }
 
+    pub def nonEmpty(x: JsonObject): Bool = not isEmpty(x)
+
     pub def singleton(k: String, v: t): JsonObject with ToJsonValue[t] = region rc {
         singletonHelper(rc, k, ToJsonValue.toJsonValue(v))
     }
