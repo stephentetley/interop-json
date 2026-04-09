@@ -1,3 +1,6 @@
+### v0.7.0 
+   Added `foldLeft` etc. functions to `JsonArray`.
+
 ### v0.6.0
    Added `JsonArray` and `JsonObject` modules back. Added enough
    functions to them to be generally useful.

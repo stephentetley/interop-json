@@ -38,6 +38,10 @@ pub mod InteropJson.JsonObject {
     // Use a threaded region if we will be discarding operations
     // otherwise use unsafe IO { ... }
 
+    pub def equals(x: JsonObject, y: JsonObject): Bool =
+        let JsonObject.JsonObject(x1) = x;
+        let JsonObject.JsonObject(y1) = y;
+        unsafe IO { x1.equals(y1) }
 
     pub def toJsonValue(x: JsonObject): JsonValue =
         let JsonObject.JsonObject(x1) = x;
@@ -46,6 +50,10 @@ pub mod InteropJson.JsonObject {
 
     pub def empty(): JsonObject = 
         JsonObject.JsonObject(unsafe IO { JJsonValue.EMPTY_JSON_OBJECT })
+
+    pub def isEmpty(obj: JsonObject): Bool = 
+        let JsonObject.JsonObject(obj1) = obj;
+        unsafe IO { obj1.isEmpty() }
 
     pub def singleton(k: String, v: t): JsonObject with ToJsonValue[t] = region rc {
         singletonHelper(rc, k, ToJsonValue.toJsonValue(v))
@@ -73,12 +81,12 @@ pub mod InteropJson.JsonObject {
         let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
         JsonObject.JsonObject(ans)
     
-    pub def merge(x: JsonObject, y: JsonObject): JsonObject = region rc {
-        mergeHelper(rc, x, y)
+    pub def append(x: JsonObject, y: JsonObject): JsonObject = region rc {
+        appendHelper(rc, x, y)
     }
 
 
-    def mergeHelper(_: Region[r], x: JsonObject, y: JsonObject): JsonObject \ r =
+    def appendHelper(_: Region[r], x: JsonObject, y: JsonObject): JsonObject \ r =
         let JsonObject.JsonObject(x1) = x;
         let JsonObject.JsonObject(y1) = y;
         let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(x1) as _ \ r);

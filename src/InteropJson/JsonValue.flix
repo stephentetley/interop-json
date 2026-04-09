@@ -16,7 +16,8 @@
 
 
 pub mod InteropJson.JsonValue {
-    
+    use InteropJson.JsonValue.jsonString
+        
 
     use InteropJson.JsonValue.ValueType.ValueType
     use InteropJson.JsonValue
@@ -39,7 +40,12 @@ pub mod InteropJson.JsonValue {
     import java.util.{Map$Entry => JMapEntry}
     import java.util.{Collection => JCollection}
 
-        
+
+    pub def equals(x: JsonValue, y: JsonValue): Bool =
+        let JsonValue.JsonValue(x1) = x;
+        let JsonValue.JsonValue(y1) = y;
+        unsafe IO { x1.equals(y1) }
+
     pub def getValueType(x: JsonValue): ValueType =
         let JsonValue.JsonValue(x1) = x;
         InteropJson.JsonValue.ValueType.unmarshalValueType(unsafe IO { x1.getValueType() })
@@ -62,6 +68,7 @@ pub mod InteropJson.JsonValue {
         let value: JJsonValue = checked_cast(unsafe IO { JJsonValue.EMPTY_JSON_OBJECT });
         JsonValue.JsonValue(value)
 
+    pub def jsonBool(b: Bool): JsonValue = if(b) jsonTrue() else jsonFalse()
 
     pub def jsonString(s: String): JsonValue = 
         let value: JJsonValue = checked_cast(unsafe IO { Json.createValue(s) });
@@ -258,7 +265,22 @@ pub mod InteropJson.JsonValue {
     pub def getBigDecimalWithDefault(d: BigDecimal, x: JsonValue): BigDecimal = 
         InteropJson.JsonValue.getBigDecimal(x) |> Option.getWithDefault(d)
 
+    pub def mapBool(f: Bool -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBool(x) {
+        case Some(b) => jsonBool(f(b))
+        case None    => x
+    } 
 
+
+    pub def mapString(f: String -> String \ ef, x: JsonValue): JsonValue \ ef = match getString(x) {
+        case Some(s) => jsonString(f(s))
+        case None    => x
+    }
+
+
+    pub def mapInt32(f: Int32 -> Int32 \ ef, x: JsonValue): JsonValue \ ef = match getInt32(x) {
+        case Some(s) => jsonNumberFromInt32(f(s))
+        case None    => x
+    }
 
     pub def readJsonString(s: String): Result[String, JsonValue] = 
         use InteropJson.ReadJsonFromString;

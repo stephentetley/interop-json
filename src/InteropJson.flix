@@ -31,7 +31,25 @@ pub mod InteropJson {
     pub enum JsonValue(JJsonValue)
 
 
+    instance Eq[JsonValue] {
+        pub def eq(x: JsonValue, y: JsonValue): Bool =
+            InteropJson.JsonValue.equals(x, y)
+    }
+
+    instance ToString[JsonValue] {
+        pub def toString(x: JsonValue): String =
+            let JsonValue.JsonValue(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+    
+
+
     pub enum JsonObject(JJsonObject)
+
+    instance Eq[JsonObject] {
+        pub def eq(x: JsonObject, y: JsonObject): Bool =
+            InteropJson.JsonObject.equals(x, y)
+    }
 
     instance ToString[JsonObject] {
         pub def toString(x: JsonObject): String =
@@ -42,6 +60,11 @@ pub mod InteropJson {
 
     pub enum JsonArray(JJsonArray)
 
+    instance Eq[JsonArray] {
+        pub def eq(x: JsonArray, y: JsonArray): Bool =
+            InteropJson.JsonArray.equals(x, y)
+    }
+
     instance ToString[JsonArray] {
         pub def toString(x: JsonArray): String =
             let JsonArray.JsonArray(x1) = x;
@@ -49,12 +72,6 @@ pub mod InteropJson {
     }
 
 
-    instance ToString[JsonValue] {
-        pub def toString(x: JsonValue): String =
-            let JsonValue.JsonValue(x1) = x;
-            unsafe IO { x1.toString() }
-    }
-    
 
     ///
     /// A trait for types that can be converted to Json.
