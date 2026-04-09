@@ -126,24 +126,30 @@ pub mod InteropJson.JsonObject {
 
     pub def forEach(f: (String, JsonValue) -> Unit \ ef, obj: JsonObject): Unit \ ef =
         let JsonObject.JsonObject(obj1) = obj;
-        unchecked_cast(obj1.forEach(makeBiConsumer(f)) as _ \ ef)
+        def f1(s: String, jv: JJsonValue): Unit \ ef = {
+            let v1 = JsonValue.JsonValue(jv);
+            f(s, v1)
+        };
+        unchecked_cast(obj1.forEach(makeBiConsumer(f1)) as _ \ ef)
     
 
     
         
     
 
-    // pub def map(f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef = region rc {
-    //     mapHelper(rc, f, obj)
-    // }
+    pub def map(f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef = region rc {
+        mapHelper(rc, f, obj)
+    }
 
-
-    // pub def mapHelper(_: Region[r], f: JsonObject -> JsonObject \ ef, obj: JsonObject): JsonObject \ ef + r = 
-    //     let JsonObject.JsonObject(obj1) = obj;
-    //     let javaValues: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { obj1.entrySet() };
-    //     let flixIter = Adaptor.fromSetToIterator(rc, javaValues);
-    //     Iterator.forEach(flixIter);
-    //     List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans)
+    pub def mapHelper(_: Region[r], f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef + r = 
+        let builder: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        def fn(k: String, v: JsonValue): Unit \ r + ef = { 
+            let JsonValue.JsonValue(jv) = f(v);
+            unchecked_cast(discard builder.add(k, jv) as _ \ r)
+        };
+        forEach(fn, obj);
+        let ans = unchecked_cast(builder.build() as _ \ r);
+        JsonObject.JsonObject(ans)
 
 
     pub def fromMap(m: Map[String, v]): JsonObject with ToJsonValue[v] = region rc {
@@ -156,7 +162,28 @@ pub mod InteropJson.JsonObject {
             v1 
         }; 
         let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
-        Map.forEach((k, v) -> { let v1 = unwrap(v); unchecked_cast(discard b1.add(k, v1) as _ \ r) }, m);
+        Map.forEach((k, v) -> { 
+            let v1 = unwrap(v); 
+            unchecked_cast(discard b1.add(k, v1) as _ \ r) 
+            }, m);
+        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        JsonObject.JsonObject(ans)
+
+
+    pub def fromList(m: List[(String, v)]): JsonObject with ToJsonValue[v] = region rc {
+        fromListHelper(rc, m)
+    }
+
+    def fromListHelper(_: Region[r], m: List[(String, v)]): JsonObject \ r with ToJsonValue[v] =
+        def unwrap(v) = { 
+            let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
+            v1 
+        }; 
+        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        List.forEach(match (k, v) -> { 
+            let v1 = unwrap(v); 
+            unchecked_cast(discard b1.add(k, v1) as _ \ r) 
+            }, m);
         let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
         JsonObject.JsonObject(ans)
 

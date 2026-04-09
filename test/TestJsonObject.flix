@@ -21,7 +21,45 @@ pub mod TestJsonObject {
             expected = 4,
             InteropJson.JsonObject.size(json)
         )
+    @Test
+    def forEach01(): Unit \ { Assert, IO } =
+        let xm: Map[String, Int32] = Map#{};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        InteropJson.JsonObject.forEach((k, v) -> println("${k}:=${v}"), json);
+        assertEq(
+            expected = true,
+            true
+        )
 
+    @Test
+    def forEach02(): Unit \ { Assert, IO } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        InteropJson.JsonObject.forEach((k, v) -> println("${k}:=${v}"), json);
+        assertEq(
+            expected = true,
+            true
+        )
+
+    @Test
+    def map01(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapInt32(_ -> 10), json);
+        assertEq(
+            expected = { let ym: Map[String, Int32] = Map#{}; InteropJson.JsonObject.fromMap(ym) },
+            ans
+        )
+
+    @Test
+    def map02(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapInt32(_ -> 10), json);
+        assertEq(
+            expected = { let ym: Map[String, Int32] = Map#{"a" => 10, "b" => 10, "c" => 10}; InteropJson.JsonObject.fromMap(ym) },
+            ans
+        )
 
 }
 
