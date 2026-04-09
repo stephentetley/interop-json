@@ -16,6 +16,7 @@
 
 
 pub mod InteropJson.JsonObject {
+    use Fs.FileStat.exists
 
     use InteropJson.JsonObject
     use InteropJson.ToJsonValue
@@ -104,38 +105,16 @@ pub mod InteropJson.JsonObject {
         let JsonObject.JsonObject(o1) = o;
         unsafe IO {o1.size()}
 
-    def mapEntryKey(x: JMapEntry[k, v]): k = x.getKey()
-    def mapEntryValue(x: JMapEntry[k, v]): v = x.getValue()
+    def getMapEntryKey(x: JMapEntry[k, v]): k = x.getKey()
+    def getMapEntryValue(x: JMapEntry[k, v]): v = x.getValue()
 
     pub def toList(obj: JsonObject): List[(String, JsonValue)] =  region rc {
         let JsonObject.JsonObject(obj1) = obj;
         let javaValues: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { obj1.entrySet() };
         let flixIter = Adaptor.fromSetToIterator(rc, javaValues);
         let ans = Iterator.toList(flixIter);
-        List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans)
+        List.map(mx -> (getMapEntryKey(mx), JsonValue.JsonValue(getMapEntryValue(mx))), ans)
     } 
-
-
-    def makeBiConsumer(f: (t1, t2) -> Unit \ ef): JBiConsumer[t1, t2] = 
-        unsafe IO { 
-            new JBiConsumer[t1, t2] {
-                def accept(_this: JBiConsumer[t1, t2], u: t1, v: t2): Unit \ ef = 
-                    f(u, v)
-            }
-        }
-
-    pub def forEach(f: (String, JsonValue) -> Unit \ ef, obj: JsonObject): Unit \ ef =
-        let JsonObject.JsonObject(obj1) = obj;
-        def f1(s: String, jv: JJsonValue): Unit \ ef = {
-            let v1 = JsonValue.JsonValue(jv);
-            f(s, v1)
-        };
-        unchecked_cast(obj1.forEach(makeBiConsumer(f1)) as _ \ ef)
-    
-
-    
-        
-    
 
     pub def map(f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef = region rc {
         mapHelper(rc, f, obj)
@@ -150,6 +129,78 @@ pub mod InteropJson.JsonObject {
         forEach(fn, obj);
         let ans = unchecked_cast(builder.build() as _ \ r);
         JsonObject.JsonObject(ans)
+
+
+
+
+    pub def filter(f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef = region rc {
+        filterHelper(rc, f, obj)
+    }
+
+    pub def filterHelper(_: Region[r], f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef + r = 
+        let builder: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        def fn(k: String, v: JsonValue): Unit \ r + ef = { 
+            if(f(v)) {
+                let JsonValue.JsonValue(jv) = v;
+                unchecked_cast(discard builder.add(k, jv) as _ \ r)
+            } else ()
+        };
+        forEach(fn, obj);
+        let ans = unchecked_cast(builder.build() as _ \ r);
+        JsonObject.JsonObject(ans)
+
+
+    pub def fold(f: (b, JsonValue) -> b \ ef, s: b, obj: JsonObject): b \ ef = region rc {
+        foldHelper(rc, f, s, obj)
+    }
+
+    pub def foldHelper(rc: Region[r], f: (b, JsonValue) -> b \ ef, s: b, obj: JsonObject): b \ ef + r = 
+        let cell = Ref.fresh(rc, s);
+        def fn(_: String, v: JsonValue): Unit \ r + ef = { 
+            let acc1 = f(Ref.get(cell), v);
+            Ref.put(acc1, cell)
+        };
+        forEach(fn, obj);
+        Ref.get(cell)
+    
+
+
+    def makeBiConsumer(f: (t1, t2) -> Unit \ ef): JBiConsumer[t1, t2] = 
+        unsafe IO { 
+            new JBiConsumer[t1, t2] {
+                def accept(_this: JBiConsumer[t1, t2], u: t1, v: t2): Unit \ ef = 
+                    f(u, v)
+            }
+        }
+
+
+    pub def forEach(f: (String, JsonValue) -> Unit \ ef, obj: JsonObject): Unit \ ef =
+        let JsonObject.JsonObject(obj1) = obj;
+        def f1(s: String, jv: JJsonValue): Unit \ ef = {
+            let v1 = JsonValue.JsonValue(jv);
+            f(s, v1)
+        };
+        unchecked_cast(obj1.forEach(makeBiConsumer(f1)) as _ \ ef)
+
+
+    pub def exists(f: (String, JsonValue) -> Bool \ ef, obj: JsonObject): Bool \ ef = 
+        let JsonObject.JsonObject(obj1) = obj;
+        let eset1: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { obj1.entrySet() };
+        let javaiter: JIterator[JMapEntry[String, JJsonValue]] = unsafe IO { eset1.iterator() };
+        def loop(): Bool =  {
+            let bnext: Bool = unsafe IO { javaiter.hasNext() };
+            if (bnext) {
+                let entry1: JMapEntry[String, JJsonValue] = unsafe IO { javaiter.next() };
+                let k1: String = getMapEntryKey(entry1);
+                let v1: JJsonValue = getMapEntryValue(entry1);
+                let bfound = f(k1, JsonValue.JsonValue(v1));
+                if (bfound) true else loop()
+            } else false
+        };
+        loop()
+        
+    
+
 
 
     pub def fromMap(m: Map[String, v]): JsonObject with ToJsonValue[v] = region rc {

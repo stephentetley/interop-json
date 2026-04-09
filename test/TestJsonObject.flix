@@ -61,5 +61,69 @@ pub mod TestJsonObject {
             ans
         )
 
+    @Test
+    def fold01(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.fold(
+                    (ac, x) -> ac + InteropJson.JsonValue.getInt32WithDefault(0, x), 
+                    0, 
+                    json);
+        assertEq(
+            expected = 0,
+            ans
+        )
+
+    @Test
+    def fold02(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.fold(
+                    (ac, x) -> ac + InteropJson.JsonValue.getInt32WithDefault(0, x), 
+                    0, 
+                    json);
+        assertEq(
+            expected = 6,
+            ans
+        )
+
+
+    @Test
+    def exists01(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.exists(
+                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "c", 
+                    json);
+        assertEq(
+            expected = false,
+            ans
+        )
+
+    @Test
+    def exists02(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.exists(
+                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "c", 
+                    json);
+        assertEq(
+            expected = true,
+            ans
+        )
+
+    @Test
+    def exists03(): Unit \ { Assert } =
+        let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
+        let json = InteropJson.JsonObject.fromMap(xm);
+        let ans = InteropJson.JsonObject.exists(
+                    (k, x) -> InteropJson.JsonValue.getInt32(x) == Some(3) and k == "notc", 
+                    json);
+        assertEq(
+            expected = false,
+            ans
+        )
+
+
 }
 
