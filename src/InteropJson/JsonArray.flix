@@ -98,6 +98,33 @@ pub mod InteropJson.JsonArray {
         List.map(JsonValue.JsonValue, ans)
     }
 
+    pub def foldLeft(f: (b, JsonValue) -> b \ ef, s: b, arr: JsonArray): b \ ef =
+        let len = size(arr); 
+        let JsonArray.JsonArray(arr1) = arr;
+        @Tailrec
+        def loop(ix, acc) = 
+            if (ix < len) {
+                let jv: JJsonValue = unsafe IO { arr1.get(ix) };
+                let v1 = JsonValue.JsonValue(jv);
+                let acc1 = f(acc, v1);
+                loop(ix + 1, acc1)
+            } else acc;
+        loop(0, s)
+
+    pub def foldRight(f: (JsonValue, b) -> b \ ef, s: b, arr: JsonArray): b \ ef =
+        let len = size(arr); 
+        let JsonArray.JsonArray(arr1) = arr;
+        @Tailrec
+        def loop(ix, acc) = 
+            if (ix >= 0) {
+                let jv: JJsonValue = unsafe IO { arr1.get(ix) };
+                let v1 = JsonValue.JsonValue(jv);
+                let acc1 = f(v1, acc);
+                loop(ix - 1, acc1)
+            } else acc;
+        loop(len-1, s)
+
+
 
     pub def fromList(t: List[v]): JsonArray with ToJsonValue[v] = region rc {
         fromFoldableHelper(rc, t)

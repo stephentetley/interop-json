@@ -22,5 +22,45 @@ pub mod TestJsonArray {
         )
 
 
+    @Test
+    def foldLeft01(): Unit \ { Assert } =
+        let xs: List[Int32] = List#{};
+        let json = InteropJson.JsonArray.fromList(xs);
+        let ans = InteropJson.JsonArray.foldLeft((ac, x) -> "${ac}${x}", "", json);
+        assertEq(
+            expected = "",
+            ans
+        )
+
+    @Test
+    def foldLeft02(): Unit \ { Assert } =
+        let xs: List[Int32] = List#{1,2,3};
+        let json = InteropJson.JsonArray.fromList(xs);
+        let ans = InteropJson.JsonArray.foldLeft((ac, x) -> "${ac}${x}", "", json);
+        assertEq(
+            expected = "123",
+            ans
+        )
+
+    @Test
+    def foldRight01(): Unit \ { Assert } =
+        let xs: List[Int32] = List#{};
+        let json = InteropJson.JsonArray.fromList(xs);
+        let ans = InteropJson.JsonArray.foldRight((x, ac) -> "${ac}${x}", "", json);
+        assertEq(
+            expected = "",
+            ans
+        )
+
+    @Test
+    def foldRight02(): Unit \ { Assert } =
+        let xs: List[Int32] = List#{1,2,3};
+        let json = InteropJson.JsonArray.fromList(xs);
+        let ans = InteropJson.JsonArray.foldRight((x, ac) -> "${ac}${x}", "", json);
+        assertEq(
+            expected = "321",
+            ans
+        )
+
 }
 
