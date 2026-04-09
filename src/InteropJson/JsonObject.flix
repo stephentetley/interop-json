@@ -34,6 +34,7 @@ pub mod InteropJson.JsonObject {
     import java.util.{Set => JSet}
     import java.util.{Map$Entry => JMapEntry}
     import java.util.{Collection => JCollection}
+    import java.util.function.{BiConsumer => JBiConsumer}
 
     // Use a threaded region if we will be discarding operations
     // otherwise use unsafe IO { ... }
@@ -113,7 +114,38 @@ pub mod InteropJson.JsonObject {
         let ans = Iterator.toList(flixIter);
         List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans)
     } 
-     
+
+
+    def makeBiConsumer(f: (t1, t2) -> Unit \ ef): JBiConsumer[t1, t2] = 
+        unsafe IO { 
+            new JBiConsumer[t1, t2] {
+                def accept(_this: JBiConsumer[t1, t2], u: t1, v: t2): Unit \ ef = 
+                    f(u, v)
+            }
+        }
+
+    pub def forEach(f: (String, JsonValue) -> Unit \ ef, obj: JsonObject): Unit \ ef =
+        let JsonObject.JsonObject(obj1) = obj;
+        unchecked_cast(obj1.forEach(makeBiConsumer(f)) as _ \ ef)
+    
+
+    
+        
+    
+
+    // pub def map(f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef = region rc {
+    //     mapHelper(rc, f, obj)
+    // }
+
+
+    // pub def mapHelper(_: Region[r], f: JsonObject -> JsonObject \ ef, obj: JsonObject): JsonObject \ ef + r = 
+    //     let JsonObject.JsonObject(obj1) = obj;
+    //     let javaValues: JSet[JMapEntry[String, JJsonValue]] = unsafe IO { obj1.entrySet() };
+    //     let flixIter = Adaptor.fromSetToIterator(rc, javaValues);
+    //     Iterator.forEach(flixIter);
+    //     List.map(mx -> (mapEntryKey(mx), JsonValue.JsonValue(mapEntryValue(mx))), ans)
+
+
     pub def fromMap(m: Map[String, v]): JsonObject with ToJsonValue[v] = region rc {
         fromMapHelper(rc, m)
     }
