@@ -22,6 +22,7 @@ pub mod InteropJson.JsonObject {
     use InteropJson.ToJsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonValue
+    use InteropJson.JsonNumber
 
     import jakarta.json.{Json => JJson}
     import jakarta.json.{JsonValue => JJsonValue}
@@ -385,6 +386,15 @@ pub mod InteropJson.JsonObject {
         let JsonObject.JsonObject(obj1) = obj;
         unsafe IO { obj1.getString(name#name, d) }
     } 
+
+
+    pub def getJsonNumber(name: {name = String}, obj: JsonObject): Option[JsonNumber] = try {
+        let JsonObject.JsonObject(obj1) = obj;
+        let num: JJsonNumber= unsafe IO { obj1.getJsonNumber(name#name) };
+        Some(JsonNumber.JsonNumber(num))
+    } catch {
+        case _: JException => None
+    }
 
     pub def getJsonArray(name: {name = String}, obj: JsonObject): Option[JsonArray] = try {
         let JsonObject.JsonObject(obj1) = obj;

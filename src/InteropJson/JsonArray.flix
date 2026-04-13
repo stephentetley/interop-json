@@ -16,12 +16,13 @@
 
 
 pub mod InteropJson.JsonArray {
-    use InteropJson.JsonArray.mapHelper
+    
     
     use InteropJson.ToJsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonObject
     use InteropJson.JsonValue
+    use InteropJson.JsonNumber
 
     import jakarta.json.{Json => JJson}
     import jakarta.json.{JsonValue => JJsonValue}
@@ -343,73 +344,6 @@ pub mod InteropJson.JsonArray {
         unsafe IO {arr1.getInt(ix#index, d) }
     } 
     
-    pub def getInt64(ix: {index = Int32}, arr: JsonArray): Option[Int64] = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        let ans = unsafe IO { num.longValue() };
-        Some(ans)
-    } catch {
-        case _: JException => None
-    }
-
-    pub def getInt64WithDefault(ix: {index = Int32}, d: Int64, arr: JsonArray): Int64 = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        unsafe IO { num.longValue() }
-    } catch {
-        case _: JException => d
-    }
-
-    pub def getBigInt(ix: {index = Int32}, arr: JsonArray): Option[BigInt] = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        let ans = unsafe IO { num.bigIntegerValue() };
-        Some(ans)
-    } catch {
-        case _: JException => None
-    }
-
-    pub def getBigIntWithDefault(ix: {index = Int32}, d: BigInt, arr: JsonArray): BigInt = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        unsafe IO { num.bigIntegerValue() }
-    } catch {
-        case _: JException => d
-    }
-
-    pub def getFloat64(ix: {index = Int32}, arr: JsonArray): Option[Float64] = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        let ans = unsafe IO { num.doubleValue() };
-        Some(ans)
-    } catch {
-        case _: JException => None
-    }
-
-    pub def getFloat64WithDefault(ix: {index = Int32}, d: Float64, arr: JsonArray): Float64 = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        unsafe IO { num.doubleValue() }
-    } catch {
-        case _: JException => d
-    }
-
-    pub def getBigDecimal(ix: {index = Int32}, arr: JsonArray): Option[BigDecimal] = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        let ans = unsafe IO { num.bigDecimalValue() };
-        Some(ans)
-    } catch {
-        case _: JException => None
-    }
-
-    pub def getBigDecimalWithDefault(ix: {index = Int32}, d: BigDecimal, arr: JsonArray): BigDecimal = try {
-        let JsonArray.JsonArray(arr1) = arr;
-        let num: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
-        unsafe IO { num.bigDecimalValue() }
-    } catch {
-        case _: JException => d
-    }
 
     pub def getString(ix: {index = Int32}, arr: JsonArray): Option[String] = try {
         let JsonArray.JsonArray(arr1) = arr;
@@ -423,6 +357,15 @@ pub mod InteropJson.JsonArray {
         let JsonArray.JsonArray(arr1) = arr;
         unsafe IO {arr1.getString(ix#index, d) }
     } 
+
+    pub def getJsonNumber(ix: {index = Int32}, arr: JsonArray): Option[JsonNumber] = try {
+        let JsonArray.JsonArray(arr1) = arr;
+        let ans: JJsonNumber = unsafe IO {arr1.getJsonNumber(ix#index) };
+        Some(JsonNumber.JsonNumber(ans))
+    } catch {
+        case _: JException => None
+    }
+
 
     pub def getJsonArray(ix: {index = Int32}, arr: JsonArray): Option[JsonArray] = try {
         let JsonArray.JsonArray(arr1) = arr;

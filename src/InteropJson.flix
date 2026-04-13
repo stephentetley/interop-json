@@ -23,6 +23,7 @@ pub mod InteropJson {
     import jakarta.json.{JsonValue => JJsonValue}
     import jakarta.json.{JsonArray => JJsonArray}
     import jakarta.json.{JsonObject => JJsonObject}
+    import jakarta.json.{JsonNumber => JJsonNumber}
 
     ///
     /// Represents a JsonValue.
@@ -69,6 +70,26 @@ pub mod InteropJson {
         pub def toString(x: JsonArray): String =
             let JsonArray.JsonArray(x1) = x;
             unsafe IO { x1.toString() }
+    }
+
+    pub enum JsonNumber(JJsonNumber)
+
+    instance Eq[JsonNumber] {
+        pub def eq(x: JsonNumber, y: JsonNumber): Bool =
+            InteropJson.JsonNumber.equals(x, y)
+    }
+
+    instance ToString[JsonNumber] {
+        pub def toString(x: JsonNumber): String =
+            let JsonNumber.JsonNumber(x1) = x;
+            unsafe IO { x1.toString() }
+    }
+
+    instance Order[JsonNumber] {
+        pub def compare(x: JsonNumber, y: JsonNumber): Comparison =
+            Order.compare(
+                InteropJson.JsonNumber.getBigDecimal(x), 
+                InteropJson.JsonNumber.getBigDecimal(y))
     }
 
 
@@ -183,6 +204,11 @@ pub mod InteropJson {
             InteropJson.JsonObject.toJsonValue(x)
     }
 
+    instance ToJsonValue[JsonNumber] {
+        pub def toJsonValue(x: JsonNumber): JsonValue =
+            InteropJson.JsonNumber.toJsonValue(x)
+    }
+
     ///
     /// A trait for types that can be parsed from Json.
     ///
@@ -202,24 +228,34 @@ pub mod InteropJson {
     }
 
     instance FromJsonValue[Int32] {
-        pub def fromJsonValue(x: JsonValue): Option[Int32] = InteropJson.JsonValue.getInt32Exact(x)
+        pub def fromJsonValue(x: JsonValue): Option[Int32] = 
+            InteropJson.JsonValue.getJsonNumber(x) 
+                |> Option.map(InteropJson.JsonNumber.getInt32)
     }
 
     instance FromJsonValue[Int64] {
-        pub def fromJsonValue(x: JsonValue): Option[Int64] = InteropJson.JsonValue.getInt64Exact(x)
+        pub def fromJsonValue(x: JsonValue): Option[Int64] = 
+            InteropJson.JsonValue.getJsonNumber(x) 
+                |> Option.map(InteropJson.JsonNumber.getInt64)
     }
 
     instance FromJsonValue[BigInt] {
-        pub def fromJsonValue(x: JsonValue): Option[BigInt] = InteropJson.JsonValue.getBigIntExact(x)
+        pub def fromJsonValue(x: JsonValue): Option[BigInt] = 
+            InteropJson.JsonValue.getJsonNumber(x) 
+                |> Option.map(InteropJson.JsonNumber.getBigInt)
     }
 
     // Not exact
     instance FromJsonValue[Float64] {
-        pub def fromJsonValue(x: JsonValue): Option[Float64] = InteropJson.JsonValue.getFloat64(x)
+        pub def fromJsonValue(x: JsonValue): Option[Float64] = 
+            InteropJson.JsonValue.getJsonNumber(x) 
+                |> Option.map(InteropJson.JsonNumber.getFloat64)
     }
 
     instance FromJsonValue[BigDecimal] {
-        pub def fromJsonValue(x: JsonValue): Option[BigDecimal] = InteropJson.JsonValue.getBigDecimal(x)
+        pub def fromJsonValue(x: JsonValue): Option[BigDecimal] = 
+            InteropJson.JsonValue.getJsonNumber(x) 
+                |> Option.map(InteropJson.JsonNumber.getBigDecimal)
     }
 
     instance FromJsonValue[JsonValue] {
@@ -234,6 +270,12 @@ pub mod InteropJson {
     instance FromJsonValue[JsonObject] {
         pub def fromJsonValue(x: JsonValue): Option[JsonObject] = 
             InteropJson.JsonValue.getJsonObject(x)
+    }
+
+
+    instance FromJsonValue[JsonNumber] {
+        pub def fromJsonValue(x: JsonValue): Option[JsonNumber] = 
+            InteropJson.JsonValue.getJsonNumber(x)
     }
 
     pub eff ReadJson {

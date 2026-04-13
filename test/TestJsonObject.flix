@@ -45,7 +45,8 @@ pub mod TestJsonObject {
     def map01(): Unit \ { Assert } =
         let xm: Map[String, Int32] = Map#{};
         let json = InteropJson.JsonObject.fromMap(xm);
-        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapInt32(_ -> 10), json);
+        let ten = InteropJson.JsonNumber.fromInt32(10);
+        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapJsonNumber(_ -> ten), json);
         assertEq(
             expected = { let ym: Map[String, Int32] = Map#{}; InteropJson.JsonObject.fromMap(ym) },
             ans
@@ -55,7 +56,8 @@ pub mod TestJsonObject {
     def map02(): Unit \ { Assert } =
         let xm: Map[String, Int32] = Map#{"a" => 1, "b" => 2, "c" => 3};
         let json = InteropJson.JsonObject.fromMap(xm);
-        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapInt32(_ -> 10), json);
+        let ten = InteropJson.JsonNumber.fromInt32(10);
+        let ans = InteropJson.JsonObject.map(InteropJson.JsonValue.mapJsonNumber(_ -> ten), json);
         assertEq(
             expected = { let ym: Map[String, Int32] = Map#{"a" => 10, "b" => 10, "c" => 10}; InteropJson.JsonObject.fromMap(ym) },
             ans

@@ -22,6 +22,7 @@ pub mod InteropJson.JsonValue {
     use InteropJson.JsonValue
     use InteropJson.JsonArray
     use InteropJson.JsonObject
+    use InteropJson.JsonNumber
     use InteropJson.BuildJsonArray.BuildJsonArray
     use InteropJson.BuildJsonObject.BuildJsonObject
     
@@ -162,6 +163,14 @@ pub mod InteropJson.JsonValue {
         } else None
 
 
+    pub def getJsonNumber(x: JsonValue): Option[JsonNumber] =
+        if (isNumber(x)) {
+            let JsonValue.JsonValue(x1) = x;
+            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
+            Some(JsonNumber.JsonNumber(jsonnumber))
+        } else None
+
+
     pub def getNull(x: JsonValue): Option[Unit] = 
         if (isNull(x)) Some(()) else None
 
@@ -184,93 +193,34 @@ pub mod InteropJson.JsonValue {
 
     pub def getStringWithDefault(d: String, x: JsonValue): String = 
         InteropJson.JsonValue.getString(x) |> Option.getWithDefault(d)
-
+    
     pub def getInt32(x: JsonValue): Option[Int32] = 
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(unsafe IO { jsonnumber.intValue() })
-        } else None
+        getJsonNumber(x) |> Option.map(InteropJson.JsonNumber.getInt32)
 
-    pub def getInt32WithDefault(d: Int32, x: JsonValue): Int32 = 
-        InteropJson.JsonValue.getInt32(x) |> Option.getWithDefault(d)
+    pub def getInt32WithDefault(d: Int32, x: JsonValue): Int32 = match getJsonNumber(x) {
+        case Some(n) => InteropJson.JsonNumber.getInt32(n)
+        case None    => d
+    }
 
-    pub def getInt32Exact(x: JsonValue): Option[Int32] = 
-        if (isNumber(x)) {
-            try {
-                let JsonValue.JsonValue(x1) = x;
-                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-                Some(unsafe IO { jsonnumber.intValueExact() })
-            } catch {
-                case _: JException => None
-            }
-        } else None
+    pub def getInt64WithDefault(d: Int64, x: JsonValue): Int64 = match getJsonNumber(x) {
+        case Some(n) => InteropJson.JsonNumber.getInt64(n)
+        case None    => d
+    }
 
-    pub def getInt64(x: JsonValue): Option[Int64] =
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(unsafe IO { jsonnumber.longValue() })
-        } else None
+    pub def getFloat64WithDefault(d: Float64, x: JsonValue): Float64 = match getJsonNumber(x) {
+        case Some(n) => InteropJson.JsonNumber.getFloat64(n)
+        case None    => d
+    }
 
-    pub def getInt64WithDefault(d: Int64, x: JsonValue): Int64 = 
-        InteropJson.JsonValue.getInt64(x) |> Option.getWithDefault(d)
+    pub def getBigIntWithDefault(d: BigInt, x: JsonValue): BigInt = match getJsonNumber(x) {
+        case Some(n) => InteropJson.JsonNumber.getBigInt(n)
+        case None    => d
+    }
 
-    pub def getInt64Exact(x: JsonValue): Option[Int64] =
-        if (isNumber(x)) {
-            try {
-                let JsonValue.JsonValue(x1) = x;
-                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-                Some(unsafe IO { jsonnumber.longValueExact() })
-            } catch {
-                case _: JException => None
-            }
-        } else None
-
-    pub def getBigInt(x: JsonValue): Option[BigInt] =
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(unsafe IO { jsonnumber.bigIntegerValue() })
-        } else None
-
-    pub def getBigIntWithDefault(d: BigInt, x: JsonValue): BigInt = 
-        InteropJson.JsonValue.getBigInt(x) |> Option.getWithDefault(d)
-
-
-    pub def getBigIntExact(x: JsonValue): Option[BigInt] =
-        if (isNumber(x)) {
-            try {
-                let JsonValue.JsonValue(x1) = x;
-                let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-                Some(unsafe IO { jsonnumber.bigIntegerValueExact() })
-            } catch {
-                case _: JException => None
-            }
-        } else None
-
-
-    pub def getFloat64(x: JsonValue): Option[Float64] =
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(unsafe IO { jsonnumber.doubleValue() })
-        } else None
-
-    pub def getFloat64WithDefault(d: Float64, x: JsonValue): Float64 = 
-        InteropJson.JsonValue.getFloat64(x) |> Option.getWithDefault(d)
-
-    pub def getBigDecimal(x: JsonValue): Option[BigDecimal] =
-        if (isNumber(x)) {
-            let JsonValue.JsonValue(x1) = x;
-            let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-            Some(unsafe IO { jsonnumber.bigDecimalValue() })
-        } else None
-
-    pub def getBigDecimalWithDefault(d: BigDecimal, x: JsonValue): BigDecimal = 
-        InteropJson.JsonValue.getBigDecimal(x) |> Option.getWithDefault(d)
-
-
+    pub def getBigDecimalWithDefault(d: BigDecimal, x: JsonValue): BigDecimal = match getJsonNumber(x) {
+        case Some(n) => InteropJson.JsonNumber.getBigDecimal(n)
+        case None    => d
+    }
 
 
     pub def existsBool(f: Bool -> Bool \ ef, x: JsonValue): Bool \ ef = match getBool(x) {
@@ -283,26 +233,8 @@ pub mod InteropJson.JsonValue {
         case None    => false
     } 
 
-    pub def existsInt32(f: Int32 -> Bool \ ef, x: JsonValue): Bool \ ef = match getInt32(x) {
-        case Some(i) => f(i)
-        case None    => false
-    }
 
-    pub def existsInt64(f: Int64 -> Bool \ ef, x: JsonValue): Bool \ ef = match getInt64(x) {
-        case Some(i) => f(i)
-        case None    => false
-    }
-
-    pub def existsBigInt(f: BigInt -> Bool \ ef, x: JsonValue): Bool \ ef = match getBigInt(x) {
-        case Some(i) => f(i)
-        case None    => false
-    }
-    pub def existsFloat64(f: Float64 -> Bool \ ef, x: JsonValue): Bool \ ef = match getFloat64(x) {
-        case Some(d) => f(d)
-        case None    => false
-    }
-
-    pub def existsBigDecimal(f: BigDecimal -> Bool \ ef, x: JsonValue): Bool \ ef = match getBigDecimal(x) {
+    pub def existsJsonNumber(f: JsonNumber -> Bool \ ef, x: JsonValue): Bool \ ef = match getJsonNumber(x) {
         case Some(d) => f(d)
         case None    => false
     }
@@ -318,38 +250,8 @@ pub mod InteropJson.JsonValue {
         case None      => false
     }
 
-    pub def filterBool(f: Bool -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBool(x) {
-        case Some(b) => if (f(b)) jsonBool(b) else jsonNull()
-        case None    => jsonNull()
-    } 
-
-    pub def filterString(f: String -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getString(x) {
-        case Some(s) => if (f(s)) jsonString(s) else jsonNull()
-        case None    => jsonNull()
-    } 
-
-    pub def filterInt32(f: Int32 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getInt32(x) {
-        case Some(i) => if (f(i)) jsonNumberFromInt32(i) else jsonNull()
-        case None    => jsonNull()
-    }
-
-    pub def filterInt64(f: Int64 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getInt64(x) {
-        case Some(i) => if (f(i)) jsonNumberFromInt64(i) else jsonNull()
-        case None    => jsonNull()
-    }
-
-    pub def filterBigInt(f: BigInt -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBigInt(x) {
-        case Some(i) => if (f(i)) jsonNumberFromBigInt(i) else jsonNull()
-        case None    => jsonNull()
-    }
-
-    pub def filterFloat64(f: Float64 -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getFloat64(x) {
-        case Some(d) => if (f(d)) jsonNumberFromFloat64(d) else jsonNull()
-        case None    => jsonNull()
-    }
-
-    pub def filterBigDecimal(f: BigDecimal -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getBigDecimal(x) {
-        case Some(d) => if (f(d)) jsonNumberFromBigDecimal(d) else jsonNull()
+    pub def filterJsonNumber(f: JsonNumber -> Bool \ ef, x: JsonValue): JsonValue \ ef = match getJsonNumber(x) {
+        case Some(d) => if (f(d)) InteropJson.JsonNumber.toJsonValue(d) else jsonNull()
         case None    => jsonNull()
     }
 
@@ -374,28 +276,9 @@ pub mod InteropJson.JsonValue {
         case None    => x
     }
 
-    pub def mapInt32(f: Int32 -> Int32 \ ef, x: JsonValue): JsonValue \ ef = match getInt32(x) {
-        case Some(s) => jsonNumberFromInt32(f(s))
-        case None    => x
-    }
 
-    pub def mapInt64(f: Int64 -> Int64 \ ef, x: JsonValue): JsonValue \ ef = match getInt64(x) {
-        case Some(i) => jsonNumberFromInt64(f(i))
-        case None    => x
-    }
-
-    pub def mapBigInt(f: BigInt -> BigInt \ ef, x: JsonValue): JsonValue \ ef = match getBigInt(x) {
-        case Some(i) => jsonNumberFromBigInt(f(i))
-        case None    => x
-    }
-
-    pub def mapFloat64(f: Float64 -> Float64 \ ef, x: JsonValue): JsonValue \ ef = match getFloat64(x) {
-        case Some(d) => jsonNumberFromFloat64(f(d))
-        case None    => x
-    }
-
-    pub def mapBigDecimal(f: BigDecimal -> BigDecimal \ ef, x: JsonValue): JsonValue \ ef = match getBigDecimal(x) {
-        case Some(d) => jsonNumberFromBigDecimal(f(d))
+    pub def mapJsonNumber(f: JsonNumber ->JsonNumber \ ef, x: JsonValue): JsonValue \ ef = match getJsonNumber(x) {
+        case Some(d) => f(d) |> InteropJson.JsonNumber.toJsonValue
         case None    => x
     }
 

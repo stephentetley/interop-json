@@ -1,3 +1,9 @@
+### v0.8.0 
+   Added `JsonNumber` module.
+   Simplified `JsonValue` preferring to use `JsonNumber` in 
+   functions rather than provide families of functions for the 
+   primitive number types.
+
 ### v0.7.0 
    Added `foldLeft` etc. functions to `JsonArray`.
    Added `fold` etc. functions to `JsonObject`.

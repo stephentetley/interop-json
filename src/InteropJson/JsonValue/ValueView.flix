@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Stephen Tetley
+ * Copyright 2026 Stephen Tetley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 pub mod InteropJson.JsonValue.ValueView {
     
 
-    use InteropJson.{JsonValue, JsonArray, JsonObject}
+    use InteropJson.{JsonValue, JsonArray, JsonObject, JsonNumber}
     use InteropJson.JsonValue.ValueType.ValueType
     
     import jakarta.json.{JsonValue => JJsonValue}
@@ -32,7 +32,7 @@ pub mod InteropJson.JsonValue.ValueView {
         case JsFalse
         case JsTrue
         case JsString(String)
-        case JsNumber(BigDecimal)
+        case JsNumber(JsonNumber)
         case JsArray(JsonArray)
         case JsObject(JsonObject)
     }
@@ -53,7 +53,7 @@ pub mod InteropJson.JsonValue.ValueView {
             case ValueType.NUMBER   => { 
                 let JsonValue.JsonValue(x1) = x;
                 let jsonnumber = unchecked_cast(x1 as JJsonNumber);
-                JsonValueView.JsNumber(unsafe IO { jsonnumber.bigDecimalValue() })
+                JsonValueView.JsNumber(JsonNumber.JsonNumber(jsonnumber))
             }
 
             case ValueType.OBJECT   => { 
