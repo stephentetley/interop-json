@@ -67,9 +67,9 @@ pub mod InteropJson.JsonObject {
 
     def singletonHelper(_: Region[r], k: String, v: JsonValue): JsonObject \ r=
         let JsonValue.JsonValue(v1) = v;
-        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
-        unchecked_cast(discard b1.add(k, v1) as _ \ r);
-        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
+        unsafe IO as r { discard b1.add(k, v1) };
+        let ans: JJsonObject = unsafe IO as r { b1.build() };
         JsonObject.JsonObject(ans)
 
 
@@ -81,9 +81,9 @@ pub mod InteropJson.JsonObject {
     def addHelper(_: Region[r], k: String, v: JsonValue, o: JsonObject): JsonObject \ r =
         let JsonValue.JsonValue(v1) = v;
         let JsonObject.JsonObject(o1) = o;
-        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(o1) as _ \ r);
-        unchecked_cast(discard b1.add(k, v1) as _ \ r);
-        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder(o1) };
+        unsafe IO as r { discard b1.add(k, v1) };
+        let ans: JJsonObject = unsafe IO as r { b1.build() };
         JsonObject.JsonObject(ans)
     
     pub def append(x: JsonObject, y: JsonObject): JsonObject = region rc {
@@ -94,10 +94,10 @@ pub mod InteropJson.JsonObject {
     def appendHelper(_: Region[r], x: JsonObject, y: JsonObject): JsonObject \ r =
         let JsonObject.JsonObject(x1) = x;
         let JsonObject.JsonObject(y1) = y;
-        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(x1) as _ \ r);
-        let b2: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(y1) as _ \ r);
-        unchecked_cast(discard b1.addAll(b2) as _ \ r);
-        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder(x1) };
+        let b2: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder(y1) };
+        unsafe IO as r { discard b1.addAll(b2) };
+        let ans: JJsonObject = unsafe IO as r { b1.build() };
         JsonObject.JsonObject(ans)
     
 
@@ -122,13 +122,13 @@ pub mod InteropJson.JsonObject {
     }
 
     pub def mapHelper(_: Region[r], f: JsonValue -> JsonValue \ ef, obj: JsonObject): JsonObject \ ef + r = 
-        let builder: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        let builder: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
         def fn(k: String, v: JsonValue): Unit \ r + ef = { 
             let JsonValue.JsonValue(jv) = f(v);
-            unchecked_cast(discard builder.add(k, jv) as _ \ r)
+            unsafe IO as r { discard builder.add(k, jv) }
         };
         forEach(fn, obj);
-        let ans = unchecked_cast(builder.build() as _ \ r);
+        let ans = unsafe IO as r { builder.build() };
         JsonObject.JsonObject(ans)
 
 
@@ -139,15 +139,15 @@ pub mod InteropJson.JsonObject {
     }
 
     pub def filterHelper(_: Region[r], f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef + r = 
-        let builder: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        let builder: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
         def fn(k: String, v: JsonValue): Unit \ r + ef = { 
             if(f(v)) {
                 let JsonValue.JsonValue(jv) = v;
-                unchecked_cast(discard builder.add(k, jv) as _ \ r)
+                unsafe IO as r { discard builder.add(k, jv) }
             } else ()
         };
         forEach(fn, obj);
-        let ans = unchecked_cast(builder.build() as _ \ r);
+        let ans = unsafe IO as r { builder.build() };
         JsonObject.JsonObject(ans)
 
 
@@ -181,7 +181,7 @@ pub mod InteropJson.JsonObject {
             let v1 = JsonValue.JsonValue(jv);
             f(s, v1)
         };
-        unchecked_cast(obj1.forEach(makeBiConsumer(f1)) as _ \ ef)
+        unsafe IO as ef { obj1.forEach(makeBiConsumer(f1)) }
 
 
     pub def exists(f: (String, JsonValue) -> Bool \ ef, obj: JsonObject): Bool \ ef = 
@@ -227,12 +227,12 @@ pub mod InteropJson.JsonObject {
             let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
             v1 
         }; 
-        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
         Map.forEach((k, v) -> { 
             let v1 = unwrap(v); 
-            unchecked_cast(discard b1.add(k, v1) as _ \ r) 
+            unsafe IO as r { discard b1.add(k, v1) } 
             }, m);
-        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        let ans: JJsonObject = unsafe IO as r { b1.build() };
         JsonObject.JsonObject(ans)
 
 
@@ -245,12 +245,12 @@ pub mod InteropJson.JsonObject {
             let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
             v1 
         }; 
-        let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder() as _ \ r);
+        let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
         List.forEach(match (k, v) -> { 
             let v1 = unwrap(v); 
-            unchecked_cast(discard b1.add(k, v1) as _ \ r) 
+            unsafe IO as r { discard b1.add(k, v1) } 
             }, m);
-        let ans: JJsonObject = unchecked_cast(b1.build() as _ \ r);
+        let ans: JJsonObject = unsafe IO as r { b1.build() };
         JsonObject.JsonObject(ans)
 
 

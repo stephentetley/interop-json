@@ -1,3 +1,6 @@
+### v0.9.0
+   Updated to use "unsafe IO as r" syntax.
+
 ### v0.8.0 
    Added `JsonNumber` module.
    Simplified `JsonValue` preferring to use `JsonNumber` in 

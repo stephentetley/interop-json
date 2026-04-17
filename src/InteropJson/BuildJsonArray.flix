@@ -96,84 +96,84 @@ pub mod InteropJson.BuildJsonArray {
         } with handler BuildJsonArray {
 
             def addNull(k) = {
-                unchecked_cast(discard jbuilder.addNull() as _ \ r);
+                unsafe IO as r { discard jbuilder.addNull() };
                 k()
             }
 
             def addNullAt(ix, k) =  try {
-                unchecked_cast(discard jbuilder.addNull(ix#index) as _ \ r);
+                unsafe IO as r { discard jbuilder.addNull(ix#index) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addBool(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addBoolAt(ix, value, k) =  try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addInt32(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addInt32At(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addBigInt(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addBigIntAt(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addFloat64(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addFloat64At(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addBigDecimal(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addBigDecimalAt(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def addString(value, k) = {
-                unchecked_cast(discard jbuilder.add(value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value) };
                 k()
             }
 
             def addStringAt(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.add(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -181,13 +181,13 @@ pub mod InteropJson.BuildJsonArray {
 
             def addJsonValue(value, k) = {
                 let JsonValue.JsonValue(value1) = value;
-                unchecked_cast(discard jbuilder.add(value1) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(value1) };
                 k()
             }
 
             def addJsonValueAt(ix, value, k) = try {
                 let JsonValue.JsonValue(value1) = value;
-                unchecked_cast(discard jbuilder.add(ix#index, value1) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(ix#index, value1) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -198,7 +198,7 @@ pub mod InteropJson.BuildJsonArray {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => {
                     let JsonValue.JsonValue(value1) = value;
-                    unchecked_cast(discard jbuilder.add(value1) as _ \ r);
+                    unsafe IO as r { discard jbuilder.add(value1) };
                     k()
                 } 
             }
@@ -207,7 +207,7 @@ pub mod InteropJson.BuildJsonArray {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => try {
                     let JsonValue.JsonValue(value1) = value;
-                    unchecked_cast(discard jbuilder.add(ix#index, value1) as _ \ r);
+                    unsafe IO as r { discard jbuilder.add(ix#index, value1) };
                     k()
                 } catch {
                     case ex: Exception => Err(ex.getMessage())
@@ -216,64 +216,64 @@ pub mod InteropJson.BuildJsonArray {
                         
             def addAll(arr, k) = try {
                 let JsonArray.JsonArray(arr1) = arr;
-                let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder(arr1) as _ \ r );
-                unchecked_cast(discard jbuilder.addAll(b1) as _ \ r);
+                let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder(arr1) };
+                unsafe IO as r { discard jbuilder.addAll(b1) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def remove(ix, k) = try {
-                unchecked_cast(discard jbuilder.remove(ix#index) as _ \ r);
+                unsafe IO as r { discard jbuilder.remove(ix#index) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setNull(ix, k) = try {
-                unchecked_cast(discard jbuilder.setNull(ix#index) as _ \ r);
+                unsafe IO as r { discard jbuilder.setNull(ix#index) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setBool(ix, value, k) =  try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setInt32(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setBigInt(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setFloat64(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setBigDecimal(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
             }
 
             def setString(ix, value, k) = try {
-                unchecked_cast(discard jbuilder.set(ix#index, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -281,7 +281,7 @@ pub mod InteropJson.BuildJsonArray {
 
             def setJsonValue(ix, value, k) = try {
                 let JsonValue.JsonValue(value1) = value;
-                unchecked_cast(discard jbuilder.set(ix#index, value1) as _ \ r);
+                unsafe IO as r { discard jbuilder.set(ix#index, value1) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -290,7 +290,7 @@ pub mod InteropJson.BuildJsonArray {
         match ans { 
             case Err(msg) => Err(msg)
             case Ok(ans1) => {
-                let jsarr: JJsonArray = unchecked_cast(jbuilder.build() as _ \ r);
+                let jsarr: JJsonArray = unsafe IO as r { jbuilder.build() };
                 Ok((JsonArray.JsonArray(jsarr), ans1))
             }
         }

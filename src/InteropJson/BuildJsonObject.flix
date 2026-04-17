@@ -69,66 +69,66 @@ pub mod InteropJson.BuildJsonObject {
             
         }
 
-    // TODO - make builder a param so we can initialize from empty or a JJsonObject
+
     def handleHelper(_: Region[r], jbuilder: JJsonObjectBuilder, f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject + r) = x -> {        
         let ans = run {
             Ok(f(x))
         } with handler BuildJsonObject {
 
             def addNull(name, k) = {
-                unchecked_cast(discard jbuilder.addNull(name#name) as _ \ r);
+                unsafe IO as r { discard jbuilder.addNull(name#name) };
                 k()
             }
 
             def addBool(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt32(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt64(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addBigInt(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addFloat64(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt64(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addBigDecimal(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addString(name, value, k) = {
-                unchecked_cast(discard jbuilder.add(name#name, value) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addJsonValue(name, value, k) = {
                 let JsonValue.JsonValue(value1) = value;
-                unchecked_cast(discard jbuilder.add(name#name, value1) as _ \ r);
+                unsafe IO as r { discard jbuilder.add(name#name, value1) };
                 k()
             }
 
 
             def remove(name, k) = try {
-                unchecked_cast(discard jbuilder.remove(name#name) as _ \ r);
+                unsafe IO as r { discard jbuilder.remove(name#name) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -138,15 +138,15 @@ pub mod InteropJson.BuildJsonObject {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => {
                     let JsonValue.JsonValue(value1) = value;
-                    unchecked_cast(discard jbuilder.add(name#name, value1) as _ \ r);
+                    unsafe IO as r { discard jbuilder.add(name#name, value1) };
                     k()
                 }
             }
             
             def addAll(obj, k) = try {
                 let JsonObject.JsonObject(obj1) = obj;
-                let b1: JJsonObjectBuilder = unchecked_cast(JJson.createObjectBuilder(obj1) as _ \ r );
-                unchecked_cast(discard jbuilder.addAll(b1) as _ \ r);
+                let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder(obj1) };
+                unsafe IO as r { discard jbuilder.addAll(b1) };
                 k()
             } catch {
                 case ex: Exception => Err(ex.getMessage())
@@ -156,7 +156,7 @@ pub mod InteropJson.BuildJsonObject {
         match ans { 
             case Err(msg) => Err(msg)
             case Ok(ans1) => {
-                let jsobj: JJsonObject = unchecked_cast(jbuilder.build() as _ \ r);
+                let jsobj: JJsonObject = unsafe IO as r { jbuilder.build() };
                 Ok((JsonObject.JsonObject(jsobj), ans1))
             }
         }

@@ -64,9 +64,9 @@ pub mod InteropJson.JsonArray {
 
     pub def singletonHelper(_: Region[r], v: JsonValue): JsonArray \ r=
         let JsonValue.JsonValue(v1) = v;
-        let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
-        unchecked_cast(discard b1.add(v1) as _ \ r);
-        let ans: JJsonArray = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder() };
+        unsafe IO as r { discard b1.add(v1) };
+        let ans: JJsonArray = unsafe IO as r { b1.build() };
         JsonArray.JsonArray(ans)
 
 
@@ -78,9 +78,9 @@ pub mod InteropJson.JsonArray {
     def addHelper(_: Region[r], v: JsonValue, arr: JsonArray): JsonArray \ r =
         let JsonValue.JsonValue(v1) = v;
         let JsonArray.JsonArray(arr1) = arr;
-        let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder(arr1) as _ \ r);
-        unchecked_cast(discard b1.add(v1) as _ \ r);
-        let ans: JJsonArray = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder(arr1) };
+        unsafe IO as r { discard b1.add(v1) };
+        let ans: JJsonArray = unsafe IO as r { b1.build() };
         JsonArray.JsonArray(ans)
     
     pub def append(x: JsonArray, y: JsonArray): JsonArray = region rc {
@@ -91,10 +91,10 @@ pub mod InteropJson.JsonArray {
     def appendHelper(_: Region[r], x: JsonArray, y: JsonArray): JsonArray \ r =
         let JsonArray.JsonArray(x1) = x;
         let JsonArray.JsonArray(y1) = y;
-        let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder(x1) as _ \ r);
-        let b2: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder(y1) as _ \ r);
-        unchecked_cast(discard b1.addAll(b2) as _ \ r);
-        let ans: JJsonArray = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder(x1) };
+        let b2: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder(y1) };
+        unsafe IO as r { discard b1.addAll(b2) };
+        let ans: JJsonArray = unsafe IO as r { b1.build() };
         JsonArray.JsonArray(ans)
     
 
@@ -121,17 +121,17 @@ pub mod InteropJson.JsonArray {
     pub def mapHelper(_: Region[r], f: JsonValue -> JsonValue \ ef, arr: JsonArray): JsonArray \ ef + r = 
         let len = size(arr); 
         let JsonArray.JsonArray(arr1) = arr;
-        let builder: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
+        let builder: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder() };
         @Tailrec
         def loop(ix) = 
             if (ix < len) {
-                let jv: JJsonValue = unchecked_cast(arr1.get(ix) as _ \ r);
+                let jv: JJsonValue = unsafe IO as r { arr1.get(ix) };
                 let JsonValue.JsonValue(jv1) = f(JsonValue.JsonValue(jv));
-                unchecked_cast(discard builder.add(jv1) as _ \ r);
+                unsafe IO as r { discard builder.add(jv1) };
                 loop(ix + 1)
             } else ();
         loop(0);
-        let ans: JJsonArray = unchecked_cast(builder.build() as _ \ r);
+        let ans: JJsonArray = unsafe IO as r { builder.build() };
         JsonArray.JsonArray(ans)
     
     pub def filter(f: JsonValue -> Bool \ ef, arr: JsonArray): JsonArray \ ef = region rc {
@@ -142,18 +142,18 @@ pub mod InteropJson.JsonArray {
     pub def filterHelper(_: Region[r], f: JsonValue -> Bool \ ef, arr: JsonArray): JsonArray \ ef + r = 
         let len = size(arr); 
         let JsonArray.JsonArray(arr1) = arr;
-        let builder: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
+        let builder: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder() };
         @Tailrec
         def loop(ix) = 
             if (ix < len) {
-                let jv: JJsonValue = unchecked_cast(arr1.get(ix) as _ \ r);
+                let jv: JJsonValue = unsafe IO as r { arr1.get(ix) };
                 if (f(JsonValue.JsonValue(jv)))
-                    unchecked_cast(discard builder.add(jv) as _ \ r)
+                    unsafe IO as r { discard builder.add(jv) }
                 else ();
                 loop(ix + 1)
             } else ();
         loop(0);
-        let ans: JJsonArray = unchecked_cast(builder.build() as _ \ r);
+        let ans: JJsonArray = unsafe IO as r { builder.build() };
         JsonArray.JsonArray(ans)
 
 
@@ -297,9 +297,9 @@ pub mod InteropJson.JsonArray {
             let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 
             v1 
         }; 
-        let b1: JJsonArrayBuilder = unchecked_cast(JJson.createArrayBuilder() as _ \ r);
-        Foldable.forEach(v -> { let v1 = unwrap(v); unchecked_cast(discard b1.add(v1) as _ \ r) }, xs);
-        let ans: JJsonArray = unchecked_cast(b1.build() as _ \ r);
+        let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder() };
+        Foldable.forEach(v -> { let v1 = unwrap(v); unsafe IO as r { discard b1.add(v1) } }, xs);
+        let ans: JJsonArray = unsafe IO as r { b1.build() };
         JsonArray.JsonArray(ans)
 
 

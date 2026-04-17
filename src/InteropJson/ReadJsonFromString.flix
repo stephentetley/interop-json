@@ -36,10 +36,10 @@ mod InteropJson.ReadJsonFromString {
             f(x)
         } with handler ReadJsonFromString {
             def readJson(s, k) = try {
-                let ins: JStringReader = unchecked_cast(new JStringReader(s) as _ \ r);
-                let jsonreader: JJsonReader = unchecked_cast(JJson.createReader(ins) as _ \ r);
-                let value1: JJsonValue = unchecked_cast(jsonreader.readValue() as _ \ r);
-                unchecked_cast(jsonreader.close() as _ \ r);
+                let ins: JStringReader = unsafe IO as r { new JStringReader(s) };
+                let jsonreader: JJsonReader = unsafe IO as r { JJson.createReader(ins) };
+                let value1: JJsonValue = unsafe IO as r { jsonreader.readValue() };
+                unsafe IO as r { jsonreader.close() };
                 k(Ok(JsonValue.JsonValue(value1)))
             } catch {
                 case ex: Exception => k(Err(ex.getMessage()))
