@@ -65,7 +65,7 @@ pub mod InteropJson.JsonObject {
     }
 
 
-    def singletonHelper(_: Region[r], k: String, v: JsonValue): JsonObject \ r=
+    def singletonHelper(_: Region[r], k: String, v: JsonValue): JsonObject \ r =
         let JsonValue.JsonValue(v1) = v;
         let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
         unsafe IO as r { discard b1.add(k, v1) };
@@ -134,40 +134,32 @@ pub mod InteropJson.JsonObject {
 
 
 
-    pub def filter(f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef = region rc {
-        filterHelper(rc, f, obj)
-    }
-
-    pub def filterHelper(_: Region[r], f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef + r = 
-        let builder: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder() };
-        def fn(k: String, v: JsonValue): Unit \ r + ef = { 
+    pub def filter(f: JsonValue -> Bool \ ef, obj: JsonObject): JsonObject \ ef =
+        let builder: JJsonObjectBuilder = unsafe IO as ef { JJson.createObjectBuilder() };
+        def fn(k: String, v: JsonValue): Unit \ ef = { 
             if(f(v)) {
                 let JsonValue.JsonValue(jv) = v;
-                unsafe IO as r { discard builder.add(k, jv) }
+                unsafe IO as ef { discard builder.add(k, jv) }
             } else ()
         };
         forEach(fn, obj);
-        let ans = unsafe IO as r { builder.build() };
+        let ans = unsafe IO as ef { builder.build() };
         JsonObject.JsonObject(ans)
 
 
     pub def fold(f: (b, JsonValue) -> b \ ef, s: b, obj: JsonObject): b \ ef = region rc {
-        foldHelper(rc, f, s, obj)
-    }
-
-    pub def foldHelper(rc: Region[r], f: (b, JsonValue) -> b \ ef, s: b, obj: JsonObject): b \ ef + r = 
         let cell = Ref.fresh(rc, s);
-        def fn(_: String, v: JsonValue): Unit \ r + ef = { 
+        def fn(_: String, v: JsonValue): Unit \ rc + ef = { 
             let acc1 = f(Ref.get(cell), v);
             Ref.put(acc1, cell)
         };
         forEach(fn, obj);
         Ref.get(cell)
-    
+    }
 
 
     def makeBiConsumer(f: (t1, t2) -> Unit \ ef): JBiConsumer[t1, t2] = 
-        unsafe IO { 
+        unsafe IO as {} { 
             new JBiConsumer[t1, t2] {
                 def accept(_this: JBiConsumer[t1, t2], u: t1, v: t2): Unit \ ef = 
                     f(u, v)

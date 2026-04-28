@@ -25,7 +25,7 @@ pub mod InteropJson.BuildJsonObject {
     import jakarta.json.{Json => JJson}
     import jakarta.json.{JsonObjectBuilder => JJsonObjectBuilder}
     import jakarta.json.{JsonObject => JJsonObject}
-    import java.lang.{Exception}
+    import java.lang.{Exception => JException}
 
 
     ///
@@ -56,112 +56,107 @@ pub mod InteropJson.BuildJsonObject {
     // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
 
 
-    pub def handle(o: Option[JsonObject], f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject) = x -> 
-        region rc { 
-            let builder: JJsonObjectBuilder = match o {
-                case Some(o1) => { 
-                    let JsonObject.JsonObject(jo1) = o1;
-                    unsafe IO { JJson.createObjectBuilder(jo1) }
-                }
-                case None => unsafe IO { JJson.createObjectBuilder() }
-            };
-            handleHelper(rc, builder, f, x) 
-            
-        }
-
-
-    def handleHelper(_: Region[r], jbuilder: JJsonObjectBuilder, f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject + r) = x -> {        
+    pub def handle(o: Option[JsonObject], f: a -> b \ ef): a -> Result[String, (JsonObject, b)] \ (ef - BuildJsonObject) = x -> {
+        let jbuilder: JJsonObjectBuilder = match o {
+            case Some(o1) => { 
+                let JsonObject.JsonObject(jo1) = o1;
+                unsafe IO as {ef - BuildJsonObject} { JJson.createObjectBuilder(jo1) }
+            }
+            case None => unsafe IO as {ef - BuildJsonObject} { JJson.createObjectBuilder() }
+        };
         let ans = run {
             Ok(f(x))
         } with handler BuildJsonObject {
 
             def addNull(name, k) = {
-                unsafe IO as r { discard jbuilder.addNull(name#name) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.addNull(name#name) };
                 k()
             }
 
             def addBool(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt32(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt64(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addBigInt(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addFloat64(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addInt64(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addBigDecimal(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addString(name, value, k) = {
-                unsafe IO as r { discard jbuilder.add(name#name, value) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value) };
                 k()
             }
 
             def addJsonValue(name, value, k) = {
                 let JsonValue.JsonValue(value1) = value;
-                unsafe IO as r { discard jbuilder.add(name#name, value1) };
+                unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value1) };
                 k()
             }
 
 
-            def remove(name, k) = try {
-                unsafe IO as r { discard jbuilder.remove(name#name) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def remove(name, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonObject} { discard jbuilder.remove(name#name) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addNestedJsonValue(name, rvalue, k) = match rvalue {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => {
                     let JsonValue.JsonValue(value1) = value;
-                    unsafe IO as r { discard jbuilder.add(name#name, value1) };
+                    unsafe IO as {ef - BuildJsonObject} { discard jbuilder.add(name#name, value1) };
                     k()
                 }
             }
             
-            def addAll(obj, k) = try {
-                let JsonObject.JsonObject(obj1) = obj;
-                let b1: JJsonObjectBuilder = unsafe IO as r { JJson.createObjectBuilder(obj1) };
-                unsafe IO as r { discard jbuilder.addAll(b1) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addAll(obj, k) = 
+                try {
+                    let JsonObject.JsonObject(obj1) = obj;
+                    let b1: JJsonObjectBuilder = unsafe IO as {ef - BuildJsonObject} { JJson.createObjectBuilder(obj1) };
+                    unsafe IO as {ef - BuildJsonObject} { discard jbuilder.addAll(b1) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
         };
         match ans { 
             case Err(msg) => Err(msg)
             case Ok(ans1) => {
-                let jsobj: JJsonObject = unsafe IO as r { jbuilder.build() };
+                let jsobj: JJsonObject = unsafe IO as {ef - BuildJsonObject} { jbuilder.build() };
                 Ok((JsonObject.JsonObject(jsobj), ans1))
             }
         }
-
     }
+
 
     pub def runBuildJsonObject(o: Option[JsonObject], f: Unit -> a \ ef): Result[String, (JsonObject, a)] \ (ef - BuildJsonObject) =
         handle(o, f)()

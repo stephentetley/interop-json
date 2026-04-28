@@ -29,7 +29,7 @@ pub mod InteropJson.BuildJsonArray {
     import jakarta.json.{Json => JJson}
     import jakarta.json.{JsonArrayBuilder => JJsonArrayBuilder}
     import jakarta.json.{JsonArray => JJsonArray}
-    import java.lang.{Exception}
+    import java.lang.{Exception => JException}
 
 
     // `addAll` has different type to Java version but is equally
@@ -77,128 +77,132 @@ pub mod InteropJson.BuildJsonArray {
 
 
     // Can't have a default handler because we have extra input and output requirements
-
-    pub def handle(o: Option[JsonArray], f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray) = x -> 
-        region rc { 
-            let jbuilder: JJsonArrayBuilder = match  o {
-                case Some(a) => {
-                    let JsonArray.JsonArray(jarr)= a;
-                    unsafe IO { JJson.createArrayBuilder(jarr) }
-                }
-                case None => unsafe IO { JJson.createArrayBuilder() }
-            };
-            handleHelper(rc, jbuilder, f, x) 
-        }
-
-    def handleHelper(_: Region[r], jbuilder: JJsonArrayBuilder, f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray + r) = x -> {        
+    // TODO avoid return a Result with either Alt or Fail effects
+    pub def handle(o: Option[JsonArray], 
+                    f: a -> b \ ef): a -> Result[String, (JsonArray, b)] \ (ef - BuildJsonArray) = x -> {
+        let jbuilder: JJsonArrayBuilder = match  o {
+            case Some(a) => {
+                let JsonArray.JsonArray(jarr)= a;
+                unsafe IO { JJson.createArrayBuilder(jarr) }
+            }
+            case None => unsafe IO as {ef - BuildJsonArray} { JJson.createArrayBuilder() }
+        };
         let ans = run {
             Ok(f(x))
         } with handler BuildJsonArray {
 
             def addNull(k) = {
-                unsafe IO as r { discard jbuilder.addNull() };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.addNull() };
                 k()
             }
 
-            def addNullAt(ix, k) =  try {
-                unsafe IO as r { discard jbuilder.addNull(ix#index) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addNullAt(ix, k) =  
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.addNull(ix#index) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addBool(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addBoolAt(ix, value, k) =  try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addBoolAt(ix, value, k) =  
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addInt32(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addInt32At(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addInt32At(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addBigInt(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addBigIntAt(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addBigIntAt(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addFloat64(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addFloat64At(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addFloat64At(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addBigDecimal(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addBigDecimalAt(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addBigDecimalAt(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addString(value, k) = {
-                unsafe IO as r { discard jbuilder.add(value) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value) };
                 k()
             }
 
-            def addStringAt(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.add(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addStringAt(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
             def addJsonValue(value, k) = {
                 let JsonValue.JsonValue(value1) = value;
-                unsafe IO as r { discard jbuilder.add(value1) };
+                unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value1) };
                 k()
             }
 
-            def addJsonValueAt(ix, value, k) = try {
-                let JsonValue.JsonValue(value1) = value;
-                unsafe IO as r { discard jbuilder.add(ix#index, value1) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addJsonValueAt(ix, value, k) = 
+                try {
+                    let JsonValue.JsonValue(value1) = value;
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value1) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
 
             def addNestedJsonValue(rvalue, k) = match rvalue {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => {
                     let JsonValue.JsonValue(value1) = value;
-                    unsafe IO as r { discard jbuilder.add(value1) };
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(value1) };
                     k()
                 } 
             }
@@ -207,90 +211,100 @@ pub mod InteropJson.BuildJsonArray {
                 case Err(msg)   => Err(msg)
                 case Ok(value)  => try {
                     let JsonValue.JsonValue(value1) = value;
-                    unsafe IO as r { discard jbuilder.add(ix#index, value1) };
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.add(ix#index, value1) };
                     k()
                 } catch {
-                    case ex: Exception => Err(ex.getMessage())
+                    case ex: JException => Err(ex.getMessage())
                 }
             }
                         
-            def addAll(arr, k) = try {
-                let JsonArray.JsonArray(arr1) = arr;
-                let b1: JJsonArrayBuilder = unsafe IO as r { JJson.createArrayBuilder(arr1) };
-                unsafe IO as r { discard jbuilder.addAll(b1) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def addAll(arr, k) = 
+                try {
+                    let JsonArray.JsonArray(arr1) = arr;
+                    let b1: JJsonArrayBuilder = unsafe IO as {ef - BuildJsonArray} { JJson.createArrayBuilder(arr1) };
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.addAll(b1) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def remove(ix, k) = try {
-                unsafe IO as r { discard jbuilder.remove(ix#index) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def remove(ix, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.remove(ix#index) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setNull(ix, k) = try {
-                unsafe IO as r { discard jbuilder.setNull(ix#index) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setNull(ix, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.setNull(ix#index) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setBool(ix, value, k) =  try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setBool(ix, value, k) =  
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setInt32(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setInt32(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setBigInt(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setBigInt(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setFloat64(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setFloat64(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setBigDecimal(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setBigDecimal(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setString(ix, value, k) = try {
-                unsafe IO as r { discard jbuilder.set(ix#index, value) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setString(ix, value, k) = 
+                try {
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
 
-            def setJsonValue(ix, value, k) = try {
-                let JsonValue.JsonValue(value1) = value;
-                unsafe IO as r { discard jbuilder.set(ix#index, value1) };
-                k()
-            } catch {
-                case ex: Exception => Err(ex.getMessage())
-            }
+            def setJsonValue(ix, value, k) = 
+                try {
+                    let JsonValue.JsonValue(value1) = value;
+                    unsafe IO as {ef - BuildJsonArray} { discard jbuilder.set(ix#index, value1) };
+                    k()
+                } catch {
+                    case ex: JException => Err(ex.getMessage())
+                }
         };
         match ans { 
             case Err(msg) => Err(msg)
             case Ok(ans1) => {
-                let jsarr: JJsonArray = unsafe IO as r { jbuilder.build() };
+                let jsarr: JJsonArray = unsafe IO as {ef - BuildJsonArray} { jbuilder.build() };
                 Ok((JsonArray.JsonArray(jsarr), ans1))
             }
         }

@@ -33,16 +33,17 @@ mod InteropJson.WriteJson {
         run {
             f(x)
         } with handler WriteJson {
-            def writeJson(path, value, k) = try {
-                let outs: JFileOutputStream = new JFileOutputStream(path);
-                let jsonwriter: JJsonWriter = JJson.createWriter(outs);
-                let JsonValue.JsonValue(value1) = value;
-                jsonwriter.write(value1);
-                jsonwriter.close();
-                k(Ok())
-            } catch {
-                case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
-            }
+            def writeJson(path, value, k) = 
+                try {
+                    let outs: JFileOutputStream = new JFileOutputStream(path);
+                    let jsonwriter: JJsonWriter = JJson.createWriter(outs);
+                    let JsonValue.JsonValue(value1) = value;
+                    jsonwriter.write(value1);
+                    jsonwriter.close();
+                    k(Ok())
+                } catch {
+                    case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
+                }
         }
 
 

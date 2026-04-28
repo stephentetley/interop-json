@@ -34,15 +34,16 @@ mod InteropJson.ReadJson {
         run {
             f(x)
         } with handler ReadJson {
-            def readJson(path, k) = try {
-                let ins: JFileInputStream = new JFileInputStream(path);
-                let jsonreader: JJsonReader = JJson.createReader(ins);
-                let value1: JJsonValue = jsonreader.readValue();
-                jsonreader.close();
-                k(Ok(JsonValue.JsonValue(value1)))
-            } catch {
-                case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
-            }
+            def readJson(path, k) = 
+                try {
+                    let ins: JFileInputStream = new JFileInputStream(path);
+                    let jsonreader: JJsonReader = JJson.createReader(ins);
+                    let value1: JJsonValue = jsonreader.readValue();
+                    jsonreader.close();
+                    k(Ok(JsonValue.JsonValue(value1)))
+                } catch {
+                    case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
+                }
         }
 
 

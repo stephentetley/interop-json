@@ -27,25 +27,23 @@ mod InteropJson.ReadJsonFromString {
     import java.lang.Exception
 
 
-    pub def handle(f: a -> b \ ef): a -> b \ (ef - ReadJsonFromString) = x -> region rc {
-        handleHelper(rc, f, x)
-    }
-
-    def handleHelper(_: Region[r], f: a -> b \ ef): a -> b \ (ef - ReadJsonFromString) + r = x ->
+    pub def handle(f: a -> b \ ef): a -> b \ (ef - ReadJsonFromString) = x -> {
         run {
             f(x)
         } with handler ReadJsonFromString {
-            def readJson(s, k) = try {
-                let ins: JStringReader = unsafe IO as r { new JStringReader(s) };
-                let jsonreader: JJsonReader = unsafe IO as r { JJson.createReader(ins) };
-                let value1: JJsonValue = unsafe IO as r { jsonreader.readValue() };
-                unsafe IO as r { jsonreader.close() };
-                k(Ok(JsonValue.JsonValue(value1)))
-            } catch {
-                case ex: Exception => k(Err(ex.getMessage()))
-            }
+            def readJson(s, k) = 
+                try {
+                    let ins: JStringReader = unsafe IO as {ef - ReadJsonFromString} { new JStringReader(s) };
+                    let jsonreader: JJsonReader = unsafe IO as {ef - ReadJsonFromString} { JJson.createReader(ins) };
+                    let value1: JJsonValue = unsafe IO as {ef - ReadJsonFromString} { jsonreader.readValue() };
+                    unsafe IO as {ef - ReadJsonFromString} { jsonreader.close() };
+                    k(Ok(JsonValue.JsonValue(value1)))
+                } catch {
+                    case ex: Exception => k(Err(ex.getMessage()))
+                }
         }
-    
+    }
+
     pub def runReadJsonFromString(f: Unit -> a \ ef): a \ (ef - ReadJsonFromString) = handle(f)()
 
     
