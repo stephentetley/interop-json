@@ -37,7 +37,7 @@ pub mod Test01 {
             BuildJsonObject.addBigInt(name = "big", 1000ii);
             BuildJsonObject.addFloat64(name = "decimal", 1.0763f64);
             true
-        } with InteropJson.BuildJsonObject.evalBuildJsonObject(None);
+        } with InteropJson.BuildJsonObject.evalToJsonValue(None);
         println(obj);
         assertEq(expected = true, true)
 
@@ -46,13 +46,13 @@ pub mod Test01 {
         use InteropJson.BuildJsonObject.BuildJsonObject;
         let obj = run {
             BuildJsonObject.addString(name = "title", "hello world");
-            BuildJsonObject.addNestedJsonValue(name = "nesting", run {
+            BuildJsonObject.addJsonValue(name = "nesting", run {
                 BuildJsonObject.addString(name = "location", "uk");
                 BuildJsonObject.addInt32(name = "year", 2026);
                 ()
             } with InteropJson.BuildJsonObject.evalBuildJsonValue(None));
             ()
-        } with InteropJson.BuildJsonObject.evalBuildJsonObject(None);
+        } with InteropJson.BuildJsonObject.evalToJsonValue(None);
         println(obj);
         assertEq(expected = true, true)
 

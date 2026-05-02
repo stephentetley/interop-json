@@ -1,5 +1,6 @@
 ### v0.9.0
-   Updated to use "unsafe IO as r" syntax.
+   Updated to use "unsafe IO as .." syntax.
+   Added dependency on `EffectExtras` and used `Fail` effect.
 
 ### v0.8.0 
    Added `JsonNumber` module.
