@@ -284,14 +284,14 @@ pub mod InteropJson.JsonArray {
         loop(0, true)
 
 
-    pub def fromList(t: List[v]): JsonArray with ToJsonValue[v] = region rc {
-        fromFoldableHelper(rc, t)
-    }
+    pub def fromList(t: List[v]): JsonArray with ToJsonValue[v] = 
+        fromFoldable(t)
     
     pub def fromFoldable(t: t[v]): JsonArray \ Foldable.Aef[t] with Foldable[t], ToJsonValue[v]  = region rc {
         fromFoldableHelper(rc, t)
     }
 
+    // Needs a region because of `discard` otherwise it gets eliminated as a no-op
     def fromFoldableHelper(_: Region[r], xs: t[v]): JsonArray \ r + Foldable.Aef[t] with Foldable[t], ToJsonValue[v]=
         def unwrap(v) = { 
             let JsonValue.JsonValue(v1) = ToJsonValue.toJsonValue(v); 

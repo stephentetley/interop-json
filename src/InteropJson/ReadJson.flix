@@ -19,6 +19,8 @@ mod InteropJson.ReadJson {
 
     use IoError.ErrorKind
     use IoError.IoError
+
+    use EffectExtras.Fail.Fail
     use InteropJson.JsonValue
 
 
@@ -29,12 +31,12 @@ mod InteropJson.ReadJson {
     import java.lang.Exception
 
     pub eff ReadJson {
-        def readJson(path: String): Result[IoError, JsonValue]
+        def readJson(path: String): JsonValue
     }
 
 
 
-    pub def handle(f: a -> b \ ef): a -> b \ (ef - ReadJson) + IO = x ->
+    pub def handle(f: a -> b \ ef): a -> b \ (ef + Fail - ReadJson) + IO = x ->
         run {
             f(x)
         } with handler ReadJson {
@@ -44,14 +46,17 @@ mod InteropJson.ReadJson {
                     let jsonreader: JJsonReader = JJson.createReader(ins);
                     let value1: JJsonValue = jsonreader.readValue();
                     jsonreader.close();
-                    k(Ok(JsonValue.JsonValue(value1)))
+                    k(JsonValue.JsonValue(value1))
                 } catch {
-                    case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
+                    case ex: Exception => Fail.report(ex.getMessage())
                 }
         }
 
 
 
-    pub def runWithIO(f: Unit -> a \ ef): a \ (ef - ReadJson) + IO = handle(f)()
+    pub def runWithIO(f: Unit -> a \ ef): Result[IoError, a] \ (ef - Fail - ReadJson) + IO = 
+        run { 
+            handle(f)()
+        } with EffectExtras.Fail.runWithResultOfIoError
 
 }

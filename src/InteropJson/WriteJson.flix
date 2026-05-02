@@ -19,6 +19,8 @@ mod InteropJson.WriteJson {
 
     use IoError.ErrorKind
     use IoError.IoError
+
+    use EffectExtras.Fail.Fail
     use InteropJson.JsonValue
 
 
@@ -28,10 +30,10 @@ mod InteropJson.WriteJson {
     import java.lang.Exception
 
     pub eff WriteJson {
-        def writeJson(path: String, value: JsonValue): Result[IoError, Unit]
+        def writeJson(path: String, value: JsonValue): Unit
     }
 
-    pub def handle(f: a -> b \ ef): a -> b \ (ef - WriteJson) + IO = x ->
+    pub def handle(f: a -> b \ ef): a -> b \ (ef + Fail - WriteJson) + IO = x ->
         run {
             f(x)
         } with handler WriteJson {
@@ -42,14 +44,15 @@ mod InteropJson.WriteJson {
                     let JsonValue.JsonValue(value1) = value;
                     jsonwriter.write(value1);
                     jsonwriter.close();
-                    k(Ok())
+                    k()
                 } catch {
-                    case ex: Exception => k(Err(IoError(ErrorKind.Other, ex.getMessage())))
+                    case ex: Exception => Fail.report(ex.getMessage())
                 }
         }
 
 
 
-    pub def runWithIO(f: Unit -> a \ ef): a \ (ef - WriteJson) + IO = handle(f)()
+    pub def runWithIO(f: Unit -> a \ ef): Result[IoError, a] \ (ef - Fail - WriteJson) + IO = 
+        run { handle(f)() } with EffectExtras.Fail.runWithResultOfIoError
 
 }
