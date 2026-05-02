@@ -294,19 +294,19 @@ pub mod InteropJson.JsonValue {
 
 
     pub def readJsonString(s: String): Result[String, JsonValue] = 
-        use InteropJson.ReadJsonFromString;
+        use InteropJson.ReadJsonFromString.ReadJsonFromString;
         run {
             ReadJsonFromString.readJson(s) 
         } with InteropJson.ReadJsonFromString.runReadJsonFromString
 
     pub def readJsonFile(path: String): Result[IoError, JsonValue] \ IO = 
-        use InteropJson.ReadJson;
+        use InteropJson.ReadJson.ReadJson;
         run {
             ReadJson.readJson(path) 
         } with InteropJson.ReadJson.runWithIO
 
     pub def writeJsonFile(path: String, value: JsonValue): Result[IoError, Unit] \ IO = 
-        use InteropJson.WriteJson;
+        use InteropJson.WriteJson.WriteJson;
         run {
             WriteJson.writeJson(path, value) 
         } with InteropJson.WriteJson.runWithIO

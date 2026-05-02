@@ -60,7 +60,7 @@ pub mod Test01 {
 
     @Test
     def test04(): Unit \ { Assert, IO } = 
-        use InteropJson.ReadJsonFromString; 
+        use InteropJson.ReadJsonFromString.ReadJsonFromString; 
         let rvalue = run {
             ReadJsonFromString.readJson("[1, \"hello\"]") 
         } with InteropJson.ReadJsonFromString.runReadJsonFromString;

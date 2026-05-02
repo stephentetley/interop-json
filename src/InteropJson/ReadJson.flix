@@ -28,6 +28,10 @@ mod InteropJson.ReadJson {
     import java.io.{FileInputStream => JFileInputStream}
     import java.lang.Exception
 
+    pub eff ReadJson {
+        def readJson(path: String): Result[IoError, JsonValue]
+    }
+
 
 
     pub def handle(f: a -> b \ ef): a -> b \ (ef - ReadJson) + IO = x ->
@@ -47,7 +51,7 @@ mod InteropJson.ReadJson {
         }
 
 
-    @DefaultHandler
+
     pub def runWithIO(f: Unit -> a \ ef): a \ (ef - ReadJson) + IO = handle(f)()
 
 }

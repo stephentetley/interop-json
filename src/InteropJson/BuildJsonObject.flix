@@ -53,9 +53,6 @@ pub mod InteropJson.BuildJsonObject {
 
 
 
-    // Can't have a default handler because we have extra input and output requirements
-    // Use a region to stop the Flix compiler eliminating Java calls that are called for their side effect
-
 
     pub def handle(o: Option[JsonObject], f: a -> b \ ef): a -> (JsonObject, b) \ (ef + Fail  - BuildJsonObject) = x -> {
         let jbuilder: JJsonObjectBuilder = match o {

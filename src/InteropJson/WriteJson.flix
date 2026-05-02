@@ -27,7 +27,9 @@ mod InteropJson.WriteJson {
     import java.io.{FileOutputStream => JFileOutputStream}
     import java.lang.Exception
 
-
+    pub eff WriteJson {
+        def writeJson(path: String, value: JsonValue): Result[IoError, Unit]
+    }
 
     pub def handle(f: a -> b \ ef): a -> b \ (ef - WriteJson) + IO = x ->
         run {
@@ -47,7 +49,7 @@ mod InteropJson.WriteJson {
         }
 
 
-    @DefaultHandler
+
     pub def runWithIO(f: Unit -> a \ ef): a \ (ef - WriteJson) + IO = handle(f)()
 
 }

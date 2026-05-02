@@ -76,8 +76,7 @@ pub mod InteropJson.BuildJsonArray {
         BuildJsonArray.addJsonValueAt(index, ToJsonValue.toJsonValue(value))
 
 
-    // Can't have a default handler because we have extra input and output requirements
-    // TODO avoid return a Result with either Alt or Fail effects
+
     pub def handle(o: Option[JsonArray], 
                     f: a -> b \ ef): a -> (JsonArray, b) \ (ef + Fail - BuildJsonArray) = x -> {
         let jbuilder: JJsonArrayBuilder = match  o {

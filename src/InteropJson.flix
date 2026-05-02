@@ -278,16 +278,9 @@ pub mod InteropJson {
             InteropJson.JsonValue.getJsonNumber(x)
     }
 
-    pub eff ReadJson {
-        def readJson(path: String): Result[IoError, JsonValue]
-    }
 
-    pub eff WriteJson {
-        def writeJson(path: String, value: JsonValue): Result[IoError, Unit]
-    }
 
-    pub eff ReadJsonFromString {
-        def readJson(s: String): Result[String, JsonValue]
-    }
+
+
 
 }

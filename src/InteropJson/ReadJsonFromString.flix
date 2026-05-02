@@ -25,7 +25,10 @@ mod InteropJson.ReadJsonFromString {
     import jakarta.json.{JsonValue => JJsonValue}
     import java.io.{StringReader => JStringReader}
     import java.lang.Exception
-
+    
+    pub eff ReadJsonFromString {
+        def readJson(s: String): Result[String, JsonValue]
+    }
 
     pub def handle(f: a -> b \ ef): a -> b \ (ef - ReadJsonFromString) = x -> {
         run {
